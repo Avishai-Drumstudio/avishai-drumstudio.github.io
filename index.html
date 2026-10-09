@@ -1002,10 +1002,25 @@ window.mergeContent = function (saved) {
     // hero background: poster + video (YouTube or mp4)
     const img = $("#heroImg"); if(real(S.heroImage)) img.src = S.heroImage;
     const bg = String(S.bgVideo||"").trim();
-    if(!reduce && real(bg) && !/claude/i.test(location.hostname)){
-      if(/\.(mp4|webm)(\?|$)/i.test(bg)){
-        $("#heroMedia").insertAdjacentHTML("beforeend", `<video class="hero__mp4" src="${esc(bg)}"${real(S.heroImage) ? ` poster="${esc(S.heroImage)}"` : ""} autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>`);
-      } else if(ytId(bg)){
+    if(real(bg) && /\.(mp4|webm)(\?|$)/i.test(bg) && !/claude/i.test(location.hostname)){
+      // silent studio clip: built by hand so iPhone treats it as muted and lets it play inline
+      const v = document.createElement("video");
+      v.className = "hero__mp4";
+      v.muted = true; v.defaultMuted = true; v.setAttribute("muted", "");
+      v.playsInline = true; v.setAttribute("playsinline", ""); v.setAttribute("webkit-playsinline", "");
+      v.loop = true; v.autoplay = true; v.setAttribute("autoplay", ""); v.preload = "auto";
+      v.setAttribute("disablepictureinpicture", ""); v.setAttribute("aria-hidden", "true");
+      if(real(S.heroImage)) v.poster = S.heroImage;
+      v.src = bg;
+      $("#heroMedia").appendChild(v);
+      const tryPlay = () => { v.muted = true; const p = v.play(); if(p && p.catch) p.catch(() => {}); };
+      tryPlay(); v.addEventListener("canplay", tryPlay, {once:true});
+      // phones in battery-saving mode block autoplay until the first touch or scroll
+      const kick = () => { tryPlay(); if(!v.paused) ["touchstart","pointerdown","scroll"].forEach(ev => removeEventListener(ev, kick)); };
+      ["touchstart","pointerdown","scroll"].forEach(ev => addEventListener(ev, kick, {passive:true}));
+      document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") tryPlay(); });
+    } else if(!reduce && real(bg) && !/claude/i.test(location.hostname)){
+      if(ytId(bg)){
         const id = ytId(bg);
         $("#heroMedia").insertAdjacentHTML("beforeend", `<iframe class="hero__yt" id="heroYt" tabindex="-1" aria-hidden="true" title="" src="${embedUrl(id, `&mute=1&loop=1&playlist=${id}&controls=0&disablekb=1&iv_load_policy=3&fs=0`)}" allow="autoplay; encrypted-media"></iframe>`);
         setTimeout(() => $("#heroYt")?.classList.add("is-on"), 2200); // hide YouTube's first-second UI

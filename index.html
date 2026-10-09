@@ -911,7 +911,7 @@ window.mergeContent = function (saved) {
     const m = s.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/);
     return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(s) ? s : "");
   };
-  const embedUrl = (id, extra="") => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}${extra}`;
+  const embedUrl = (id, extra="") => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1${extra}`;
   const thumbFix = "if(this.naturalWidth<=120){this.remove()}";
 
   /* ---------------- load content (saved in the admin panel) ---------------- */
@@ -1280,12 +1280,12 @@ window.mergeContent = function (saved) {
   document.addEventListener("click", e => {
     const b = e.target.closest(".video button"); if(!b) return;
     pauseAudio(); const box = b.parentElement;
-    box.innerHTML = `<iframe src="${embedUrl(box.dataset.id)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    box.innerHTML = `<iframe src="${embedUrl(box.dataset.id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   });
   let lenis = null, lastFocus = null;
   function openModal(id){
     if(!id) return; pauseAudio(); lastFocus = document.activeElement;
-    $("#modalBox").innerHTML = `<iframe src="${embedUrl(id)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    $("#modalBox").innerHTML = `<iframe src="${embedUrl(id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
     $("#modalYt").href = `https://www.youtube.com/watch?v=${id}`;
     $("#modal").hidden = false; lenis && lenis.stop(); document.documentElement.style.overflow = "hidden"; $("#modalClose").focus();
   }

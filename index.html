@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>אבישי ישר | אולפן תופים – Live &amp; Studio Drums</title>
+<meta name="description" content="אבישי ישר – מתופף סשן. הקלטות תופים מרחוק, ערוצים ברמת Mix Ready.">
+<meta name="theme-color" content="#0F1716">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="he_IL">
+<meta property="og:title" content="אבישי ישר - מתופף">
+<meta property="og:description" content="הקלטות תופים מרחוק, ערוצים ברמת Mix Ready.">
+<meta property="og:image" content="https://media.base44.com/images/public/6a196c87afba7d8040ba859c/a8063eaf7_IMG_1551.PNG/v1/fill/w_1200,h_630/a8063eaf7_IMG_1551.PNG">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%232ED3C3'/><text x='32' y='42' font-family='Arial' font-weight='900' font-size='28' text-anchor='middle' fill='%230F1716'>AY</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://docs.google.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* Layout: full-bleed video hero that shrinks into a card on scroll; every section below is one centered column */
+:root{
+  --bg:#0F1716;
+  --surface:#16211F;
+  --surface-2:#1E2B28;
+  --line:rgba(225,214,190,.10);
+  --text:#EDE4D3;
+  --muted:#A39E90;
+  --lime:#2ED3C3;
+  --tq-grad:linear-gradient(180deg,#7BF3E6 0%,#2ED3C3 48%,#13A797 100%);
+  --gloss:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -3px 8px rgba(0,60,55,.25),0 10px 28px -10px rgba(46,211,195,.75);
+  --sand:#E3D3B6;
+  --lime-soft:rgba(46,211,195,.13);
+  --on-lime:#0C1A18;
+  --wa:#25D366;
+  --font:"Heebo","Assistant",Arial,sans-serif;
+  --wrap:1120px;
+  --gutter:clamp(18px,5vw,40px);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+h1,h2,h3{text-wrap:balance}
+:focus-visible{outline:2px solid var(--lime);outline-offset:3px;border-radius:10px}
+[hidden]{display:none!important}
+.wrap{max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gutter)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* grain over everything – very subtle */
+body::after{content:"";position:fixed;inset:-50%;z-index:90;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------- intro curtain ---------- */
+.intro{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;animation:introFail .5s 9s forwards}
+@keyframes introFail{to{opacity:0;visibility:hidden;pointer-events:none}}
+.intro__logo{width:84px;height:84px;border-radius:22px;background:var(--tq-grad);box-shadow:var(--gloss);color:var(--on-lime);display:grid;place-items:center;font-weight:900;font-size:32px;direction:ltr;animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(.92)}}
+
+/* ---------- progress line ---------- */
+.progress{position:fixed;top:0;inset-inline:0;height:2px;z-index:60;background:var(--lime);transform-origin:right;transform:scaleX(0)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 26px;border-radius:14px;font-weight:700;font-size:16px;transition:background .2s,color .2s,border-color .2s,transform .2s var(--ease)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.98)}
+.btn--lime{background:var(--tq-grad);color:var(--on-lime);box-shadow:var(--gloss)}
+.btn--lime:hover{filter:brightness(1.08)}
+.btn--ghost{border:1.5px solid rgba(237,228,211,.35);color:var(--text);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.btn--ghost:hover{border-color:var(--lime);color:var(--lime)}
+.btn--line{border:1.5px solid var(--lime);color:var(--lime)}
+.btn--line:hover{background:var(--lime-soft)}
+.btn svg{width:20px;height:20px;flex:none;fill:currentColor}
+
+/* ---------- header ---------- */
+.top{position:fixed;inset-inline:0;top:0;z-index:50;padding-top:env(safe-area-inset-top,0px);transition:background .3s,border-color .3s,transform .4s var(--ease);border-bottom:1px solid transparent}
+.top.is-solid{background:rgba(15,23,22,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:var(--line)}
+.top.is-away{transform:translateY(-110%)}
+.top__in{display:flex;align-items:center;justify-content:space-between;height:70px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:12px;background:var(--tq-grad);box-shadow:var(--gloss);color:var(--on-lime);display:grid;place-items:center;font-weight:900;font-size:17px;direction:ltr}
+.brand__txt{display:grid;line-height:1.15}
+.brand__txt b{font-weight:800;font-size:16px}
+.brand__txt small{font-size:12px;color:var(--muted);direction:ltr;text-align:right}
+.top .btn{min-height:42px;padding:0 16px;font-size:15px;border-radius:12px}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;height:100svh;min-height:560px;isolation:isolate}
+.hero__bg{position:absolute;inset:0;overflow:hidden;background:radial-gradient(60% 50% at 70% 20%,rgba(46,211,195,.16),transparent 70%),radial-gradient(50% 40% at 20% 80%,rgba(46,211,195,.08),transparent 70%),#0B1210;clip-path:inset(0% 0% 0% 0% round 0px);will-change:clip-path}
+.hero__media{position:absolute;inset:0;will-change:transform}
+.hero__poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;animation:kb 26s ease-in-out infinite alternate}
+@keyframes kb{from{transform:scale(1.04)}to{transform:scale(1.16) translateY(-1.5%)}}
+.fog{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.fog i{position:absolute;inset:-10% 0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='600'%3E%3Cfilter id='f' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0045 .009' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .93 0 0 0 0 .92 0 0 0 0 .88 0 0 0 1.6 -.62'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");background-size:1200px 100%;background-repeat:repeat-x;opacity:.42;animation:fog 70s linear infinite;will-change:background-position}
+.fog i:nth-child(2){opacity:.26;background-size:1600px 120%;animation-duration:110s;animation-direction:reverse;top:20%}
+.fog i:nth-child(3){opacity:.18;background-size:900px 80%;animation-duration:45s;top:45%;filter:blur(2px)}
+@keyframes fog{from{background-position:0 0}to{background-position:-1200px 0}}
+.hero__yt{position:absolute;top:50%;left:50%;width:100vw;height:56.25vw;min-height:100svh;min-width:177.78svh;transform:translate(-50%,-50%);border:0;pointer-events:none;opacity:0;transition:opacity 1.2s}
+.hero__yt.is-on{opacity:1}
+.hero__mp4{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero__bg::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(to top,var(--bg) 0%,rgba(15,23,22,.55) 38%,rgba(15,23,22,.35) 70%,rgba(15,23,22,.7) 100%),
+  radial-gradient(70% 60% at 50% 45%,transparent,rgba(15,23,22,.5))}
+.hero__fx{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.hero__content{position:relative;z-index:2;height:100%;display:grid;align-content:center;justify-items:center;text-align:center;gap:18px;padding-top:70px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--sand);font-size:14px;font-weight:500}
+.eyebrow::before,.eyebrow::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--lime)}
+.hero h1{font-weight:900;font-size:clamp(2.6rem,10vw,5.6rem);line-height:1.02;letter-spacing:-.02em;max-width:14ch}
+@media (min-width:760px){.hero h1{max-width:22ch;font-size:clamp(3rem,6vw,4.8rem)}}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.wi{display:inline-block}
+.hero__sub{color:#D3DBD5;max-width:42ch;font-size:clamp(1rem,3.8vw,1.18rem)}
+.hero__cta{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:8px}
+@media (max-width:480px){.hero__cta{width:100%}.hero__cta .btn{flex:1 1 100%}}
+.scrollcue{position:absolute;bottom:calc(22px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:2;display:grid;justify-items:center;gap:8px;font-size:12px;color:var(--muted);letter-spacing:.08em}
+.scrollcue i{width:1.5px;height:44px;background:rgba(237,228,211,.18);position:relative;overflow:hidden;border-radius:2px}
+.scrollcue i::after{content:"";position:absolute;inset:0;background:var(--lime);animation:drip 1.8s var(--ease) infinite}
+@keyframes drip{0%{transform:translateY(-100%)}60%,100%{transform:translateY(100%)}}
+
+/* ---------- reel (sideways video carousel) ---------- */
+.reel{padding-block:clamp(28px,5vw,56px) clamp(8px,2vw,20px);position:relative}
+.reel .head{margin-bottom:8px}
+.reel__track{--cw:min(66vw,360px);display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-inline:calc(50% - var(--cw)/2);padding-block:26px 30px;perspective:1200px;cursor:grab;-webkit-overflow-scrolling:touch}
+.reel__track::-webkit-scrollbar{display:none}
+.reel__track.is-drag{scroll-snap-type:none;cursor:grabbing}
+.reel__item{flex:0 0 var(--cw);scroll-snap-align:center;aspect-ratio:4/5;border-radius:26px;overflow:hidden;position:relative;border:1px solid var(--line);
+  background:radial-gradient(120% 80% at 80% 0%,rgba(46,211,195,.22),transparent 60%),linear-gradient(160deg,#1E2B28,#0F1716);
+  text-align:right;will-change:transform,opacity;transition:border-color .35s,box-shadow .35s}
+.reel__item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.reel__item::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,16,15,.92) 0%,rgba(10,16,15,.25) 50%,rgba(10,16,15,.1) 100%)}
+.reel__fb{position:absolute;inset:auto 0 50% 0;padding:0 22px;font-weight:900;font-size:clamp(1.6rem,7vw,2.3rem);line-height:1.05;color:rgba(237,228,211,.14)}
+.reel__info{position:absolute;inset:auto 0 0 0;z-index:2;padding:20px;display:grid;gap:6px}
+.reel__info b{font-weight:800;font-size:1.12rem;line-height:1.3}
+.reel__info small{color:var(--lime);font-size:13px;font-weight:500;opacity:0;transition:opacity .3s}
+.reel__play{position:absolute;top:50%;left:50%;z-index:2;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;background:var(--tq-grad);display:grid;place-items:center;transform:scale(.6);opacity:0;transition:transform .35s var(--ease),opacity .35s;box-shadow:0 0 0 12px rgba(46,211,195,.16)}
+.reel__play svg{width:24px;height:24px;fill:var(--on-lime);margin-left:4px}
+.reel__item.is-active{border-color:rgba(46,211,195,.6);box-shadow:0 30px 70px -25px rgba(46,211,195,.45)}
+.reel__item.is-active .reel__play{transform:scale(1);opacity:1}
+.reel__item.is-active .reel__info small{opacity:1}
+.reel__nav{display:flex;align-items:center;justify-content:center;gap:14px}
+.reel__dots{display:flex;gap:6px}
+.reel__dots i{width:6px;height:6px;border-radius:6px;background:rgba(237,228,211,.2);transition:width .35s var(--ease),background .35s}
+.reel__dots i.on{width:22px;background:var(--lime)}
+.reel__arrow{width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center}
+.reel__arrow svg{width:18px;height:18px}
+.reel__arrow:hover{border-color:var(--lime);color:var(--lime)}
+
+/* fallback behind thumbnails that can't load */
+.video__fb{position:absolute;inset:0;display:grid;place-items:end start;padding:16px;font-weight:900;font-size:1.4rem;line-height:1.1;color:rgba(237,228,211,.12);background:radial-gradient(100% 90% at 85% 0%,rgba(46,211,195,.16),transparent 60%),linear-gradient(160deg,#1E2B28,#0F1716)}
+.video img{position:relative}
+
+/* ---------- about ---------- */
+#about{overflow-x:clip}
+.about{display:grid;gap:30px;align-items:center}
+@media (min-width:880px){.about{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:64px}}
+.about__media{position:relative;margin:0;isolation:isolate;width:min(100%,440px);aspect-ratio:1;justify-self:center}
+.about__hoop{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;will-change:transform}
+.about__disc{position:absolute;inset:7%;border-radius:50%;overflow:hidden;background:radial-gradient(100% 80% at 70% 10%,rgba(46,211,195,.25),transparent 60%),linear-gradient(160deg,#1E2B28,#0F1716);box-shadow:0 30px 80px -30px rgba(46,211,195,.6),inset 0 0 0 1px rgba(227,211,182,.12)}
+.about__disc img{position:absolute;inset:-8% 0;width:100%;height:116%;object-fit:cover;will-change:transform}
+.about__disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 40%,transparent 55%,rgba(15,23,22,.55));}
+.about__media::before{content:"";position:absolute;inset:-10%;border-radius:50%;background:radial-gradient(circle,rgba(46,211,195,.22),transparent 65%);z-index:-1;filter:blur(8px)}
+.about__badge{position:absolute;width:30%;bottom:2%;inset-inline-start:2%;z-index:3;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5))}
+.about__badge-spin{transform-origin:60px 60px;animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.about__text{display:grid;gap:16px;justify-items:start}
+.about__text h2{font-weight:900;font-size:clamp(2.3rem,8vw,3.8rem);line-height:1.04;letter-spacing:-.01em}
+.about__body{display:grid;gap:12px}
+.about__body p{color:#D5CDBE;max-width:52ch}
+.about__body p:first-child{font-size:1.14rem;color:var(--text);font-weight:500}
+
+/* ---------- marquee ---------- */
+.marquee{padding-block:clamp(40px,7vw,80px);overflow:hidden;display:grid;gap:6px;border-block:1px solid var(--line)}
+.marquee{direction:ltr}
+.marquee__row{display:flex;width:max-content;white-space:nowrap;direction:ltr;font-weight:900;font-size:clamp(2.4rem,9vw,6.5rem);line-height:1.05;letter-spacing:-.02em;will-change:transform}
+.marquee__row span{padding-inline:.35em;display:inline-flex;align-items:center;gap:.7em}
+.marquee__row span::after{content:"";width:.22em;height:.22em;border-radius:50%;background:var(--lime);flex:none}
+.marquee__row--out{color:transparent;-webkit-text-stroke:1.5px rgba(237,228,211,.35)}
+.marquee__row--out span::after{background:transparent;border:1.5px solid rgba(46,211,195,.6)}
+
+/* ---------- facts ---------- */
+.facts{display:grid;gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 16px;text-align:center;display:grid;gap:6px;align-content:start}
+.fact b{color:var(--sand);font-weight:800;font-size:clamp(1.1rem,4.4vw,1.6rem);line-height:1.2;direction:ltr}
+.fact small{color:var(--muted);font-size:14px;line-height:1.45}
+@media (max-width:560px){.facts{grid-template-columns:1fr;gap:8px}.fact{grid-template-columns:auto 1fr;align-items:center;gap:14px;text-align:right;padding:16px 18px}.fact b{min-width:96px}}
+.trust{margin-top:18px;text-align:center;color:var(--muted);font-size:15px}
+
+/* ---------- section heads ---------- */
+.section{padding-block:clamp(40px,6vw,68px);position:relative}
+.marquee{margin-block:clamp(24px,4vw,48px)}
+.head{text-align:center;display:grid;justify-items:center;gap:12px;margin-bottom:clamp(30px,5vw,52px)}
+.head h2{font-weight:800;font-size:clamp(2rem,7vw,3.2rem);line-height:1.12;max-width:18ch}
+.head p{color:var(--muted);max-width:46ch;font-size:16px}
+.rule{width:min(220px,50%);height:1.5px;background:var(--line);position:relative;overflow:hidden}
+.rule i{position:absolute;inset:0;background:var(--lime);transform-origin:center;transform:scaleX(0)}
+
+/* ---------- process ---------- */
+.rings{position:absolute;width:min(760px,130vw);aspect-ratio:1;max-width:none;top:50%;left:50%;translate:-50% -50%;z-index:-1;opacity:.5;pointer-events:none}
+.steps{list-style:none;display:grid;gap:16px;position:relative;max-width:660px;margin-inline:auto;padding-inline-start:62px}
+.steps__track,.steps__fill{position:absolute;top:22px;bottom:22px;inset-inline-start:21px;width:2px;border-radius:2px}
+.steps__track{background:var(--line)}
+.steps__fill{background:var(--lime);transform-origin:top;transform:scaleY(0);box-shadow:0 0 18px rgba(46,211,195,.5)}
+.step{position:relative;background:rgba(22,28,25,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:20px;padding:20px 22px;transition:border-color .5s}
+.step__icon{position:absolute;inset-inline-start:-62px;top:16px;width:44px;height:44px;border-radius:50%;background:var(--bg);border:2px solid var(--surface-2);display:grid;place-items:center;color:var(--muted);transition:border-color .5s,color .5s,background .5s,box-shadow .5s}
+.step__icon svg{width:20px;height:20px}
+.step.is-on{border-color:rgba(46,211,195,.25)}
+.step.is-on .step__icon{border-color:var(--lime);color:var(--on-lime);background:var(--lime);box-shadow:0 0 0 6px rgba(46,211,195,.15)}
+.step__n{display:inline-block;font-size:12.5px;font-weight:500;color:var(--muted);background:var(--surface-2);border-radius:8px;padding:1px 10px;margin-bottom:8px}
+.step h3{font-weight:800;font-size:1.25rem;line-height:1.3}
+.step p{color:var(--muted);font-size:15.5px;margin-top:4px}
+
+/* ---------- video cards ---------- */
+.grid{display:grid;gap:20px}
+@media (min-width:680px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .3s,transform .4s var(--ease)}
+.card:hover{border-color:rgba(46,211,195,.3)}
+.video{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--surface-2);overflow:hidden}
+.video img{width:100%;height:100%;object-fit:cover;will-change:transform}
+.video button{position:absolute;inset:0;width:100%;display:grid;place-items:center;background:linear-gradient(to top,rgba(15,23,22,.45),transparent 55%)}
+.play{width:64px;height:64px;border-radius:50%;background:var(--tq-grad);box-shadow:var(--gloss);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.45);transition:transform .3s var(--ease)}
+.video button:hover .play{transform:scale(1.1)}
+.play svg{width:22px;height:22px;fill:var(--on-lime);margin-left:4px}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.card__body{padding:16px 18px 18px;display:grid;gap:10px}
+.card__title{font-weight:700;font-size:16.5px;line-height:1.45}
+.card__link{display:inline-flex;align-items:center;gap:6px;color:var(--lime);font-size:14.5px;font-weight:500;justify-self:start}
+.card__link svg{width:15px;height:15px}
+.more{display:flex;justify-content:center;margin-top:28px}
+
+/* ---------- sources ---------- */
+.tracks{display:grid;gap:16px}
+@media (min-width:820px){.tracks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.track{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px;display:grid;gap:16px}
+.track__top{display:flex;align-items:center;gap:14px}
+.track__btn{width:56px;height:56px;border-radius:50%;flex:none;background:var(--tq-grad);box-shadow:var(--gloss);display:grid;place-items:center;transition:transform .2s}
+.track__btn:active{transform:scale(.94)}
+.track__btn svg{width:20px;height:20px;fill:var(--on-lime)}
+.track__btn .i-pause{display:none}
+.track.is-playing .i-play{display:none}
+.track.is-playing .i-pause{display:block}
+.track__name{font-weight:800;font-size:1.3rem;flex:1;min-width:0}
+.track__time{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;direction:ltr;flex:none}
+.wave{display:flex;align-items:center;gap:3px;height:56px;direction:ltr;cursor:pointer;border-radius:8px}
+.wave i{flex:1;min-width:2px;border-radius:3px;background:rgba(237,228,211,.16);transition:background .2s}
+.wave i.on{background:var(--lime)}
+.track.is-playing .wave i.on:last-of-type{box-shadow:0 0 12px var(--lime)}
+.track .btn{min-height:48px;font-size:15px;font-weight:500}
+.mixer{display:grid;gap:8px;background:var(--surface-2);border-radius:14px;padding:12px 14px}
+.mixer__labels{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:500}
+.mixer__labels b{font-weight:700;transition:color .25s}
+.mixer__labels b.on{color:var(--text)}
+.mixer input{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;direction:ltr;cursor:pointer}
+.mixer input::-webkit-slider-runnable-track{height:6px;border-radius:6px;background:linear-gradient(to right,var(--sand),var(--lime))}
+.mixer input::-moz-range-track{height:6px;border-radius:6px;background:linear-gradient(to right,var(--sand),var(--lime))}
+.mixer input::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--text);margin-top:-10px;box-shadow:0 0 0 5px rgba(46,211,195,.25),0 4px 12px rgba(0,0,0,.4)}
+.mixer input::-moz-range-thumb{width:26px;height:26px;border:0;border-radius:50%;background:var(--text);box-shadow:0 0 0 5px rgba(46,211,195,.25)}
+
+/* ---------- studio + gear ---------- */
+.studio-video{max-width:760px;margin-inline:auto;margin-bottom:clamp(30px,5vw,48px)}
+.gearcat + .gearcat{margin-top:30px}
+.gearcat__head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.gearcat__head h3{font-weight:800;font-size:1.3rem;flex:1}
+.gearcat__head button{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:none;place-items:center}
+.gearcat__head button:hover{border-color:var(--lime);color:var(--lime)}
+.gearcat__head svg{width:16px;height:16px}
+@media (min-width:900px){.gearcat__head button{display:grid}}
+.gearrail{display:grid;grid-auto-flow:column;grid-auto-columns:min(60vw,236px);gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:calc(var(--gutter)*-1);padding-inline:var(--gutter);padding-bottom:6px}
+.gearrail::-webkit-scrollbar{display:none}
+.gcard{scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .3s,transform .35s var(--ease)}
+a.gcard:hover{border-color:rgba(46,211,195,.45);transform:translateY(-3px)}
+.gcard__img{aspect-ratio:1;background:#F2ECE2;display:grid;place-items:center;overflow:hidden;position:relative}
+.gcard__img img{width:88%;height:88%;object-fit:contain;transition:transform .6s var(--ease)}
+a.gcard:hover .gcard__img img{transform:scale(1.07)}
+.gcard__img svg{width:46px;height:46px;color:#B9AE9A}
+.gcard__body{padding:14px 16px 16px;display:grid;gap:3px;flex:1;align-content:start}
+.gcard__role{font-size:12.5px;color:var(--lime);font-weight:500;direction:ltr;text-align:right}
+.gcard__name{font-weight:700;font-size:15.5px;line-height:1.35;direction:ltr;text-align:right;unicode-bidi:plaintext}
+.gcard__go{margin-top:8px;font-size:13.5px;color:var(--sand);font-weight:500}
+.studio{display:grid;gap:22px;align-items:start}
+@media (min-width:900px){.studio{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:36px}}
+.gear{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px}
+.tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;min-height:40px;padding:0 14px;border-radius:10px;background:var(--surface-2);color:var(--muted);font-size:14.5px;font-weight:500;transition:background .25s,color .25s}
+.tab[aria-selected="true"]{background:var(--tq-grad);color:var(--on-lime)}
+.rows{list-style:none}
+.row{border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row > *{display:flex;align-items:center;gap:12px;min-height:58px;padding-block:8px}
+.row__role{flex:none;width:96px;font-size:13px;color:var(--muted);direction:ltr;text-align:right}
+.row__name{flex:1;min-width:0;font-weight:500;font-size:15.5px;line-height:1.35;direction:ltr;text-align:right;unicode-bidi:plaintext}
+.row__go{flex:none;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--muted);background:var(--surface-2);transition:background .2s,color .2s}
+.row__go svg{width:15px;height:15px}
+a.row__link:hover .row__go{background:var(--lime);color:var(--on-lime)}
+
+/* ---------- testimonials ---------- */
+.quotes{display:grid;grid-auto-flow:column;grid-auto-columns:min(86%,380px);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:calc(var(--gutter)*-1);padding-inline:var(--gutter);padding-bottom:6px}
+.quotes::-webkit-scrollbar{display:none}
+.quote{scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:26px 24px;display:flex;flex-direction:column;gap:18px}
+.quote__mark{font-size:56px;line-height:.6;color:var(--lime);font-weight:900;height:24px}
+.quote p{font-size:17px;line-height:1.65;flex:1}
+.quote__who{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.quote__av{width:42px;height:42px;border-radius:50%;background:var(--lime-soft);color:var(--lime);display:grid;place-items:center;font-weight:800;flex:none}
+.quote__who b{display:block;font-weight:700;font-size:15.5px;line-height:1.3}
+.quote__who small{color:var(--muted);font-size:13.5px}
+
+/* ---------- CTA ---------- */
+.cta{background:var(--sand);color:#1B2422;border-radius:28px;padding:clamp(34px,7vw,72px) clamp(22px,5vw,56px);display:grid;gap:14px;justify-items:center;text-align:center;overflow:hidden;position:relative;isolation:isolate}
+.cta::before{content:"";position:absolute;inset:auto -10% -60% -10%;height:120%;z-index:-1;background:radial-gradient(50% 50% at 50% 50%,rgba(255,255,255,.35),transparent 70%)}
+.cta h2{font-weight:900;font-size:clamp(2rem,7.5vw,3.4rem);line-height:1.08;max-width:15ch}
+.cta p{font-size:17px;font-weight:500;max-width:40ch;opacity:.8}
+.cta .btn{background:#13201E;color:var(--sand);margin-top:6px}
+.cta__phone{font-size:15px;font-weight:500;direction:ltr;opacity:.75;user-select:all}
+
+/* ---------- footer ---------- */
+.foot{padding-top:64px;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px));overflow:hidden}
+.foot__in{display:grid;justify-items:center;gap:20px;text-align:center}
+.socials{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.socials a{width:48px;height:48px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;transition:color .2s,border-color .2s,transform .2s}
+.socials a:hover{color:var(--lime);border-color:var(--lime);transform:translateY(-2px)}
+.socials svg{width:20px;height:20px;fill:currentColor}
+.foot__small{font-size:13px;color:var(--muted);display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.foot__small a:hover{color:var(--text)}
+.wordmark{margin-top:40px;font-weight:900;line-height:.8;white-space:nowrap;direction:ltr;font-size:min(14vw,12rem);letter-spacing:-.03em;color:transparent;-webkit-text-stroke:1.5px rgba(227,211,182,.22);user-select:none;will-change:transform}
+
+/* ---------- floating WhatsApp ---------- */
+.fab{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:55;width:58px;height:58px;border-radius:50%;background:var(--wa);color:#fff;display:grid;place-items:center;box-shadow:0 10px 28px rgba(0,0,0,.45);transition:transform .45s var(--ease)}
+.fab svg{width:30px;height:30px;fill:currentColor}
+.fab.is-hidden{transform:translateY(160%)}
+
+/* ---------- video modal ---------- */
+.modal{position:fixed;inset:0;z-index:95;background:rgba(6,8,7,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center;padding:var(--gutter)}
+.modal__box{width:min(1000px,100%);aspect-ratio:16/9;max-width:100%;border-radius:18px;overflow:hidden;background:#000;position:relative}
+.modal__box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.modal__close{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));left:16px;width:48px;height:48px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center}
+.modal__close svg{width:20px;height:20px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .intro{display:none}
+}
+
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
+</head>
+<body>
+
+<div class="intro" id="intro" aria-hidden="true"><div class="intro__logo">AY</div></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- ============ HEADER ============ -->
+<header class="top" id="top">
+  <div class="wrap top__in">
+    <a class="brand js-anchor" href="#hero" aria-label="אבישי ישר – לראש הדף">
+      <span class="logo">AY</span>
+      <span class="brand__txt"><b>אבישי ישר</b><small>Live &amp; Studio Drums</small></span>
+    </a>
+    <a class="btn btn--lime js-wa" target="_blank" rel="noopener">דברו איתי</a>
+  </div>
+</header>
+
+<main id="main">
+  <!-- ============ HERO (always first) ============ -->
+  <section class="hero" id="hero">
+    <div class="hero__bg" id="heroBg">
+      <div class="hero__media" id="heroMedia">
+        <img class="hero__poster" id="heroImg" alt="" fetchpriority="high" onerror="this.remove()">
+      </div>
+      <div class="fog" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+    <canvas class="hero__fx" id="heroFx" aria-hidden="true"></canvas>
+    <div class="wrap hero__content" id="heroContent">
+      <span class="eyebrow" id="heroEyebrow" data-hero></span>
+      <h1 id="heroTitle"></h1>
+      <p class="hero__sub" id="heroLead" data-hero></p>
+      <div class="hero__cta" id="heroCta" data-hero>
+        <a class="btn btn--lime js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>שלחו סקיצה בוואטסאפ</a>
+        <button class="btn btn--ghost" type="button" id="watchIntro"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play"/></svg>צפו בסרטון</button>
+      </div>
+    </div>
+    <div class="scrollcue" aria-hidden="true"><i></i>גללו</div>
+  </section>
+
+  <!-- ============ REEL ============ -->
+  <section class="reel" id="reel" aria-label="הפקות נבחרות">
+    <div class="wrap"><div class="head"><span class="eyebrow">הפקות נבחרות</span></div></div>
+    <div class="reel__track" id="reelTrack"></div>
+    <div class="reel__nav">
+      <button class="reel__arrow" type="button" id="reelPrev" aria-label="הקודם"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="reel__dots" id="reelDots" aria-hidden="true"></div>
+      <button class="reel__arrow" type="button" id="reelNext" aria-label="הבא"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="section" id="about">
+    <div class="wrap about">
+      <figure class="about__media" data-reveal>
+        <svg class="about__hoop" id="aboutHoop" viewBox="0 0 400 400" aria-hidden="true">
+          <circle cx="200" cy="200" r="192" fill="none" stroke="url(#hoopG)" stroke-width="3"/>
+          <circle cx="200" cy="200" r="182" fill="none" stroke="rgba(227,211,182,.18)" stroke-width="1"/>
+          <g stroke="#2ED3C3" stroke-width="6" stroke-linecap="round">
+            <path d="M200 0v14M200 386v14M0 200h14M386 200h14M58.6 58.6l9.9 9.9M331.5 331.5l9.9 9.9M58.6 341.4l9.9-9.9M331.5 68.5l9.9-9.9"/>
+          </g>
+          <defs><linearGradient id="hoopG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7BF3E6"/><stop offset=".5" stop-color="rgba(46,211,195,.25)"/><stop offset="1" stop-color="#2ED3C3"/></linearGradient></defs>
+        </svg>
+        <div class="about__disc"><img id="aboutImg" alt="אבישי ישר" loading="lazy" onerror="this.remove()"></div>
+        <svg class="about__badge" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="58" fill="#0F1716"/>
+          <defs><path id="badgeCirc" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
+          <g class="about__badge-spin"><text direction="ltr" style="direction:ltr" font-size="9.4" font-weight="700" fill="#E3D3B6" font-family="Heebo, Arial, sans-serif"><textPath href="#badgeCirc" textLength="268" lengthAdjust="spacing">AVISHAI YASHAR • LIVE &amp; STUDIO DRUMS •</textPath></text></g>
+          <text x="60" y="68" text-anchor="middle" font-size="24" font-weight="900" fill="#2ED3C3" font-family="Heebo, Arial, sans-serif">AY</text>
+        </svg>
+      </figure>
+      <div class="about__text">
+        <span class="eyebrow">קצת עליי</span>
+        <h2 data-split id="aboutTitle"></h2>
+        <div class="about__body" id="aboutBody" data-reveal></div>
+        <a class="btn btn--lime js-wa" target="_blank" rel="noopener" data-reveal><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>בוא נדבר על ההפקה הבאה</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MARQUEE ============ -->
+  <section class="marquee" id="marquee" aria-label="ז'אנרים">
+    <div class="marquee__row" id="mq1"></div>
+    <div class="marquee__row marquee__row--out" id="mq2"></div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <section class="section" id="facts" aria-label="במה אני שונה">
+    <div class="wrap">
+      <div class="facts" id="factsBox" data-stagger></div>
+      <p class="trust" id="trust" data-reveal></p>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section class="section" id="process" style="overflow:hidden;isolation:isolate">
+    <svg class="rings" id="rings" viewBox="0 0 400 400" aria-hidden="true">
+      <g fill="none" stroke="#2ED3C3">
+        <circle cx="200" cy="200" r="196" stroke-opacity=".10"/>
+        <circle cx="200" cy="200" r="170" stroke-opacity=".06" stroke-dasharray="2 6"/>
+        <circle cx="200" cy="200" r="148" stroke-opacity=".08"/>
+        <circle cx="200" cy="200" r="122" stroke-opacity=".05" stroke-dasharray="1 4"/>
+        <circle cx="200" cy="200" r="98"  stroke-opacity=".09"/>
+        <circle cx="200" cy="200" r="70"  stroke-opacity=".05" stroke-dasharray="3 5"/>
+        <circle cx="200" cy="200" r="34"  stroke-opacity=".12"/>
+        <path d="M200 4v28M200 368v28M4 200h28M368 200h28" stroke-opacity=".18"/>
+      </g>
+    </svg>
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">איך זה עובד</span>
+        <h2 data-split id="hProcess"></h2>
+        <div class="rule"><i></i></div>
+      </div>
+      <ol class="steps" id="steps">
+        <span class="steps__track" aria-hidden="true"></span>
+        <span class="steps__fill" id="stepsFill" aria-hidden="true"></span>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ PRODUCTIONS ============ -->
+  <section class="section" id="productions">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">הפקות</span>
+        <h2 data-split id="hProductions"></h2>
+        <div class="rule"><i></i></div>
+      </div>
+      <div class="grid" id="prodGrid"></div>
+      <div class="more" id="prodMore"><button class="btn btn--line" type="button">טען עוד</button></div>
+    </div>
+  </section>
+
+  <!-- ============ SOURCES ============ -->
+  <section class="section" id="sources">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">סורסים</span>
+        <h2 data-split id="hSources"></h2>
+        <p data-reveal id="pSources"></p>
+      </div>
+      <div class="tracks" id="tracks" data-stagger></div>
+    </div>
+  </section>
+
+  <!-- ============ STUDIO + GEAR ============ -->
+  <section class="section" id="studio">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">האולפן</span>
+        <h2 data-split id="hStudio"></h2>
+        <div class="rule"><i></i></div>
+      </div>
+      <div class="studio-video" id="studioVideo" data-reveal></div>
+      <div id="gearCats"></div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="section" id="testimonials">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">המלצות</span>
+        <h2 data-split id="hTestimonials"></h2>
+        <div class="rule"><i></i></div>
+      </div>
+      <div class="quotes" id="quotes" data-stagger></div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="section" id="ctaSection">
+    <div class="wrap">
+      <div class="cta" id="cta">
+        <h2 id="ctaTitle"></h2>
+        <p id="ctaText"></p>
+        <a class="btn js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>שלחו סקיצה בוואטסאפ</a>
+        <span class="cta__phone" id="phone"></span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <a class="brand js-anchor" href="#hero"><span class="logo">AY</span><span class="brand__txt"><b>אבישי ישר</b><small>Live &amp; Studio Drums</small></span></a>
+    <nav class="socials" id="socials" aria-label="רשתות חברתיות"></nav>
+    <div class="foot__small">
+      <span>© <span id="year">2026</span> כל הזכויות שמורות</span>
+      <a href="admin.html" id="adminLink">כניסת ניהול</a>
+    </div>
+  </div>
+  <div class="wordmark" id="wordmark" aria-hidden="true">AVISHAI YASHAR · AVISHAI YASHAR</div>
+</footer>
+
+<a class="fab js-wa is-hidden" id="fab" target="_blank" rel="noopener" aria-label="דברו איתי בוואטסאפ"><svg viewBox="0 0 24 24"><use href="#i-wa"/></svg></a>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="סרטון" hidden>
+  <button class="modal__close" id="modalClose" type="button" aria-label="סגירה"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+  <div class="modal__box" id="modalBox"></div>
+</div>
+
+<!-- icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 15l-1.4 5 5.2-1.36A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.18-1.140l-.3-.18-3.08.8.82-3-.2-.31a8.22 8.22 0 1 1 6.94 3.83Zm4.5-6.15c-.25-.12-1.46-.72-1.69-.8-.23-.08-.39-.12-.55.12-.17.25-.64.8-.78.96-.14.17-.29.19-.53.06a6.7 6.7 0 0 1-3.34-2.92c-.25-.43.25-.4.72-1.34.08-.17.04-.31-.02-.43l-.76-1.83c-.2-.48-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.74 2.74 0 0 0-.85 2.04 4.76 4.76 0 0 0 1 2.53 10.9 10.9 0 0 0 4.17 3.68c1.55.67 2.16.73 2.94.61.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.08.14-1.18-.06-.1-.22-.16-.47-.28Z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v8.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/></symbol>
+  <symbol id="i-kit" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><ellipse cx="12" cy="15" rx="5" ry="5"/><circle cx="12" cy="15" r="1.6"/><path d="M3 8h6M6 8v12M15 8h6M18 8v12"/></g></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 4v6M6 14v6M12 4v2M12 10v10M18 4v10M18 18v2M4 12h4M10 8h4M16 16h4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-facebook" viewBox="0 0 24 24"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.87.25-1.46 1.5-1.46h1.6V4.46A21 21 0 0 0 14.27 4c-2.32 0-3.9 1.41-3.9 4v2.5H7.75v3h2.62V21z"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 24 24"><path d="M12 7.3A4.7 4.7 0 1 0 16.7 12 4.7 4.7 0 0 0 12 7.3Zm0 7.75A3.05 3.05 0 1 1 15.05 12 3.05 3.05 0 0 1 12 15.05Zm4.9-8.95a1.1 1.1 0 1 0 1.1 1.1 1.1 1.1 0 0 0-1.1-1.1ZM21.94 7.1a5.4 5.4 0 0 0-1.48-3.56A5.43 5.43 0 0 0 16.9 2.06C15.5 1.98 8.5 1.98 7.1 2.06a5.42 5.42 0 0 0-3.56 1.47A5.41 5.41 0 0 0 2.06 7.1c-.08 1.4-.08 8.4 0 9.8a5.4 5.4 0 0 0 1.48 3.56 5.44 5.44 0 0 0 3.56 1.48c1.4.08 8.4.08 9.8 0a5.4 5.4 0 0 0 3.56-1.48 5.43 5.43 0 0 0 1.48-3.56c.08-1.4.08-8.4 0-9.8Zm-2.15 11.3a3.3 3.3 0 0 1-1.85 1.86c-1.28.5-4.33.39-5.74.39s-4.47.11-5.74-.39a3.3 3.3 0 0 1-1.86-1.86c-.5-1.28-.39-4.32-.39-5.74s-.11-4.47.39-5.74a3.3 3.3 0 0 1 1.86-1.86c1.28-.5 4.32-.39 5.740-.39s4.47-.11 5.74.39a3.3 3.3 0 0 1 1.85 1.86c.51 1.28.4 4.32.4 5.74s.11 4.47-.4 5.74Z"/></symbol>
+  <symbol id="i-youtube" viewBox="0 0 24 24"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.77-1.77C18.27 5 12 5 12 5s-6.27 0-7.83.43A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.77 1.77C5.73 19 12 19 12 19s6.27 0 7.83-.43a2.5 2.5 0 0 0 1.77-1.77A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8ZM10 15V9l5.2 3Z"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M16.6 3c.4 2.2 1.8 3.7 4 4v3.1c-1.5 0-2.9-.4-4-1.2v6.3a5.8 5.8 0 1 1-5.8-5.8c.3 0 .6 0 .9.1v3.2a2.7 2.7 0 1 0 1.9 2.5V3z"/></symbol>
+  <symbol id="i-spotify" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4.6 14.4a.6.6 0 0 1-.9.2c-2.4-1.5-5.4-1.8-9-1a.6.6 0 1 1-.3-1.2c3.9-.9 7.2-.5 9.9 1.1.3.2.4.6.3.9Zm1.2-2.7a.8.8 0 0 1-1.1.3c-2.7-1.7-6.9-2.2-10.1-1.2a.8.8 0 0 1-.5-1.5c3.7-1.1 8.3-.6 11.4 1.3.4.2.5.7.3 1.1Zm.1-2.8C14.7 9 9.4 8.8 6.3 9.7a.9.9 0 1 1-.5-1.8c3.6-1.1 9.4-.9 13 1.3a.9.9 0 0 1-.9 1.7Z"/></symbol>
+  <symbol id="i-soundcloud" viewBox="0 0 24 24"><path d="M11 7.5v10h8.2a3.3 3.3 0 0 0 .3-6.6A5 5 0 0 0 11 7.5ZM9.5 9v8.5h-1V9.6l1-.6ZM7 10.2v7.3H6v-7l1-.3ZM4.5 11.4v6.1h-1v-5.8l1-.3ZM2 13.2v4.3H1v-4l1-.3Z"/></symbol>
+</svg>
+
+<script>
+/* =========================================================
+   הגדרות האתר
+   SITE_API – הכתובת של שירות השמירה (Google Apps Script).
+   כל עוד היא ריקה, האתר מציג את התוכן שכאן למטה.
+   ========================================================= */
+window.SITE_API = "https://script.google.com/macros/s/AKfycbxGFMxWOnvCFgnJFxp0vZVyt5WpYdAO99KQPjjErYWwMFeBilOqNeCzeXX8AW1YJ2Aqvg/exec";
+
+/* links between the site and the admin page (replaced automatically on the Google-hosted version) */
+window.SITE_LINKS = { home: "./", admin: "admin.html" };
+
+/* one way to read and save content, whether the site is hosted by Google or elsewhere */
+(function () {
+  const gs = window.google && google.script && google.script.run;
+  const call = (fn, arg) => new Promise((res, rej) => { const r = google.script.run.withSuccessHandler(res).withFailureHandler(rej); arg === undefined ? r[fn]() : r[fn](arg); });
+  // on the Google-hosted version, talk to the web app address directly (works even when several Google accounts are signed in)
+  const home = (window.SITE_LINKS && window.SITE_LINKS.home) || "";
+  const remote = window.SITE_API || (/^https:\/\/script\.google\.com\//.test(home) ? home : "");
+  const getRemote = () => fetch(remote + (remote.indexOf("?") < 0 ? "?" : "&") + "action=get&t=" + Date.now()).then(r => r.json());
+  const postRemote = body => fetch(remote, { method: "POST", body: JSON.stringify(body) }).then(r => r.json());
+  window.siteApi = {
+    available: !!(gs || remote),
+    get: () => remote ? getRemote().catch(e => gs ? call("apiGet") : Promise.reject(e)) : call("apiGet"),
+    post: body => remote ? postRemote(body).catch(e => gs ? call("apiPost", body) : Promise.reject(e)) : call("apiPost", body)
+  };
+  // never leave the opening screen stuck
+  setTimeout(() => { const i = document.getElementById("intro"); if (i) i.remove(); }, 7000);
+})();
+
+
+window.SITE_DEFAULTS = {
+  eyebrow: "מתופף סשן | הקלטות מרחוק",
+  title: "תופים מוכנים למיקס, ישר להפקה שלך",
+  lead: "מקליט מהאולפן שלי ושולח ערוצים נקיים ברמת Mix Ready. מרוק, פופ ופאנק ועד ים-תיכוני וחסידי. מהיר, מדויק, וחוסך לך זמן.",
+  trust: "ניסיון בהקלטות ובהופעות עם האמנים והמפיקים המובילים בישראל",
+
+  whatsapp: "https://wa.me/972532854507",
+  phone: "053-2854507",
+  heroImage: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/da3fa96a8_IMG_8136.jpeg",
+  bgVideo: "",
+  introVideo: "https://youtu.be/SMZbWh5Qp8A",
+  studioVideo: "https://youtube.com/shorts/acj-V-isUmU",
+  studioTitle: "My Drum Studio",
+  productionsFirst: 2,
+
+  aboutTitle: "אבישי ישר",
+  aboutText: "מתופף וסשניסט. מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל, לצד מענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nאת רוב ההקלטות שלי היום אני מבצע מרחוק: מהר, מדויק, עם תקשורת רציפה ועבודה נעימה, מה שחוסך לך כמפיק זמן יקר.\n\nבסשן נתאים את הסאונד בדיוק לפרויקט שלך, כך שהערוצים מגיעים ברמת Mix Ready: סאונד בריא, טבעי ונקי לחלוטין.",
+  aboutImage: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/da3fa96a8_IMG_8136.jpeg",
+
+  marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
+  marquee2: "Mix Ready, Remote Sessions, Live & Studio Drums",
+
+  facts: [
+    { title: "Mix Ready", text: "ערוצים נקיים וטבעיים, מוכנים למיקס" },
+    { title: "מרחוק", text: "מקליט אצלי, בתקשורת רציפה איתך" },
+    { title: "כל ז'אנר", text: "רוק, פופ, פאנק, ים-תיכוני, חסידי" }
+  ],
+  hProcess: "מסקיצה לערוצים בשלושה צעדים",
+  steps: [
+    { title: "שולחים סקיצה", text: "שלח לי את השיר בוואטסאפ, עם רפרנס אם יש לך." },
+    { title: "מתאימים סאונד ומקליטים", text: "בוחרים יחד תוף, סנר וסאונד שמתאימים לפרויקט, ואני מקליט." },
+    { title: "מקבלים ערוצים", text: "ערוצים מופרדים ברמת Mix Ready, מוכנים לעבודה." }
+  ],
+  hProductions: "שירים שניגנתי בהם",
+  hSources: "ככה נשמעים הערוצים",
+  pSources: "ערוצי תופים כמו שהם יוצאים מהאולפן, לפני מיקס.",
+  hStudio: "האולפן והציוד",
+  hTestimonials: "מה אומרים מפיקים",
+  ctaTitle: "יש לך שיר שמחכה לתופים?",
+  ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
+
+  order: ["reel", "facts", "process", "sources", "about", "studio", "productions", "testimonials", "marquee", "cta"],
+  show: { reel: true, about: true, marquee: false, facts: true, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
+
+  productions: [
+    { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true },
+    { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
+    { url: "https://youtu.be/1ui0jm29em4", title: "אבישי רוזן – חמש דקות (קליפ רשמי)", show: true },
+    { url: "https://youtu.be/mvlhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
+    { url: "https://youtu.be/dnbj0Vzzb-w", title: "אהבת תורה – להקת מזמור שיר", show: true },
+    { url: "https://youtu.be/i3dohIGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true }
+  ],
+  sources: [
+    { name: "אלנתן שלום", mix: "", audio: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/0c5afe0a5_.mp3", drive: "https://drive.google.com/drive/folders/1-dH-V356X2e5Lmw8rw-bqHWlSoCR2pZJ?usp=sharing", show: true },
+    { name: "זירה ריקה", mix: "", audio: "", drive: "https://drive.google.com/drive/folders/1FkOUO-WOalogkMx66P5cOJC8LHAdzL6y?usp=sharing", show: true }
+  ],
+  gear: [
+    { category: "מערכות תופים", role: "Drumset", name: "Gretsch USA Custom", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ea1af205d_image.png", url: "https://www.thomann.ie/gretsch_drums_us_custom_24_candy_apple_red.htm", show: true },
+    { category: "מערכות תופים", role: "Drumset", name: "Pearl Vision Maple (VMX)", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/40b8c99b4_IMG_8103.jpeg", url: "", show: true },
+    { category: "מערכות תופים", role: "Drumset", name: "Yamaha Stage Custom Birch", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/885386856_IMG_8116.jpeg", url: "", show: true },
+    { category: "מצילות וסנרים", role: "Snare 1", name: "Ludwig Black Beauty 14×6.5", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ad89ebef7_IMG_8117.jpeg", url: "https://www.thomann.ie/ludwig_lb417_14x65_black_beauty.htm", show: true },
+    { category: "מצילות וסנרים", role: "Snare 2", name: "Ludwig Black Magic 14×6.5", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/87cabe3a2_IMG_8121.jpeg", url: "https://www.thomann.ie/ludwig_lu6514c_14_x65_black_magic.htm", show: true },
+    { category: "מצילות וסנרים", role: "Snare 3", name: "Yamaha Recording Custom", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3f0778a59_IMG_8122.jpeg", url: "https://www.thomann.ie/yamaha_recording_custom_13_x65_br.htm", show: true },
+    { category: "מצילות וסנרים", role: "Snare 4", name: "Tama Metalworks 10×5.5", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/528481e05_IMG_8125.jpeg", url: "https://www.tama.com/eu/products/snare_drums/metalworks1055.html", show: true },
+    { category: "מצילות וסנרים", role: "Cymbals", name: "Istanbul Mehmet", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bc8a0e938_image.png", url: "", show: true },
+    { category: "מצילות וסנרים", role: "Cymbals", name: "SUBIAN", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a6b75f1fb_IMG_8134.jpeg", url: "", show: true },
+    { category: "מיקרופונים", role: "Overheads", name: "Warm Audio WA-87 R2", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3063bcfa4_IMG_8097.jpeg", url: "https://www.thomann.ie/warm_audio_wa_87_r2.htm", show: true },
+    { category: "מיקרופונים", role: "Toms", name: "Sennheiser MD 421", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/59a6e307f_image.png", url: "https://www.thomann.ie/sennheiser_md421u4.htm", show: true },
+    { category: "מיקרופונים", role: "Kick In", name: "Beyerdynamic TG D71C", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a10c19e67_image.png", url: "https://www.thomannmusic.com/beyerdynamic_tg_d71.htm", show: true },
+    { category: "מיקרופונים", role: "Kick Out", name: "Audix D6", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/903783247_image.png", url: "https://www.thomannmusic.com/audix_d6_bassdrummikro.htm", show: true },
+    { category: "מיקרופונים", role: "Snare Top", name: "Shure SM57", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/cace07592_image.png", url: "https://www.thomann.ie/shure_sm57_lc.htm", show: true },
+    { category: "מיקרופונים", role: "Snare Top 2", name: "AKG P170", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3edea3952_image.png", url: "https://www.thomann.ie/akg_p170.htm", show: true },
+    { category: "מיקרופונים", role: "Snare Bottom", name: "Shure SM57", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/7e3813ffb_image.png", url: "https://www.thomann.ie/shure_sm57_lc.htm", show: true },
+    { category: "מיקרופונים", role: "Hi-Hat", name: "AKG C430", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/586af5b12_image.png", url: "https://www.thomann.ie/akg_c430.htm", show: true },
+    { category: "מיקרופונים", role: "Rooms", name: "Lewitt LCT 441 Flex", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/d6c1cd271_thomann-image.jpg", url: "https://www.thomann.ie/lewitt_lct_441_flex.htm", show: true },
+    { category: "כרטיס קול ופראמפים", role: "Interface", name: "Roland Studio Capture", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg", url: "https://vintageking.com/roland-studio-capture-usb-audio-interface", show: true },
+    { category: "כרטיס קול ופראמפים", role: "Preamps", name: "פראמפים", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg", url: "", show: true }
+  ],
+  testimonials: [],
+  socials: [
+    { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
+    { type: "youtube", url: "https://youtube.com/@avishaiyashar-4676?si=sjj83mEsxMoenPS5" },
+    { type: "facebook", url: "https://facebook.com" }
+  ]
+};
+
+/* merges saved content over the defaults, so new fields always have a value */
+window.mergeContent = function (saved) {
+  const d = JSON.parse(JSON.stringify(window.SITE_DEFAULTS));
+  if (!saved || typeof saved !== "object") return d;
+  Object.keys(saved).forEach(k => {
+    if (k === "show") d.show = Object.assign(d.show, saved.show || {});
+    else if (saved[k] !== undefined && saved[k] !== null) d[k] = saved[k];
+  });
+  const all = window.SITE_DEFAULTS.order;
+  d.order = (d.order || []).filter(k => all.includes(k));
+  all.forEach(k => { if (!d.order.includes(k)) d.order.push(k); });
+  return d;
+};
+
+</script>
+<script>
+(function(){
+  "use strict";
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const icon = (id, cls="") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><use href="#${id}"/></svg>`;
+  const real = u => !!(u && String(u).trim() && String(u).trim() !== "#");
+  const yes = v => !/^(לא|no|false|0)$/i.test(String(v ?? "").trim());
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const touch = matchMedia("(pointer: coarse)").matches; // phones: native scrolling, lighter effects
+  if(touch){ const st = document.createElement("style"); st.textContent = "@media (pointer:coarse){   .top.is-solid,.btn--ghost,.step,.modal{backdrop-filter:none;-webkit-backdrop-filter:none}   .top.is-solid{background:rgba(15,23,22,.95)}   .step{background:rgba(22,28,25,.97)}   .fog i{animation:none}   .fog i:nth-child(3),.about__media::before{filter:none}   .hero__bg,.hero__media,.about__disc img{will-change:auto} }"; document.head.appendChild(st); }
+  const ytId = u => {
+    if(!u) return "";
+    const s = String(u).trim();
+    const m = s.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(s) ? s : "");
+  };
+  const embedUrl = (id, extra="") => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1${extra}`;
+
+  /* ---------------- load content (saved in the admin panel) ---------------- */
+  async function loadContent(){
+    if(!window.siteApi || !siteApi.available) return mergeContent(null);
+    const json = await siteApi.get();
+    return mergeContent(json && json.data);
+  }
+  const withTimeout = (p, ms) => Promise.race([p, new Promise((_,rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
+
+  /* ---------------- render ---------------- */
+  const audios = [];
+  function pauseAudio(except){ audios.forEach(a => a !== except && a !== (except && except.__pair) && a.pause()); }
+
+  function splitWords(el){
+    const words = el.textContent.trim().split(/\s+/);
+    el.setAttribute("aria-label", el.textContent.trim());
+    el.innerHTML = words.map(w => `<span class="w" aria-hidden="true"><span class="wi">${esc(w)}</span></span>`).join(" ");
+  }
+
+  function buildReel(list){
+    const track = $("#reelTrack"), dots = $("#reelDots");
+    if(!list.length){ $("#reel").hidden = true; return; }
+    track.innerHTML = list.map((v,i) => { const id = ytId(v.url); return `
+      <button class="reel__item" type="button" data-i="${i}" data-id="${esc(id)}" aria-label="${esc(v.title)}">
+        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="${i < 3 ? "eager" : "lazy"}" onerror="this.remove()">
+        <span class="reel__play" aria-hidden="true">${icon('i-play')}</span>
+        <span class="reel__info"><b>${esc(v.title)}</b><small>לחצו לצפייה</small></span>
+      </button>`; }).join("");
+    dots.innerHTML = list.map(() => "<i></i>").join("");
+    const items = [...track.children], ds = [...dots.children];
+    let active = -1, raf = 0;
+    const paint = () => {
+      raf = 0;
+      const tr = track.getBoundingClientRect(), mid = tr.left + tr.width/2;
+      const step = items[0].offsetWidth + 14;
+      let best = 0, bestD = 1e9;
+      items.forEach((el,i) => {
+        const r = el.getBoundingClientRect(), d = (r.left + r.width/2 - mid) / step, ad = Math.min(Math.abs(d), 1.6);
+        if(Math.abs(d) < bestD){ bestD = Math.abs(d); best = i; }
+        el.style.transform = reduce ? "" : `rotateY(${Math.max(-1,Math.min(1,d)) * -14}deg) scale(${1 - .17*Math.min(ad,1.2)})`;
+        el.style.opacity = String(1 - .55*Math.min(ad,1));
+      });
+      if(best !== active){ active = best; items.forEach((el,i) => el.classList.toggle("is-active", i === best)); ds.forEach((d,i) => d.classList.toggle("on", i === best)); }
+    };
+    const queue = () => { if(!raf) raf = requestAnimationFrame(paint); };
+    track.addEventListener("scroll", queue, {passive:true}); addEventListener("resize", queue);
+    const center = (i, smooth=true) => { const el = items[(i + items.length) % items.length]; const tr = track.getBoundingClientRect(), r = el.getBoundingClientRect();
+      track.scrollBy({left: (r.left + r.width/2) - (tr.left + tr.width/2), behavior: smooth && !reduce ? "smooth" : "auto"}); };
+
+    // tap: centered item plays, side item comes to the center
+    let dragged = false;
+    track.addEventListener("click", e => { const it = e.target.closest(".reel__item"); if(!it || dragged) return;
+      const i = +it.dataset.i; stopAuto(); if(i === active) openModal(it.dataset.id); else center(i); });
+    $("#reelPrev").addEventListener("click", () => { stopAuto(); center(active - 1); });
+    $("#reelNext").addEventListener("click", () => { stopAuto(); center(active + 1); });
+
+    // mouse drag on desktop
+    let down = false, sx = 0, sl = 0;
+    track.addEventListener("pointerdown", e => { if(e.pointerType !== "mouse") return; down = true; dragged = false; sx = e.clientX; sl = track.scrollLeft; stopAuto(); });
+    addEventListener("pointermove", e => { if(!down) return; const dx = e.clientX - sx; if(Math.abs(dx) > 5){ dragged = true; track.classList.add("is-drag"); } track.scrollLeft = sl - dx; });
+    addEventListener("pointerup", () => { if(!down) return; down = false; track.classList.remove("is-drag"); if(dragged){ center(active); setTimeout(() => dragged = false, 50); } });
+
+    // gentle auto-advance until the visitor touches it
+    let timer = 0, visible = false;
+    const stopAuto = () => { clearInterval(timer); timer = -1; };
+    ["touchstart","wheel"].forEach(ev => track.addEventListener(ev, stopAuto, {passive:true}));
+    if(!reduce && "IntersectionObserver" in window){
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(track);
+      timer = setInterval(() => { if(timer !== -1 && visible && document.visibilityState === "visible" && $("#modal").hidden) center(active + 1 >= items.length ? 0 : active + 1); }, 4200);
+    }
+    requestAnimationFrame(paint);
+  }
+
+  function videoCard(v){
+    const id = ytId(v.url);
+    return `<article class="card" data-reveal>
+      <div class="video zoom" data-id="${esc(id)}">
+        <span class="video__fb" aria-hidden="true">${esc(v.title)}</span>
+        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">
+        <button type="button" aria-label="נגן: ${esc(v.title)}"><span class="play">${icon('i-play')}</span></button>
+      </div>
+      <div class="card__body">
+        <h3 class="card__title">${esc(v.title)}</h3>
+      </div>
+    </article>`;
+  }
+
+  function render(S){
+    // basics
+    $$(".js-wa").forEach(a => a.href = S.whatsapp);
+    const on = list => (list || []).filter(x => x && x.show !== false);
+    S.productions = on(S.productions).filter(p => ytId(p.url));
+    S.sources = on(S.sources).filter(s => s.name);
+    S.gear = on(S.gear).filter(g => g.name).map(g => ({...g, category: g.category || "כללי"}));
+    S.testimonials = on(S.testimonials).filter(t => t.text);
+    S.productionsFirst = parseInt(S.productionsFirst, 10) || 2;
+
+    // texts
+    const txt = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v || ""; };
+    txt("heroEyebrow", S.eyebrow); txt("heroTitle", S.title); splitWords($("#heroTitle"));
+    txt("heroLead", S.lead); txt("trust", S.trust); txt("phone", S.phone);
+    ["hProcess","hProductions","hSources","pSources","hStudio","hTestimonials","ctaTitle","ctaText"].forEach(k => txt(k, S[k]));
+    $("#year").textContent = new Date().getFullYear();
+    if(window.SITE_LINKS) $("#adminLink").href = SITE_LINKS.admin;
+    $$("[data-split]").forEach(splitWords);
+    $("#heroEyebrow").hidden = !S.eyebrow;
+
+    // section order + visibility (hero is always first)
+    const ids = { reel:"reel", about:"about", marquee:"marquee", facts:"facts", process:"process", productions:"productions", sources:"sources", studio:"studio", testimonials:"testimonials", cta:"ctaSection" };
+    const main = $("#main");
+    S.order.forEach(k => { const el = document.getElementById(ids[k]); if(el){ main.appendChild(el); el.hidden = S.show[k] === false; } });
+
+    // about
+    txt("aboutTitle", S.aboutTitle); splitWords($("#aboutTitle"));
+    $("#aboutBody").innerHTML = String(S.aboutText || "").split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join("");
+    if(real(S.aboutImage)) $("#aboutImg").src = S.aboutImage; else $("#aboutImg").remove();
+
+    // facts + steps
+    $("#factsBox").innerHTML = (S.facts || []).filter(f => f.title).map(f => `<div class="fact"><b>${esc(f.title)}</b><small>${esc(f.text)}</small></div>`).join("");
+    const stepIcons = ["i-send","i-sliders","i-check"];
+    $("#steps").insertAdjacentHTML("beforeend", (S.steps || []).filter(s => s.title).map((s,i) => `
+      <li class="step">
+        <span class="step__icon"><svg viewBox="0 0 24 24"><use href="#${stepIcons[i % 3]}"/></svg></span>
+        <span class="step__n">שלב ${i+1}</span>
+        <h3>${esc(s.title)}</h3>
+        <p>${esc(s.text)}</p>
+      </li>`).join(""));
+
+    // hero background: poster + video (YouTube or mp4)
+    const img = $("#heroImg"); if(real(S.heroImage)) img.src = S.heroImage;
+    const bg = String(S.bgVideo||"").trim();
+    if(!reduce && real(bg) && !/claude/i.test(location.hostname)){
+      if(/\.(mp4|webm)(\?|$)/i.test(bg)){
+        $("#heroMedia").insertAdjacentHTML("beforeend", `<video class="hero__mp4" src="${esc(bg)}" autoplay muted loop playsinline preload="auto"></video>`);
+      } else if(ytId(bg)){
+        const id = ytId(bg);
+        $("#heroMedia").insertAdjacentHTML("beforeend", `<iframe class="hero__yt" id="heroYt" tabindex="-1" aria-hidden="true" title="" src="${embedUrl(id, `&mute=1&loop=1&playlist=${id}&controls=0&disablekb=1&iv_load_policy=3&fs=0`)}" allow="autoplay; encrypted-media"></iframe>`);
+        setTimeout(() => $("#heroYt")?.classList.add("is-on"), 2200); // hide YouTube's first-second UI
+      }
+    }
+
+    // intro video in a modal
+    const introId = ytId(S.introVideo);
+    if(!introId) $("#watchIntro").hidden = true;
+    $("#watchIntro").addEventListener("click", () => openModal(introId));
+
+    // marquee
+    const words = s => String(s || "").split(",").map(w => w.trim()).filter(Boolean);
+    const g1 = words(S.marquee1), g2 = words(S.marquee2);
+    const fill = g => g.length ? Array(Math.ceil(24 / g.length)).fill(g).flat().map(t => `<span>${esc(t)}</span>`).join("") : "";
+    $("#mq1").innerHTML = fill(g1); $("#mq2").innerHTML = fill(g2);
+    $("#mq1").hidden = !g1.length; $("#mq2").hidden = !g2.length;
+
+    // productions
+    let shown = 0;
+    const grid = $("#prodGrid"), more = $("#prodMore");
+    const showMore = n => {
+      const next = S.productions.slice(shown, shown + n);
+      grid.insertAdjacentHTML("beforeend", next.map(videoCard).join(""));
+      shown += next.length; more.hidden = shown >= S.productions.length;
+      return [...grid.children].slice(-next.length);
+    };
+    showMore(S.productionsFirst);
+    more.querySelector("button").addEventListener("click", () => { const added = showMore(2); window.__animateNew && window.__animateNew(added); });
+
+    // reel: sideways carousel, the centered video is highlighted
+    buildReel(S.productions);
+
+    // studio video
+    if(ytId(S.studioVideo)) $("#studioVideo").innerHTML = videoCard({url:S.studioVideo, title:S.studioTitle});
+
+    // sources with waveform
+    const fmt = s => isFinite(s) ? `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}` : "0:00";
+    const bars = (seed, n=56) => { let x = 0; for(const ch of seed) x = (x*31 + ch.charCodeAt(0)) >>> 0;
+      return Array.from({length:n}, (_,i) => { x = (x*1103515245 + 12345) >>> 0; const r = (x % 1000)/1000; const env = .45 + .55*Math.sin(Math.PI*(i+1)/(n+1)); return Math.round((22 + r*78) * env); }); };
+    $("#tracks").innerHTML = S.sources.map((t,i) => `
+      <article class="track" data-i="${i}">
+        <div class="track__top">
+          ${real(t.audio) ? `<button class="track__btn" type="button" aria-label="נגן ${esc(t.name)}">${icon('i-play','i-play')}${icon('i-pause','i-pause')}</button>` : ``}
+          <h3 class="track__name">${esc(t.name)}</h3>
+          ${real(t.audio) ? `<span class="track__time"><span class="cur">0:00</span> / <span class="dur">0:00</span></span>` : ``}
+        </div>
+        ${real(t.audio) ? `<div class="wave" role="slider" tabindex="0" aria-label="מיקום בשיר ${esc(t.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${bars(t.name).map(h => `<i style="height:${h}%"></i>`).join("")}</div>` : ``}
+        ${real(t.audio) && real(t.mix) ? `<div class="mixer">
+          <div class="mixer__labels" aria-hidden="true"><b data-k="full">כל ההפקה</b><b data-k="drums" class="on">רק תופים</b></div>
+          <input type="range" min="0" max="100" value="0" aria-label="מעבר בין התופים לבד לבין ההפקה המלאה">
+        </div>` : ``}
+        ${real(t.drive) ? `<a class="btn btn--line" href="${esc(t.drive)}" target="_blank" rel="noopener">${icon('i-folder')}לערוצים המלאים</a>` : ``}
+      </article>`).join("");
+    $$(".track").forEach(el => {
+      const t = S.sources[el.dataset.i]; if(!real(t.audio)) return;
+      const hasMix = real(t.mix);
+      const mk = (src, cors) => { const x = new Audio(); x.preload = "metadata"; if(cors) x.crossOrigin = "anonymous"; x.src = src; return x; };
+      // a = drums only (drives the timeline), b = full production
+      let a = mk(t.audio, hasMix), b = hasMix ? mk(t.mix, true) : null;
+      let mix = 0, ctx = null, ga = null, gb = null, mode = hasMix ? "gain" : "single";
+      const btn = $(".track__btn", el), wave = $(".wave", el), cur = $(".cur", el), dur = $(".dur", el), bs = $$("i", wave);
+      const slider = $(".mixer input", el), labels = $$(".mixer__labels b", el);
+
+      // equal-power crossfade; falls back to volume, then to a hard switch where volume can't be set (iPhone)
+      const applyMix = () => {
+        if(!b) return;
+        const ga2 = Math.cos(mix * Math.PI / 2), gb2 = Math.sin(mix * Math.PI / 2);
+        if(mode === "gain" && ga){ ga.gain.value = ga2; gb.gain.value = gb2; a.muted = b.muted = false; }
+        else if(mode === "volume"){ a.volume = ga2; b.volume = gb2; if(mix > 0 && mix < 1 && a.volume === 1 && b.volume === 1) mode = "switch"; }
+        if(mode === "switch"){ a.volume = b.volume = 1; a.muted = mix > .5; b.muted = mix <= .5; }
+        labels.forEach(l => l.classList.toggle("on", l.dataset.k === "drums" ? mix < .5 : mix >= .5));
+      };
+      const setupGraph = () => {
+        if(!b || mode !== "gain" || ctx) return;
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext; ctx = new AC();
+          ga = ctx.createGain(); gb = ctx.createGain();
+          ctx.createMediaElementSource(a).connect(ga).connect(ctx.destination);
+          ctx.createMediaElementSource(b).connect(gb).connect(ctx.destination);
+        } catch(e){ mode = "volume"; ctx = null; }
+        applyMix();
+      };
+      // if the file host doesn't allow cross-origin reading, reload plainly and mix by volume instead
+      const fallback = () => { if(mode !== "gain") return; mode = "volume"; const tA = a.currentTime;
+        audios.splice(audios.indexOf(a),1); audios.splice(audios.indexOf(b),1);
+        a = mk(t.audio, false); b = mk(t.mix, false); a.__pair = b; b.__pair = a; audios.push(a, b); wire(); a.currentTime = tA; applyMix(); };
+
+      const paint = () => { const p = a.duration ? a.currentTime / a.duration : 0; const k = Math.round(p * bs.length);
+        bs.forEach((x,i) => x.classList.toggle("on", i < k)); cur.textContent = fmt(a.currentTime); wave.setAttribute("aria-valuenow", Math.round(p*100)); };
+      const play = () => { setupGraph(); if(ctx && ctx.state === "suspended") ctx.resume();
+        if(b){ b.currentTime = a.currentTime; b.play().catch(() => {}); } a.play().catch(() => {}); };
+      const pause = () => { a.pause(); b && b.pause(); };
+      const seek = p => { if(a.duration){ a.currentTime = Math.max(0, Math.min(1, p)) * a.duration; if(b) b.currentTime = a.currentTime; paint(); } };
+
+      function wire(){
+        a.addEventListener("loadedmetadata", () => dur.textContent = fmt(a.duration));
+        a.addEventListener("timeupdate", () => { paint(); if(b && !b.paused && Math.abs(b.currentTime - a.currentTime) > .15) b.currentTime = a.currentTime; });
+        a.addEventListener("play", () => { pauseAudio(a); el.classList.add("is-playing"); btn.setAttribute("aria-label","השהה "+t.name); });
+        a.addEventListener("pause", () => { b && b.pause(); el.classList.remove("is-playing"); btn.setAttribute("aria-label","נגן "+t.name); });
+        a.addEventListener("ended", () => { b && b.pause(); a.currentTime = 0; paint(); });
+        if(b){ a.addEventListener("error", fallback, {once:true}); b.addEventListener("error", fallback, {once:true}); }
+      }
+      if(b){ a.__pair = b; b.__pair = a; audios.push(a, b); } else audios.push(a);
+      wire();
+
+      btn.addEventListener("click", () => a.paused ? play() : pause());
+      wave.addEventListener("click", e => { const r = wave.getBoundingClientRect(); seek((e.clientX - r.left) / r.width); if(a.paused) play(); });
+      wave.addEventListener("keydown", e => { if(!a.duration) return;
+        if(e.key === "ArrowRight") { seek((a.currentTime + 5) / a.duration); e.preventDefault(); }
+        if(e.key === "ArrowLeft")  { seek((a.currentTime - 5) / a.duration); e.preventDefault(); }
+        if(e.key === " " || e.key === "Enter") { a.paused ? play() : pause(); e.preventDefault(); } });
+      if(slider) slider.addEventListener("input", () => { mix = slider.value / 100; applyMix(); });
+      applyMix();
+    });
+
+    // gear: one sideways rail per category, with product photos
+    const cats = [...new Set(S.gear.map(g => g.category))];
+    const ph = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-kit"/></svg>`;
+    $("#gearCats").innerHTML = cats.map((c,ci) => `
+      <div class="gearcat">
+        <div class="gearcat__head">
+          <h3>${esc(c)}</h3>
+          <button type="button" data-rail="${ci}" data-dir="1" aria-label="הקודם"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" data-rail="${ci}" data-dir="-1" aria-label="הבא"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <div class="gearrail" id="rail${ci}">
+          ${S.gear.filter(g => g.category === c).map(it => {
+            const inner = `<div class="gcard__img">${real(it.img) ? `<img src="${esc(it.img)}" alt="${esc(it.name)}" loading="lazy" onerror="this.outerHTML=this.parentNode.dataset.ph||''">` : ph}</div>
+              <div class="gcard__body"><span class="gcard__role">${esc(it.role)}</span><span class="gcard__name">${esc(it.name)}</span>${real(it.url) ? `<span class="gcard__go">לצפייה במוצר ←</span>` : ``}</div>`;
+            return real(it.url) ? `<a class="gcard" href="${esc(it.url)}" target="_blank" rel="noopener">${inner}</a>` : `<div class="gcard">${inner}</div>`;
+          }).join("")}
+        </div>
+      </div>`).join("");
+    $$(".gcard__img").forEach(el => el.dataset.ph = ph);
+    $$(".gearcat__head button").forEach(btn => btn.addEventListener("click", () => {
+      const rail = document.getElementById("rail" + btn.dataset.rail), card = rail.firstElementChild;
+      rail.scrollBy({ left: (card ? card.offsetWidth + 14 : 240) * (+btn.dataset.dir), behavior:"smooth" });
+    }));
+
+    // testimonials
+    if(S.testimonials.length){
+      $("#quotes").innerHTML = S.testimonials.map(q => `
+        <figure class="quote">
+          <div class="quote__mark" aria-hidden="true">”</div>
+          <p>${esc(q.text)}</p>
+          <figcaption class="quote__who"><span class="quote__av" aria-hidden="true">${esc((q.name||"?").trim().charAt(0))}</span><span><b>${esc(q.name)}</b><small>${esc(q.role)}</small></span></figcaption>
+        </figure>`).join("");
+    } else $("#testimonials").hidden = true;
+
+    // socials
+    const labels = {facebook:"פייסבוק", instagram:"אינסטגרם", youtube:"יוטיוב", tiktok:"טיקטוק", spotify:"ספוטיפיי", soundcloud:"סאונדקלאוד"};
+    $("#socials").innerHTML = S.socials.filter(s => real(s.url) && labels[s.type]).map(s =>
+      `<a href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${labels[s.type]}">${icon('i-'+s.type)}</a>`).join("");
+  }
+
+  /* ---------------- video tap-to-play + modal ---------------- */
+  document.addEventListener("click", e => {
+    const b = e.target.closest(".video button"); if(!b) return;
+    pauseAudio(); const box = b.parentElement;
+    box.innerHTML = `<iframe src="${embedUrl(box.dataset.id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+  });
+  let lenis = null, lastFocus = null;
+  function openModal(id){
+    if(!id) return; pauseAudio(); lastFocus = document.activeElement;
+    $("#modalBox").innerHTML = `<iframe src="${embedUrl(id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    $("#modal").hidden = false; lenis && lenis.stop(); document.documentElement.style.overflow = "hidden"; $("#modalClose").focus();
+  }
+  function closeModal(){
+    $("#modal").hidden = true; $("#modalBox").innerHTML = ""; lenis && lenis.start(); document.documentElement.style.overflow = ""; lastFocus && lastFocus.focus();
+  }
+  $("#modalClose").addEventListener("click", closeModal);
+  $("#modal").addEventListener("click", e => { if(e.target.id === "modal") closeModal(); });
+  addEventListener("keydown", e => { if(e.key === "Escape" && !$("#modal").hidden) closeModal(); });
+
+  /* ---------------- motion ---------------- */
+  function motion(){
+    const top = $("#top"), fab = $("#fab");
+    let lastY = 0;
+    const onScroll = y => {
+      top.classList.toggle("is-solid", y > 30);
+      top.classList.toggle("is-away", y > lastY && y > innerHeight * .9);
+      lastY = y;
+      fab.classList.toggle("is-hidden", y < innerHeight * .7);
+    };
+
+    if(reduce || !window.gsap || !window.ScrollTrigger){
+      addEventListener("scroll", () => onScroll(scrollY), {passive:true});
+      $$(".js-anchor, a[href^='#']").forEach(a => a.addEventListener("click", e => { const t = document.querySelector(a.getAttribute("href")); if(t){ e.preventDefault(); t.scrollIntoView(); } }));
+      $$(".step").forEach(s => s.classList.add("is-on"));
+      $("#stepsFill").style.transform = "scaleY(1)";
+      $$(".rule i").forEach(i => i.style.transform = "scaleX(1)");
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.config({ ignoreMobileResize: true });
+
+    // smooth scrolling
+    if(window.Lenis && !touch){
+      lenis = new Lenis({ lerp: .1, smoothWheel: true });
+      lenis.on("scroll", ({scroll}) => { ScrollTrigger.update(); onScroll(scroll); });
+      gsap.ticker.add(t => lenis.raf(t * 1000));
+      gsap.ticker.lagSmoothing(0);
+    } else addEventListener("scroll", () => onScroll(scrollY), {passive:true});
+    const go = sel => { const t = document.querySelector(sel); if(!t) return; lenis ? lenis.scrollTo(t, {offset:-70, duration:1.4}) : t.scrollIntoView({behavior:"smooth"}); };
+    $$("a[href^='#']").forEach(a => a.addEventListener("click", e => { e.preventDefault(); go(a.getAttribute("href")); }));
+
+    // progress line
+    gsap.to("#progress", { scaleX:1, ease:"none", scrollTrigger:{ start:0, end:"max", scrub:.2 } });
+
+    // hero: video shrinks into a card, text drifts up
+    const heroST = { trigger:"#hero", start:"top top", end:"bottom top", scrub:true };
+    if(!touch) gsap.to("#heroBg", { clipPath:"inset(12% 5% 12% 5% round 32px)", ease:"none", scrollTrigger:heroST });
+    gsap.fromTo("#heroMedia", { scale:1.12 }, { scale:1, ease:"none", scrollTrigger:heroST });
+    gsap.to("#heroContent", { yPercent:-28, opacity:0, ease:"none", scrollTrigger:{ trigger:"#hero", start:"top top", end:"70% top", scrub:true } });
+    gsap.to(".scrollcue", { opacity:0, scrollTrigger:{ trigger:"#hero", start:"top top", end:"15% top", scrub:true } });
+
+    // about photo drifts inside its frame
+    if($("#aboutImg") && !touch) gsap.fromTo("#aboutImg", { yPercent:-6, scale:1.08 }, { yPercent:6, scale:1, ease:"none", scrollTrigger:{ trigger:"#about", start:"top bottom", end:"bottom top", scrub:true } });
+    gsap.fromTo("#aboutHoop", { rotate:-50 }, { rotate:40, ease:"none", scrollTrigger:{ trigger:"#about", start:"top bottom", end:"bottom top", scrub:true } });
+
+    // gear rails slide in
+    $$(".gearrail").forEach(r => gsap.from(r.children, { x:-50, opacity:0, duration:.8, ease:"power3.out", stagger:.07, scrollTrigger:{ trigger:r, start:"top 88%" } }));
+
+    // reel slides in
+    gsap.from("#reelTrack", { x:-120, opacity:0, duration:1.3, ease:"power3.out", scrollTrigger:{ trigger:"#reel", start:"top 85%" } });
+
+    // marquee rows move against each other with scroll
+    gsap.fromTo("#mq1", { xPercent:-30 }, { xPercent:0,   ease:"none", scrollTrigger:{ trigger:".marquee", start:"top bottom", end:"bottom top", scrub:.5 } });
+    gsap.fromTo("#mq2", { xPercent:0 },   { xPercent:-30, ease:"none", scrollTrigger:{ trigger:".marquee", start:"top bottom", end:"bottom top", scrub:.5 } });
+
+    // headings: words rise in
+    $$("[data-split]").forEach(h => gsap.from($$(".wi", h), { yPercent:110, duration:1, ease:"power4.out", stagger:.06, scrollTrigger:{ trigger:h, start:"top 85%" } }));
+    // hairlines draw
+    $$(".rule i").forEach(i => gsap.to(i, { scaleX:1, ease:"none", scrollTrigger:{ trigger:i, start:"top 90%", end:"top 55%", scrub:true } }));
+
+    // simple reveals
+    const reveal = els => els.forEach(el => gsap.from(el, { y:44, opacity:0, duration:1, ease:"power3.out", scrollTrigger:{ trigger:el, start:"top 88%" } }));
+    reveal($$("[data-reveal]"));
+    $$("[data-stagger]").forEach(box => gsap.from(box.children, { y:40, opacity:0, duration:.9, ease:"power3.out", stagger:.1, scrollTrigger:{ trigger:box, start:"top 85%" } }));
+
+    // thumbnails zoom in slightly as they enter
+    const zoom = els => touch ? 0 : els.forEach(z => { const img = $("img", z); if(img) gsap.fromTo(img, { scale:1.28 }, { scale:1, ease:"none", scrollTrigger:{ trigger:z, start:"top bottom", end:"center 45%", scrub:true } }); });
+    zoom($$(".zoom"));
+    window.__animateNew = els => { reveal(els); zoom(els.map(e => $(".zoom", e)).filter(Boolean)); ScrollTrigger.refresh(); };
+
+    // process: line fills, steps light up, cymbal rings turn
+    gsap.to("#stepsFill", { scaleY:1, ease:"none", scrollTrigger:{ trigger:"#steps", start:"top 65%", end:"bottom 60%", scrub:true } });
+    $$(".step").forEach(s => ScrollTrigger.create({ trigger:s, start:"top 62%", onEnter:() => s.classList.add("is-on"), onLeaveBack:() => s.classList.remove("is-on") }));
+    gsap.fromTo("#rings", { rotate:-40, scale:.85 }, { rotate:60, scale:1.1, ease:"none", scrollTrigger:{ trigger:"#process", start:"top bottom", end:"bottom top", scrub:true } });
+
+    // CTA grows in
+    gsap.fromTo("#cta", { scale:.88, borderRadius:"60px" }, { scale:1, borderRadius:"28px", ease:"none", scrollTrigger:{ trigger:"#cta", start:"top bottom", end:"top 45%", scrub:true } });
+    // footer wordmark slides
+    gsap.fromTo("#wordmark", { xPercent:5 }, { xPercent:-35, ease:"none", scrollTrigger:{ trigger:".foot", start:"top bottom", end:"bottom bottom", scrub:true } });
+
+    addEventListener("load", () => ScrollTrigger.refresh());
+  }
+
+  /* ---------------- hero: drum-head pulse (works even before the video loads) ---------------- */
+  function heroFx(){
+    const cv = $("#heroFx"); if(!cv || reduce) return;
+    const ctx = cv.getContext("2d"); let W = 0, H = 0, running = true;
+    const TQ = "46,211,195", SD = "227,211,182";
+    const rings = [], dust = Array.from({length:40}, () => ({x:Math.random(), y:Math.random(), r:.5+Math.random()*1.6, v:.015+Math.random()*.04, a:.15+Math.random()*.3}));
+    let pulse = 0;
+    const size = () => { const dpr = Math.min(2, devicePixelRatio || 1), r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W*dpr; cv.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); };
+    size(); addEventListener("resize", size);
+    const hit = (x, y, power, col) => { rings.push({x, y, t:0, power, col}); if(rings.length > 10) rings.shift(); };
+    // slow and calm: one beat every 1.6 seconds, alternating a deep hit and a softer one
+    const beat = 1.6; let last = performance.now(), acc = beat - .4, n = 0;
+    $("#hero").addEventListener("pointerdown", e => { if(e.target.closest("a,button")) return; const r = cv.getBoundingClientRect(); hit(e.clientX - r.left, e.clientY - r.top, 1.15, TQ); pulse = 1; });
+    new IntersectionObserver(([e]) => running = e.isIntersecting).observe(cv);
+    const frame = now => {
+      requestAnimationFrame(frame); if(!running) return;
+      const dt = Math.min(.05, (now - last) / 1000); last = now;
+      if((acc += dt) >= beat){ acc -= beat; n++; const deep = n % 2 === 1; hit(W/2, H*.46, deep ? 1 : .7, deep ? TQ : SD); pulse = deep ? 1 : .55; }
+      pulse *= Math.pow(.12, dt);
+      ctx.clearRect(0,0,W,H);
+      const R = Math.min(W, H) * .36, cx = W/2, cy = H*.46;
+      // drum head + tension rods
+      ctx.lineWidth = 1.2; ctx.strokeStyle = `rgba(${SD},${.10 + pulse*.12})`;
+      ctx.beginPath(); ctx.arc(cx, cy, R * (1 + pulse*.02), 0, Math.PI*2); ctx.stroke();
+      ctx.strokeStyle = `rgba(${SD},.07)`; ctx.beginPath(); ctx.arc(cx, cy, R*.93, 0, Math.PI*2); ctx.stroke();
+      for(let i = 0; i < 10; i++){ const a = i/10*Math.PI*2; ctx.strokeStyle = `rgba(${TQ},${.2 + pulse*.3})`; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(cx + Math.cos(a)*R*1.04, cy + Math.sin(a)*R*1.04); ctx.lineTo(cx + Math.cos(a)*R*1.11, cy + Math.sin(a)*R*1.11); ctx.stroke(); }
+      // glow
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R*1.2); g.addColorStop(0, `rgba(${TQ},${.05 + pulse*.08})`); g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+      // rings travel out slowly
+      for(let i = rings.length - 1; i >= 0; i--){ const r = rings[i]; r.t += dt;
+        const life = 4, k = r.t / life; if(k >= 1){ rings.splice(i,1); continue; }
+        const rad = 20 + (1 - Math.pow(1-k, 3)) * Math.max(W, H) * .7 * r.power;
+        ctx.lineWidth = (1 - k) * 2.4 * r.power; ctx.strokeStyle = `rgba(${r.col},${(1-k)*.45})`;
+        ctx.beginPath(); ctx.arc(r.x, r.y, rad, 0, Math.PI*2); ctx.stroke(); }
+      // dust drifting up
+      dust.forEach(d => { d.y -= d.v * dt * (1 + pulse*2); if(d.y < -.02){ d.y = 1.02; d.x = Math.random(); }
+        ctx.fillStyle = `rgba(${SD},${d.a * (.6 + pulse*.4)})`; ctx.beginPath(); ctx.arc(d.x*W + Math.sin(now/1800 + d.y*9)*6, d.y*H, d.r, 0, Math.PI*2); ctx.fill(); });
+    };
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------------- boot ---------------- */
+  function heroIn(){
+    const intro = $("#intro");
+    if(reduce || !window.gsap){ intro.remove(); return; }
+    const tl = gsap.timeline();
+    tl.to(".intro__logo", { scale:.6, opacity:0, duration:.35, ease:"power2.in" })
+      .to(intro, { yPercent:-100, duration:.8, ease:"power4.inOut" }, "-=.05")
+      .from("#heroMedia", { scale:1.35, duration:1.6, ease:"power3.out" }, "-=.6")
+      .from("#heroTitle .wi", { yPercent:110, duration:1.1, ease:"power4.out", stagger:.07 }, "-=1.3")
+      .from("[data-hero]", { y:24, opacity:0, duration:.9, ease:"power3.out", stagger:.1 }, "-=.8")
+      .add(() => intro.remove());
+  }
+
+  async function boot(){
+    const started = Date.now();
+    let S;
+    try { S = await withTimeout(loadContent(), 3500); } catch(e){ S = mergeContent(null); }
+    try { render(S); } catch(e){ console.error(e); }
+    const wait = Math.max(0, 650 - (Date.now() - started));
+    const safe = f => { try { f(); } catch(e){ console.error(e); } };
+    setTimeout(() => {
+      safe(motion);
+      try { heroIn(); } catch(e){ console.error(e); const i = $("#intro"); i && i.remove(); }
+      safe(heroFx);
+    }, wait);
+  }
+  // never leave the opening screen stuck
+  setTimeout(() => { const i = document.getElementById("intro"); if(i) i.remove(); }, 8000);
+  // wait for the deferred animation libraries
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+})();
+
+</script>
+</body>
+</html>

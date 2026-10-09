@@ -1,0 +1,12 @@
+{
+  "name": "אבישי ישר | Live & Studio Drums",
+  "short_name": "AY Drums",
+  "start_url": "./",
+  "display": "browser",
+  "background_color": "#0F1716",
+  "theme_color": "#0F1716",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

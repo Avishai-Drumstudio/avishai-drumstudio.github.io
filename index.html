@@ -64,7 +64,7 @@ h1,h2,h3{text-wrap:balance}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
 /* grain over everything – very subtle */
-body::after{content:"";position:fixed;inset:-50%;z-index:90;pointer-events:none;opacity:.05;
+body::after{content:"";position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.05;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
 /* ---------- intro curtain ---------- */
@@ -461,6 +461,11 @@ html.menu-open{overflow:hidden}
   .fog{opacity:.45}
   .hero__media::after{background:linear-gradient(180deg,rgba(9,14,13,.45) 0%,rgba(9,14,13,.12) 26%,rgba(9,14,13,.35) 48%,rgba(9,14,13,.82) 70%,rgba(9,14,13,.97) 100%)}
 }
+
+/* ---------- never let the page slide sideways ---------- */
+html,body{max-width:100%;overflow-x:hidden}
+@supports (overflow:clip){html,body{overflow-x:clip}}
+#main,.hero,.section,.reel,.marquee,.foot,.top{max-width:100vw;overflow-x:clip}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>

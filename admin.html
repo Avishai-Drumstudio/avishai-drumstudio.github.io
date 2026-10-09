@@ -33,7 +33,7 @@ a{color:inherit}
 .btn--soft{background:var(--surface-2)}
 .btn--line{border:1.5px solid var(--line)}
 .btn--sm{min-height:36px;padding:0 12px;font-size:14px;border-radius:10px;font-weight:500}
-.logo{width:40px;height:40px;border-radius:11px;background:var(--lime);color:var(--on-lime);display:grid;place-items:center;font-weight:900;direction:ltr;flex:none}
+.logo{position:relative;width:42px;height:42px;border-radius:50%;background:radial-gradient(120% 120% at 30% 20%,#25332F,#0B1110 70%);display:grid;place-items:center;font-weight:900;font-style:italic;letter-spacing:-.06em;color:var(--sand);direction:ltr;flex:none;box-shadow:0 0 0 2px var(--lime),0 6px 16px rgba(0,0,0,.4)}
 
 /* login */
 .login{min-height:100svh;display:grid;place-items:center;padding:16px}
@@ -60,6 +60,10 @@ input[dir=ltr]{text-align:left}
 .tab{flex:none;min-height:38px;padding:0 14px;border-radius:10px;background:var(--surface);color:var(--muted);font-size:14.5px;font-weight:500}
 .tab[aria-selected=true]{background:var(--lime);color:var(--on-lime)}
 .panel{padding-block:20px 140px;display:grid;gap:14px}
+.panel,.card,.panel-list{grid-template-columns:minmax(0,1fr)}
+.panel > *,.card > *{min-width:0}
+.card__head{flex-wrap:wrap}
+.card__head b{flex:1 1 140px}
 .panel h2{font-size:1.25rem;font-weight:800}
 .panel > p{color:var(--muted);font-size:14.5px;margin-top:-6px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:12px}
@@ -245,6 +249,13 @@ window.SITE_DEFAULTS = {
     { category: "כרטיס קול ופראמפים", role: "Interface", name: "Roland Studio Capture", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg", url: "https://vintageking.com/roland-studio-capture-usb-audio-interface", show: true },
     { category: "כרטיס קול ופראמפים", role: "Preamps", name: "פראמפים", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg", url: "", show: true }
   ],
+  gearCats: [
+    { name: "מערכות תופים", show: true },
+    { name: "מצילות וסנרים", show: true },
+    { name: "מיקרופונים", show: true },
+    { name: "כרטיס קול ופראמפים", show: true }
+  ],
+  custom: [],
   testimonials: [],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
@@ -261,7 +272,7 @@ window.mergeContent = function (saved) {
     if (k === "show") d.show = Object.assign(d.show, saved.show || {});
     else if (saved[k] !== undefined && saved[k] !== null) d[k] = saved[k];
   });
-  const all = window.SITE_DEFAULTS.order;
+  const all = window.SITE_DEFAULTS.order.concat((d.custom || []).filter(c => c && c.id).map(c => "c_" + c.id));
   d.order = (d.order || []).filter(k => all.includes(k));
   all.forEach(k => { if (!d.order.includes(k)) d.order.push(k); });
   return d;
@@ -313,6 +324,7 @@ window.mergeContent = function (saved) {
   $("#save").addEventListener("click", async () => {
     $("#save").disabled = true; status("שומר…");
     try {
+      syncOrder();
       const r = await post({ action:"save", password: PW, data: S });
       if(r.ok){ dirty = false; status("נשמר. האתר מעודכן."); }
       else if(r.error === "wrong_password"){ status("הסיסמה השתנתה. צאו והיכנסו מחדש.", "bad"); }
@@ -427,12 +439,19 @@ window.mergeContent = function (saved) {
           const card = el("div", {class:"card" + (S.show[k] === false ? " is-off" : "")});
           const up = iconBtn("up","למעלה", () => { [S.order[i-1],S.order[i]] = [S.order[i],S.order[i-1]]; markDirty(); draw(); }); up.disabled = i === 0;
           const dn = iconBtn("down","למטה", () => { [S.order[i+1],S.order[i]] = [S.order[i],S.order[i+1]]; markDirty(); draw(); }); dn.disabled = i === S.order.length - 1;
-          card.append(el("div", {class:"card__head"}, el("b", {}, `${i+1}. ${SECTION_NAMES[k]}`), toggle(S.show, k, "מוצג", on => card.classList.toggle("is-off", !on)), up, dn));
+          card.append(el("div", {class:"card__head"}, el("b", {}, `${i+1}. ${secName(k)}`), toggle(S.show, k, "מוצג", on => card.classList.toggle("is-off", !on)), up, dn));
           box.append(card);
         }); };
       draw();
       return [el("h2", {}, "סדר הסקציות"), el("p", {}, "החלק העליון עם הכותרת והווידאו תמיד ראשון. את כל השאר מסדרים כאן, ומסתירים מה שלא צריך."), box];
     }},
+    { name:"חלקים נוספים", build: () => [
+      el("h2", {}, "חלקים נוספים"),
+      el("p", {}, "כאן מוסיפים לאתר חלק חדש משלכם: כותרת, טקסט, תמונה וכפתור. אחרי ההוספה, בלשונית \"סדר הדף\" קובעים איפה הוא יופיע ואם הוא מוצג."),
+      listEditor(S.custom, { title:x => x.title, noShow:true,
+        fields:[["eyebrow","שורה קטנה מעל הכותרת"],["title","כותרת"],["navTitle","שם בתפריט (לא חובה)"],["text","טקסט","textarea","כדי להתחיל פסקה חדשה משאירים שורה ריקה"],["image","קישור לתמונה (לא חובה)","url"],["btnText","טקסט על הכפתור (לא חובה)"],["btnUrl","לאן הכפתור מוביל (לא חובה)","url"]],
+        blank:() => ({ id: Date.now().toString(36), eyebrow:"", title:"", navTitle:"", text:"", image:"", btnText:"", btnUrl:"" }), addLabel:"הוספת חלק חדש" })
+    ]},
     { name:"הפקות", build: () => [
       el("h2", {}, "הפקות"), el("p", {}, "כל פריט הוא סרטון יוטיוב. הסדר כאן הוא הסדר באתר, גם בגלילה לצדדים וגם ברשת."),
       listEditor(S.productions, { title:x => x.title, fields:[["url","קישור יוטיוב","url"],["title","שם השיר"]], blank:() => ({url:"",title:"",show:true}), addLabel:"הוספת הפקה" })
@@ -441,22 +460,57 @@ window.mergeContent = function (saved) {
       el("h2", {}, "סורסים"), el("p", {}, "קישור לתופים בלבד מפעיל את הנגן. כשיש גם קישור להפקה המלאה, מופיע סליידר שעובר בין התופים לבד להפקה המלאה. שני הקבצים צריכים להתחיל באותה נקודה ובאותו אורך."),
       listEditor(S.sources, { title:x => x.name, fields:[["name","שם השיר"],["audio","קישור MP3 – רק תופים","url"],["mix","קישור MP3 – ההפקה המלאה (לסליידר)","url"],["drive","קישור לערוצים המלאים","url"]], blank:() => ({name:"",audio:"",mix:"",drive:"",show:true}), addLabel:"הוספת סורס" })
     ]},
-    { name:"ציוד", build: () => [
-      el("h2", {}, "ציוד"), el("p", {}, "הקטגוריה קובעת באיזו לשונית הפריט מופיע. קישור ריק = בלי כפתור למוצר."),
-      listEditor(S.gear, { title:x => x.name, fields:[["category","קטגוריה"],["role","תפקיד (למשל Kick In)"],["name","שם הפריט"],["img","קישור לתמונה","url"],["url","קישור למוצר","url"]], blank:() => ({category:"",role:"",name:"",img:"",url:"",show:true}), addLabel:"הוספת פריט" })
-    ]},
+    { name:"ציוד", build: () => {
+      const catNames = () => [...new Set([...S.gearCats.map(c => c.name).filter(Boolean), ...S.gear.map(g => g.category).filter(Boolean)])];
+      // categories: add, rename, reorder, hide
+      const catBox = el("div", {style:"display:grid;gap:10px"});
+      const drawCats = () => { catBox.innerHTML = "";
+        S.gearCats.forEach((c,i) => {
+          const count = S.gear.filter(g => g.category === c.name).length;
+          const name = el("input", {type:"text", value:c.name || "", "aria-label":"שם הקטגוריה"});
+          let prev = c.name;
+          name.addEventListener("input", () => { c.name = name.value; markDirty(); });
+          name.addEventListener("change", () => { S.gear.forEach(g => { if(g.category === prev) g.category = c.name; }); prev = c.name; markDirty(); setTimeout(() => { if(PANELS[current].name === "ציוד") show(current); }, 0); });
+          const up = iconBtn("up","למעלה", () => { [S.gearCats[i-1],S.gearCats[i]] = [S.gearCats[i],S.gearCats[i-1]]; markDirty(); drawCats(); }); up.disabled = i === 0;
+          const dn = iconBtn("down","למטה", () => { [S.gearCats[i+1],S.gearCats[i]] = [S.gearCats[i],S.gearCats[i+1]]; markDirty(); drawCats(); }); dn.disabled = i === S.gearCats.length - 1;
+          const del = iconBtn("trash","מחיקה", () => {
+            if(count){ alert("בקטגוריה יש " + count + " פריטים. קודם מעבירים אותם לקטגוריה אחרת או מוחקים אותם."); return; }
+            S.gearCats.splice(i,1); markDirty(); show(current); }, "danger");
+          const card = el("div", {class:"card" + (c.show === false ? " is-off" : "")},
+            el("div", {class:"card__head"}, el("b", {}, count + " פריטים"), toggle(c, "show", "מוצג", on => card.classList.toggle("is-off", !on)), up, dn, del),
+            name);
+          catBox.append(card);
+        });
+        catBox.append(el("button", {type:"button", class:"add", onclick:() => { S.gearCats.push({name:"קטגוריה חדשה", show:true}); markDirty(); show(current); }}, "+ הוספת קטגוריה"));
+      };
+      drawCats();
+      return [
+        el("h2", {}, "קטגוריות ציוד"), el("p", {}, "הסדר כאן הוא הסדר באתר. שינוי שם מעדכן את כל הפריטים שבקטגוריה."), catBox,
+        el("h2", {}, "פריטי ציוד"), el("p", {}, "בוחרים לכל פריט קטגוריה. קישור ריק = בלי כפתור למוצר."),
+        listEditor(S.gear, { title:x => x.name, fields:[["category","קטגוריה","select",catNames()],["role","תפקיד (למשל Kick In)"],["name","שם הפריט"],["img","קישור לתמונה","url"],["url","קישור למוצר","url"]], blank:() => ({category:(S.gearCats[0]||{}).name||"",role:"",name:"",img:"",url:"",show:true}), addLabel:"הוספת פריט" })
+      ];
+    }},
     { name:"המלצות", build: () => [
       el("h2", {}, "המלצות"), el("p", {}, "הסקציה מופיעה באתר כשיש לפחות המלצה אחת מוצגת."),
       listEditor(S.testimonials, { title:x => x.name, fields:[["name","שם"],["role","תפקיד / על מה עבדנו"],["text","ההמלצה","textarea"]], blank:() => ({name:"",role:"",text:"",show:true}), addLabel:"הוספת המלצה" })
     ]}
   ];
 
+  const secName = k => SECTION_NAMES[k] || (k.startsWith("c_") ? "חלק נוסף: " + (((S.custom || []).find(c => "c_" + c.id === k) || {}).title || "בלי כותרת") : k);
+  // keep the page order in step with added / deleted custom sections
+  function syncOrder(){
+    S.custom = S.custom || []; S.gearCats = S.gearCats || [];
+    const keys = S.custom.filter(c => c && c.id).map(c => "c_" + c.id);
+    S.order = S.order.filter(k => !k.startsWith("c_") || keys.includes(k));
+    keys.forEach(k => { if(!S.order.includes(k)){ const at = S.order.indexOf("cta"); at < 0 ? S.order.push(k) : S.order.splice(at, 0, k); } });
+  }
+
   function buildTabs(){
     $("#tabs").innerHTML = "";
     PANELS.forEach((p,i) => $("#tabs").append(el("button", {type:"button", class:"tab", role:"tab", "aria-selected": String(i===current), onclick:() => show(i)}, p.name)));
   }
   function show(i){
-    current = i;
+    current = i; syncOrder();
     [...$("#tabs").children].forEach((t,j) => t.setAttribute("aria-selected", String(i===j)));
     const panel = el("section", {class:"panel"}, PANELS[i].build());
     $("#panels").replaceChildren(panel);

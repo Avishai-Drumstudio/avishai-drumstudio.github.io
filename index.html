@@ -62,7 +62,6 @@ body::after{content:"";position:fixed;inset:-50%;z-index:90;pointer-events:none;
 /* ---------- intro curtain ---------- */
 .intro{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;animation:introFail .5s 9s forwards}
 @keyframes introFail{to{opacity:0;visibility:hidden;pointer-events:none}}
-.intro__logo{width:84px;height:84px;border-radius:22px;background:var(--tq-grad);box-shadow:var(--gloss);color:var(--on-lime);display:grid;place-items:center;font-weight:900;font-size:32px;direction:ltr;animation:pulse 1.1s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(.92)}}
 
 /* ---------- progress line ---------- */
@@ -86,7 +85,19 @@ body::after{content:"";position:fixed;inset:-50%;z-index:90;pointer-events:none;
 .top.is-away{transform:translateY(-110%)}
 .top__in{display:flex;align-items:center;justify-content:space-between;height:70px}
 .brand{display:flex;align-items:center;gap:12px}
-.logo{width:42px;height:42px;border-radius:12px;background:var(--tq-grad);box-shadow:var(--gloss);color:var(--on-lime);display:grid;place-items:center;font-weight:900;font-size:17px;direction:ltr}
+/* AY monogram: a drum-head disc with a turning ring, unlike the flat buttons */
+.logo{position:relative;flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;direction:ltr;isolation:isolate;
+  background:radial-gradient(120% 120% at 30% 20%,#25332F 0%,#101816 55%,#070B0A 100%);
+  box-shadow:0 8px 22px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.09),inset 0 -6px 14px rgba(0,0,0,.45)}
+.logo::before{content:"";position:absolute;inset:-2px;border-radius:50%;padding:2px;z-index:-1;
+  background:conic-gradient(from 0deg,#2ED3C3,#E3D3B6 22%,rgba(46,211,195,.12) 45%,#2ED3C3 62%,#9FF6EC 78%,#2ED3C3);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  animation:ringTurn 9s linear infinite}
+.logo::after{content:"";position:absolute;top:6px;right:7px;width:5px;height:5px;border-radius:50%;background:#2ED3C3;box-shadow:0 0 8px 1px rgba(46,211,195,.9)}
+.logo i{font-style:italic;font-weight:900;font-size:16px;letter-spacing:-.07em;padding-inline-end:.08em;line-height:1;
+  background:linear-gradient(160deg,#FFF6E6 0%,#E3D3B6 45%,#2ED3C3 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.35))}
+@keyframes ringTurn{to{transform:rotate(360deg)}}
 .brand__txt{display:grid;line-height:1.15}
 .brand__txt b{font-weight:800;font-size:16px}
 .brand__txt small{font-size:12px;color:var(--muted);direction:ltr;text-align:right}
@@ -349,6 +360,55 @@ a.row__link:hover .row__go{background:var(--lime);color:var(--on-lime)}
 }
 
 
+/* ---------- header menu ---------- */
+.top__start{display:flex;align-items:center;gap:10px}
+.menubtn{width:44px;height:44px;border-radius:50%;display:grid;align-content:center;justify-items:center;gap:5px;background:rgba(15,23,22,.55);border:1px solid rgba(237,228,211,.16);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.menubtn i{display:block;width:18px;height:2px;border-radius:2px;background:var(--text);transition:transform .35s var(--ease),opacity .2s,width .3s var(--ease)}
+.menubtn i:nth-child(2){width:12px;justify-self:center}
+.menubtn:hover i:nth-child(2){width:18px}
+.menu{position:fixed;inset:0;z-index:90;background:radial-gradient(80% 60% at 85% 0%,rgba(46,211,195,.14),transparent 70%),rgba(8,12,11,.97);overflow-y:auto;overscroll-behavior:contain}
+.menu__in{min-height:100%;display:flex;flex-direction:column;gap:28px;padding:calc(18px + env(safe-area-inset-top,0px)) var(--gutter,16px) calc(28px + env(safe-area-inset-bottom,0px));max-width:720px;margin-inline:auto}
+.menu__head{display:flex;align-items:center;justify-content:space-between}
+.menu__close{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(237,228,211,.18);color:var(--text)}
+.menu__close svg{width:20px;height:20px}
+.menu__list{list-style:none;display:grid;gap:2px;counter-reset:m}
+.menu__list a{display:flex;align-items:baseline;gap:14px;padding:12px 4px;border-bottom:1px solid var(--line);font-weight:800;font-size:clamp(1.6rem,7vw,2.4rem);line-height:1.15;color:var(--text);transition:color .2s,padding .3s var(--ease)}
+.menu__list a::before{counter-increment:m;content:counter(m,decimal-leading-zero);font-size:13px;font-weight:600;color:var(--lime);letter-spacing:.06em;direction:ltr;min-width:2ch}
+.menu__list a:hover,.menu__list a:focus-visible{color:var(--lime);padding-inline-start:10px}
+.menu__foot{margin-top:auto;display:grid;gap:18px;justify-items:start}
+.menu__foot .socials{justify-content:flex-start}
+.menu.is-open .menu__list li{animation:menuIn .5s var(--ease) both}
+@keyframes menuIn{from{opacity:0;transform:translateY(18px)}}
+html.menu-open{overflow:hidden}
+
+/* ---------- custom sections (added from the admin) ---------- */
+.custom__box{display:grid;gap:28px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:clamp(22px,4vw,40px);overflow:hidden}
+.custom__box.has-img{grid-template-columns:1fr}
+@media (min-width:820px){.custom__box.has-img{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}}
+.custom__img{border-radius:20px;overflow:hidden;aspect-ratio:4/3;background:var(--surface-2)}
+.custom__img img{width:100%;height:100%;object-fit:cover}
+.custom__txt{display:grid;gap:14px;justify-items:start}
+.custom__txt h2{font-weight:800;font-size:clamp(1.8rem,6vw,2.8rem);line-height:1.12}
+.custom__body{display:grid;gap:12px;color:var(--muted);font-size:17px;line-height:1.7}
+
+/* ---------- loading screen: on-air light + level meter ---------- */
+.intro__in{display:grid;justify-items:center;gap:16px;text-align:center}
+.onair{display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 12px;border-radius:999px;border:1px solid rgba(255,90,90,.45);background:rgba(255,77,77,.08);color:#FF7A7A;font-weight:800;font-size:12px;letter-spacing:.24em;direction:ltr}
+.onair i{width:9px;height:9px;border-radius:50%;background:#FF4D4D;box-shadow:0 0 12px 2px rgba(255,77,77,.8);animation:onair 1.2s ease-in-out infinite}
+@keyframes onair{50%{opacity:.25;box-shadow:0 0 0 0 rgba(255,77,77,0)}}
+.intro__eq{display:flex;align-items:flex-end;gap:5px;height:46px}
+.intro__eq i{width:7px;height:30%;border-radius:4px;background:linear-gradient(180deg,#E3D3B6,#2ED3C3 45%,#1C9E92);animation:eq .8s ease-in-out infinite alternate}
+.intro__eq i:nth-child(2){animation-delay:-.55s;animation-duration:.7s}
+.intro__eq i:nth-child(3){animation-delay:-.2s;animation-duration:.9s}
+.intro__eq i:nth-child(4){animation-delay:-.7s;animation-duration:.6s}
+.intro__eq i:nth-child(5){animation-delay:-.35s;animation-duration:.85s}
+.intro__eq i:nth-child(6){animation-delay:-.6s;animation-duration:.75s}
+.intro__eq i:nth-child(7){animation-delay:-.1s;animation-duration:.95s}
+@keyframes eq{from{height:18%}to{height:100%}}
+.intro__t{direction:ltr;font-weight:900;font-size:clamp(2rem,9vw,3rem);letter-spacing:-.02em;line-height:1;background:linear-gradient(120deg,#FFF6E6,#E3D3B6 40%,#2ED3C3);-webkit-background-clip:text;background-clip:text;color:transparent}
+.intro__s{color:var(--muted);font-size:15px;letter-spacing:.12em}
+@media (prefers-reduced-motion:reduce){.intro__eq i,.onair i,.logo::before{animation:none}}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -356,16 +416,26 @@ a.row__link:hover .row__go{background:var(--lime);color:var(--on-lime)}
 </head>
 <body>
 
-<div class="intro" id="intro" aria-hidden="true"><div class="intro__logo">AY</div></div>
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro__in">
+    <span class="onair"><i></i>LIVE</span>
+    <div class="intro__eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <b class="intro__t">Live &amp; Studio</b>
+    <small class="intro__s">הקלטות תופים</small>
+  </div>
+</div>
 <div class="progress" id="progress" aria-hidden="true"></div>
 
 <!-- ============ HEADER ============ -->
 <header class="top" id="top">
   <div class="wrap top__in">
+    <div class="top__start">
+    <button class="menubtn" id="menuBtn" type="button" aria-label="תפריט" aria-expanded="false" aria-controls="menu"><i></i><i></i><i></i></button>
     <a class="brand js-anchor" href="#hero" aria-label="אבישי ישר – לראש הדף">
-      <span class="logo">AY</span>
+      <span class="logo"><i>AY</i></span>
       <span class="brand__txt"><b>אבישי ישר</b><small>Live &amp; Studio Drums</small></span>
     </a>
+    </div>
     <a class="btn btn--lime js-wa" target="_blank" rel="noopener">דברו איתי</a>
   </div>
 </header>
@@ -538,7 +608,7 @@ a.row__link:hover .row__go{background:var(--lime);color:var(--on-lime)}
 
 <footer class="foot">
   <div class="wrap foot__in">
-    <a class="brand js-anchor" href="#hero"><span class="logo">AY</span><span class="brand__txt"><b>אבישי ישר</b><small>Live &amp; Studio Drums</small></span></a>
+    <a class="brand js-anchor" href="#hero"><span class="logo"><i>AY</i></span><span class="brand__txt"><b>אבישי ישר</b><small>Live &amp; Studio Drums</small></span></a>
     <nav class="socials" id="socials" aria-label="רשתות חברתיות"></nav>
     <div class="foot__small">
       <span>© <span id="year">2026</span> כל הזכויות שמורות</span>
@@ -549,6 +619,20 @@ a.row__link:hover .row__go{background:var(--lime);color:var(--on-lime)}
 </footer>
 
 <a class="fab js-wa is-hidden" id="fab" target="_blank" rel="noopener" aria-label="דברו איתי בוואטסאפ"><svg viewBox="0 0 24 24"><use href="#i-wa"/></svg></a>
+
+<nav class="menu" id="menu" aria-label="תפריט האתר" hidden>
+  <div class="menu__in">
+    <div class="menu__head">
+      <span class="logo"><i>AY</i></span>
+      <button class="menu__close" id="menuClose" type="button" aria-label="סגירת התפריט"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    </div>
+    <ol class="menu__list" id="menuList"></ol>
+    <div class="menu__foot">
+      <a class="btn btn--lime js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>שלחו סקיצה בוואטסאפ</a>
+      <div class="socials" id="menuSocials"></div>
+    </div>
+  </div>
+</nav>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="סרטון" hidden>
   <button class="modal__close" id="modalClose" type="button" aria-label="סגירה"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
@@ -682,6 +766,13 @@ window.SITE_DEFAULTS = {
     { category: "כרטיס קול ופראמפים", role: "Interface", name: "Roland Studio Capture", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg", url: "https://vintageking.com/roland-studio-capture-usb-audio-interface", show: true },
     { category: "כרטיס קול ופראמפים", role: "Preamps", name: "פראמפים", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg", url: "", show: true }
   ],
+  gearCats: [
+    { name: "מערכות תופים", show: true },
+    { name: "מצילות וסנרים", show: true },
+    { name: "מיקרופונים", show: true },
+    { name: "כרטיס קול ופראמפים", show: true }
+  ],
+  custom: [],
   testimonials: [],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
@@ -698,7 +789,7 @@ window.mergeContent = function (saved) {
     if (k === "show") d.show = Object.assign(d.show, saved.show || {});
     else if (saved[k] !== undefined && saved[k] !== null) d[k] = saved[k];
   });
-  const all = window.SITE_DEFAULTS.order;
+  const all = window.SITE_DEFAULTS.order.concat((d.custom || []).filter(c => c && c.id).map(c => "c_" + c.id));
   d.order = (d.order || []).filter(k => all.includes(k));
   all.forEach(k => { if (!d.order.includes(k)) d.order.push(k); });
   return d;
@@ -834,7 +925,36 @@ window.mergeContent = function (saved) {
     // section order + visibility (hero is always first)
     const ids = { reel:"reel", about:"about", marquee:"marquee", facts:"facts", process:"process", productions:"productions", sources:"sources", studio:"studio", testimonials:"testimonials", cta:"ctaSection" };
     const main = $("#main");
+    // sections added from the admin
+    (S.custom || []).forEach(c => {
+      if(!c || !c.id) return;
+      const paras = String(c.text || "").split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join("");
+      const sec = document.createElement("section");
+      sec.className = "section"; sec.id = "c_" + c.id;
+      sec.innerHTML = `<div class="wrap"><div class="custom__box${real(c.image) ? " has-img" : ""}" data-reveal>
+        ${real(c.image) ? `<div class="custom__img"><img src="${esc(c.image)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></div>` : ""}
+        <div class="custom__txt">
+          ${c.eyebrow ? `<span class="eyebrow">${esc(c.eyebrow)}</span>` : ""}
+          ${c.title ? `<h2 data-split>${esc(c.title)}</h2>` : ""}
+          ${paras ? `<div class="custom__body">${paras}</div>` : ""}
+          ${real(c.btnUrl) ? `<a class="btn btn--lime" href="${esc(c.btnUrl)}" target="_blank" rel="noopener">${esc(c.btnText || "לפרטים")}</a>` : ""}
+        </div></div></div>`;
+      main.appendChild(sec);
+      ids["c_" + c.id] = sec.id;
+      $$("[data-split]", sec).forEach(splitWords);
+    });
     S.order.forEach(k => { const el = document.getElementById(ids[k]); if(el){ main.appendChild(el); el.hidden = S.show[k] === false; } });
+
+    // menu: every visible section, in page order
+    const navNames = { reel:"הפקות נבחרות", about:"קצת עליי", marquee:"ז'אנרים", facts:"במה אני שונה", process:"איך זה עובד", productions:"הפקות", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", cta:"יצירת קשר" };
+    $("#menuList").innerHTML = S.order.map(k => {
+      const el = document.getElementById(ids[k]); if(!el || el.hidden) return "";
+      let name = navNames[k];
+      if(k.startsWith("c_")){ const c = (S.custom || []).find(x => "c_" + x.id === k); name = c && (c.navTitle || c.title); }
+      if(k === "testimonials" && !S.testimonials.length) return "";
+      if(k === "reel" && !S.productions.length) return "";
+      return name ? `<li><a href="#${el.id}" data-go>${esc(name)}</a></li>` : "";
+    }).join("");
 
     // about
     txt("aboutTitle", S.aboutTitle); splitWords($("#aboutTitle"));
@@ -976,7 +1096,10 @@ window.mergeContent = function (saved) {
     });
 
     // gear: one sideways rail per category, with product photos
-    const cats = [...new Set(S.gear.map(g => g.category))];
+    const listed = (S.gearCats || []).filter(c => c && c.name);
+    const hiddenCats = new Set(listed.filter(c => c.show === false).map(c => c.name));
+    const cats = [...new Set([...listed.map(c => c.name), ...S.gear.map(g => g.category)])]
+      .filter(c => !hiddenCats.has(c) && S.gear.some(g => g.category === c));
     const ph = `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-kit"/></svg>`;
     $("#gearCats").innerHTML = cats.map((c,ci) => `
       <div class="gearcat">
@@ -1013,6 +1136,7 @@ window.mergeContent = function (saved) {
     const labels = {facebook:"פייסבוק", instagram:"אינסטגרם", youtube:"יוטיוב", tiktok:"טיקטוק", spotify:"ספוטיפיי", soundcloud:"סאונדקלאוד"};
     $("#socials").innerHTML = S.socials.filter(s => real(s.url) && labels[s.type]).map(s =>
       `<a href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${labels[s.type]}">${icon('i-'+s.type)}</a>`).join("");
+    $("#menuSocials").innerHTML = $("#socials").innerHTML;
   }
 
   /* ---------------- video tap-to-play + modal ---------------- */
@@ -1034,6 +1158,22 @@ window.mergeContent = function (saved) {
   $("#modal").addEventListener("click", e => { if(e.target.id === "modal") closeModal(); });
   addEventListener("keydown", e => { if(e.key === "Escape" && !$("#modal").hidden) closeModal(); });
 
+  /* ---------------- menu ---------------- */
+  const menu = $("#menu"), menuBtn = $("#menuBtn");
+  function openMenu(){ menu.hidden = false; requestAnimationFrame(() => menu.classList.add("is-open"));
+    $$("#menuList li").forEach((li,i) => li.style.animationDelay = (60 + i*45) + "ms");
+    document.documentElement.classList.add("menu-open"); lenis && lenis.stop(); menuBtn.setAttribute("aria-expanded","true"); $("#menuClose").focus(); }
+  function closeMenu(){ menu.classList.remove("is-open"); menu.hidden = true; document.documentElement.classList.remove("menu-open"); lenis && lenis.start(); menuBtn.setAttribute("aria-expanded","false"); }
+  menuBtn.addEventListener("click", openMenu);
+  $("#menuClose").addEventListener("click", () => { closeMenu(); menuBtn.focus(); });
+  addEventListener("keydown", e => { if(e.key === "Escape" && !menu.hidden) closeMenu(); });
+  menu.addEventListener("click", e => {
+    const a = e.target.closest("a[data-go]"); if(!a) return;
+    e.preventDefault(); closeMenu();
+    const t = document.querySelector(a.getAttribute("href"));
+    if(t) setTimeout(() => lenis ? lenis.scrollTo(t, {offset:-70, duration:1.2}) : t.scrollIntoView({behavior:"smooth"}), 30);
+  });
+
   /* ---------------- motion ---------------- */
   function motion(){
     const top = $("#top"), fab = $("#fab");
@@ -1047,7 +1187,7 @@ window.mergeContent = function (saved) {
 
     if(reduce || !window.gsap || !window.ScrollTrigger){
       addEventListener("scroll", () => onScroll(scrollY), {passive:true});
-      $$(".js-anchor, a[href^='#']").forEach(a => a.addEventListener("click", e => { const t = document.querySelector(a.getAttribute("href")); if(t){ e.preventDefault(); t.scrollIntoView(); } }));
+      $$(".js-anchor, a[href^='#']:not([data-go])").forEach(a => a.addEventListener("click", e => { const t = document.querySelector(a.getAttribute("href")); if(t){ e.preventDefault(); t.scrollIntoView(); } }));
       $$(".step").forEach(s => s.classList.add("is-on"));
       $("#stepsFill").style.transform = "scaleY(1)";
       $$(".rule i").forEach(i => i.style.transform = "scaleX(1)");
@@ -1065,7 +1205,7 @@ window.mergeContent = function (saved) {
       gsap.ticker.lagSmoothing(0);
     } else addEventListener("scroll", () => onScroll(scrollY), {passive:true});
     const go = sel => { const t = document.querySelector(sel); if(!t) return; lenis ? lenis.scrollTo(t, {offset:-70, duration:1.4}) : t.scrollIntoView({behavior:"smooth"}); };
-    $$("a[href^='#']").forEach(a => a.addEventListener("click", e => { e.preventDefault(); go(a.getAttribute("href")); }));
+    $$("a[href^='#']:not([data-go])").forEach(a => a.addEventListener("click", e => { e.preventDefault(); go(a.getAttribute("href")); }));
 
     // progress line
     gsap.to("#progress", { scaleX:1, ease:"none", scrollTrigger:{ start:0, end:"max", scrub:.2 } });
@@ -1167,7 +1307,7 @@ window.mergeContent = function (saved) {
     const intro = $("#intro");
     if(reduce || !window.gsap){ intro.remove(); return; }
     const tl = gsap.timeline();
-    tl.to(".intro__logo", { scale:.6, opacity:0, duration:.35, ease:"power2.in" })
+    tl.to(".intro__in", { scale:.9, opacity:0, duration:.35, ease:"power2.in" })
       .to(intro, { yPercent:-100, duration:.8, ease:"power4.inOut" }, "-=.05")
       .from("#heroMedia", { scale:1.35, duration:1.6, ease:"power3.out" }, "-=.6")
       .from("#heroTitle .wi", { yPercent:110, duration:1.1, ease:"power4.out", stagger:.07 }, "-=1.3")

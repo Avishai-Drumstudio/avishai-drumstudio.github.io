@@ -259,7 +259,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:90;pointer-events:none;
 .track.is-playing .i-pause{display:block}
 .track__name{font-weight:800;font-size:1.3rem;flex:1;min-width:0}
 .track__time{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;direction:ltr;flex:none}
-.wave{display:flex;align-items:center;gap:3px;height:56px;direction:ltr;cursor:pointer;border-radius:8px}
+.wave{position:relative;display:flex;align-items:center;gap:3px;height:56px;direction:ltr;cursor:pointer;border-radius:8px;touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .wave i{flex:1;min-width:2px;border-radius:3px;background:rgba(237,228,211,.16);transition:background .2s}
 .wave i.on{background:var(--lime)}
 .track.is-playing .wave i.on:last-of-type{box-shadow:0 0 12px var(--lime)}
@@ -408,6 +408,17 @@ html.menu-open{overflow:hidden}
 .intro__t{direction:ltr;font-weight:900;font-size:clamp(2rem,9vw,3rem);letter-spacing:-.02em;line-height:1;background:linear-gradient(120deg,#FFF6E6,#E3D3B6 40%,#2ED3C3);-webkit-background-clip:text;background-clip:text;color:transparent}
 .intro__s{color:var(--muted);font-size:15px;letter-spacing:.12em}
 @media (prefers-reduced-motion:reduce){.intro__eq i,.onair i,.logo::before{animation:none}}
+
+/* ---------- moving through a source ---------- */
+.wave__head{position:absolute;top:-4px;bottom:-4px;left:0;width:2px;margin-left:-1px;border-radius:2px;background:var(--text);box-shadow:0 0 10px rgba(46,211,195,.8);pointer-events:none;transition:left .12s linear}
+.wave__head::after{content:"";position:absolute;bottom:-7px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--text);box-shadow:0 0 0 4px rgba(46,211,195,.3);transition:transform .2s var(--ease)}
+.track.is-scrub .wave__head{transition:none}
+.track.is-scrub .wave__head::after{transform:scale(1.35)}
+.skip{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
+.skip button{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 14px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--text);font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;transition:border-color .2s,color .2s}
+.skip button:hover{border-color:var(--lime);color:var(--lime)}
+.skip button svg{width:15px;height:15px}
+.skip__hint{font-size:12px;color:var(--muted);text-align:center;direction:rtl}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1026,7 +1037,12 @@ window.mergeContent = function (saved) {
           <h3 class="track__name">${esc(t.name)}</h3>
           ${real(t.audio) ? `<span class="track__time"><span class="cur">0:00</span> / <span class="dur">0:00</span></span>` : ``}
         </div>
-        ${real(t.audio) ? `<div class="wave" role="slider" tabindex="0" aria-label="מיקום בשיר ${esc(t.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${bars(t.name).map(h => `<i style="height:${h}%"></i>`).join("")}</div>` : ``}
+        ${real(t.audio) ? `<div class="wave" role="slider" tabindex="0" aria-label="מיקום בשיר ${esc(t.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${bars(t.name).map(h => `<i style="height:${h}%"></i>`).join("")}<b class="wave__head" aria-hidden="true"></b></div>
+        <div class="skip" dir="ltr">
+          <button type="button" data-skip="-10" aria-label="10 שניות אחורה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 4 12l7 7M20 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>10</button>
+          <span class="skip__hint">גררו על הגל כדי להעביר</span>
+          <button type="button" data-skip="10" aria-label="10 שניות קדימה">10<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 5 7 7-7 7M4 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>` : ``}
         ${real(t.audio) && real(t.mix) ? `<div class="mixer">
           <div class="mixer__labels" aria-hidden="true"><b data-k="full">כל ההפקה</b><b data-k="drums" class="on">רק תופים</b></div>
           <input type="range" min="0" max="100" value="0" aria-label="מעבר בין התופים לבד לבין ההפקה המלאה">
@@ -1041,7 +1057,8 @@ window.mergeContent = function (saved) {
       let a = mk(t.audio, hasMix), b = hasMix ? mk(t.mix, true) : null;
       let mix = 0, ctx = null, ga = null, gb = null, mode = hasMix ? "gain" : "single";
       const btn = $(".track__btn", el), wave = $(".wave", el), cur = $(".cur", el), dur = $(".dur", el), bs = $$("i", wave);
-      const slider = $(".mixer input", el), labels = $$(".mixer__labels b", el);
+      const slider = $(".mixer input", el), labels = $$(".mixer__labels b", el), head = $(".wave__head", el);
+      let pending = null; // a jump asked for before the file reported its length
 
       // equal-power crossfade; falls back to volume, then to a hard switch where volume can't be set (iPhone)
       const applyMix = () => {
@@ -1068,14 +1085,17 @@ window.mergeContent = function (saved) {
         a = mk(t.audio, false); b = mk(t.mix, false); a.__pair = b; b.__pair = a; audios.push(a, b); wire(); a.currentTime = tA; applyMix(); };
 
       const paint = () => { const p = a.duration ? a.currentTime / a.duration : 0; const k = Math.round(p * bs.length);
-        bs.forEach((x,i) => x.classList.toggle("on", i < k)); cur.textContent = fmt(a.currentTime); wave.setAttribute("aria-valuenow", Math.round(p*100)); };
+        bs.forEach((x,i) => x.classList.toggle("on", i < k)); cur.textContent = fmt(a.currentTime); wave.setAttribute("aria-valuenow", Math.round(p*100));
+        head.style.left = (p*100) + "%"; };
       const play = () => { setupGraph(); if(ctx && ctx.state === "suspended") ctx.resume();
         if(b){ b.currentTime = a.currentTime; b.play().catch(() => {}); } a.play().catch(() => {}); };
       const pause = () => { a.pause(); b && b.pause(); };
-      const seek = p => { if(a.duration){ a.currentTime = Math.max(0, Math.min(1, p)) * a.duration; if(b) b.currentTime = a.currentTime; paint(); } };
+      const seek = p => { p = Math.max(0, Math.min(1, p));
+        if(!a.duration){ pending = p; head.style.left = (p*100) + "%"; return; }
+        a.currentTime = p * a.duration; if(b) b.currentTime = a.currentTime; paint(); };
 
       function wire(){
-        a.addEventListener("loadedmetadata", () => dur.textContent = fmt(a.duration));
+        a.addEventListener("loadedmetadata", () => { dur.textContent = fmt(a.duration); if(pending !== null){ const q = pending; pending = null; seek(q); } });
         a.addEventListener("timeupdate", () => { paint(); if(b && !b.paused && Math.abs(b.currentTime - a.currentTime) > .15) b.currentTime = a.currentTime; });
         a.addEventListener("play", () => { pauseAudio(a); el.classList.add("is-playing"); btn.setAttribute("aria-label","השהה "+t.name); });
         a.addEventListener("pause", () => { b && b.pause(); el.classList.remove("is-playing"); btn.setAttribute("aria-label","נגן "+t.name); });
@@ -1086,7 +1106,15 @@ window.mergeContent = function (saved) {
       wire();
 
       btn.addEventListener("click", () => a.paused ? play() : pause());
-      wave.addEventListener("click", e => { const r = wave.getBoundingClientRect(); seek((e.clientX - r.left) / r.width); if(a.paused) play(); });
+      // tap or drag along the waveform to move through the song
+      let scrub = false;
+      const at = e => { const r = wave.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
+      wave.addEventListener("pointerdown", e => { scrub = true; try { wave.setPointerCapture(e.pointerId); } catch(_){} el.classList.add("is-scrub"); seek(at(e)); });
+      wave.addEventListener("pointermove", e => { if(scrub) seek(at(e)); });
+      wave.addEventListener("pointerup", () => { if(!scrub) return; scrub = false; el.classList.remove("is-scrub"); if(a.paused) play(); });
+      wave.addEventListener("pointercancel", () => { scrub = false; el.classList.remove("is-scrub"); });
+      $$(".skip button", el).forEach(sb => sb.addEventListener("click", () => {
+        if(!a.duration) return; seek((a.currentTime + (+sb.dataset.skip)) / a.duration); if(a.paused) play(); }));
       wave.addEventListener("keydown", e => { if(!a.duration) return;
         if(e.key === "ArrowRight") { seek((a.currentTime + 5) / a.duration); e.preventDefault(); }
         if(e.key === "ArrowLeft")  { seek((a.currentTime - 5) / a.duration); e.preventDefault(); }

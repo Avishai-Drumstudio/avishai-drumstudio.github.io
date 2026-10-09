@@ -491,6 +491,11 @@ html,body{max-width:100%;overflow-x:hidden}
 
 #heroTitle .ln{display:block;white-space:nowrap}
 
+.reel__fb{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(120% 80% at 70% 20%,rgba(46,211,195,.28),transparent 60%),radial-gradient(90% 70% at 20% 90%,rgba(237,228,211,.12),transparent 60%),linear-gradient(160deg,#16201e,#0b1110)}
+.reel__fb i{font:italic 800 clamp(4rem,22vw,7rem)/1 Inter,system-ui,sans-serif;letter-spacing:-.05em;padding:0 .12em;background:linear-gradient(135deg,#EDE4D3,#2ED3C3);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.22;margin-top:-18%}
+.modal{grid-template-rows:auto auto;align-content:center;gap:14px}
+.modal__yt{justify-self:center;color:rgba(237,228,211,.75);font-size:.92rem;text-decoration:underline;text-underline-offset:3px;padding:8px 12px}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -537,7 +542,7 @@ html,body{max-width:100%;overflow-x:hidden}
       <h1 id="heroTitle"></h1>
       <p class="hero__sub" id="heroLead" data-hero></p>
       <div class="hero__cta" id="heroCta" data-hero>
-        <a class="btn btn--lime js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>שלחו סקיצה בוואטסאפ</a>
+        <a class="btn btn--lime js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>לתיאום הקלטה</a>
         <button class="btn btn--ghost" type="button" id="watchIntro"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play"/></svg><span>צפו בסרטון</span></button>
       </div>
     </div>
@@ -681,7 +686,7 @@ html,body{max-width:100%;overflow-x:hidden}
       <div class="cta" id="cta">
         <h2 id="ctaTitle"></h2>
         <p id="ctaText"></p>
-        <a class="btn js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>שלחו סקיצה בוואטסאפ</a>
+        <a class="btn js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>לתיאום הקלטה</a>
         <span class="cta__phone" id="phone"></span>
       </div>
     </div>
@@ -710,7 +715,7 @@ html,body{max-width:100%;overflow-x:hidden}
     </div>
     <ol class="menu__list" id="menuList"></ol>
     <div class="menu__foot">
-      <a class="btn btn--lime js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>שלחו סקיצה בוואטסאפ</a>
+      <a class="btn btn--lime js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>לתיאום הקלטה</a>
       <div class="socials" id="menuSocials"></div>
     </div>
   </div>
@@ -719,6 +724,7 @@ html,body{max-width:100%;overflow-x:hidden}
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="סרטון" hidden>
   <button class="modal__close" id="modalClose" type="button" aria-label="סגירה"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
   <div class="modal__box" id="modalBox"></div>
+  <a class="modal__yt" id="modalYt" target="_blank" rel="noopener">הסרטון לא מתנגן? לצפייה ביוטיוב</a>
 </div>
 
 <!-- icons -->
@@ -902,7 +908,8 @@ window.mergeContent = function (saved) {
     const m = s.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/);
     return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(s) ? s : "");
   };
-  const embedUrl = (id, extra="") => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1${extra}`;
+  const embedUrl = (id, extra="") => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}${extra}`;
+  const thumbFix = "if(this.naturalWidth<=120){this.remove()}";
 
   /* ---------------- load content (saved in the admin panel) ---------------- */
   async function loadContent(){
@@ -931,7 +938,8 @@ window.mergeContent = function (saved) {
     if(!list.length){ $("#reel").hidden = true; return; }
     track.innerHTML = list.map((v,i) => { const id = ytId(v.url); return `
       <button class="reel__item" type="button" data-i="${i}" data-id="${esc(id)}" aria-label="${esc(v.title)}">
-        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="${i < 3 ? "eager" : "lazy"}" onerror="this.remove()">
+        <span class="reel__fb" aria-hidden="true"><i>AY</i></span>
+        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="${i < 3 ? "eager" : "lazy"}" onerror="this.remove()" onload="${thumbFix}">
         <span class="reel__play" aria-hidden="true">${icon('i-play')}</span>
         <span class="reel__info"><b>${esc(v.title)}</b><small>לחצו לצפייה</small></span>
       </button>`; }).join("");
@@ -985,7 +993,7 @@ window.mergeContent = function (saved) {
     return `<article class="card" data-reveal>
       <div class="video zoom" data-id="${esc(id)}">
         <span class="video__fb" aria-hidden="true">${esc(v.title)}</span>
-        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">
+        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()" onload="${thumbFix}">
         <button type="button" aria-label="נגן: ${esc(v.title)}"><span class="play">${icon('i-play')}</span></button>
       </div>
       <div class="card__body">
@@ -1269,12 +1277,13 @@ window.mergeContent = function (saved) {
   document.addEventListener("click", e => {
     const b = e.target.closest(".video button"); if(!b) return;
     pauseAudio(); const box = b.parentElement;
-    box.innerHTML = `<iframe src="${embedUrl(box.dataset.id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    box.innerHTML = `<iframe src="${embedUrl(box.dataset.id)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   });
   let lenis = null, lastFocus = null;
   function openModal(id){
     if(!id) return; pauseAudio(); lastFocus = document.activeElement;
-    $("#modalBox").innerHTML = `<iframe src="${embedUrl(id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    $("#modalBox").innerHTML = `<iframe src="${embedUrl(id)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    $("#modalYt").href = `https://www.youtube.com/watch?v=${id}`;
     $("#modal").hidden = false; lenis && lenis.stop(); document.documentElement.style.overflow = "hidden"; $("#modalClose").focus();
   }
   function closeModal(){

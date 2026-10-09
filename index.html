@@ -433,6 +433,35 @@ html.menu-open{overflow:hidden}
 .hero__media:has(.hero__mp4) .hero__poster{animation:none}
 .hero__media::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(9,14,13,.62) 0%,rgba(9,14,13,.42) 38%,rgba(9,14,13,.5) 62%,rgba(9,14,13,.86) 100%)}
 
+/* ---------- cleaner opening on phones ---------- */
+.logo i{padding:0 .14em 0 .04em;letter-spacing:-.05em}
+@media (max-width:760px){
+  .top__in{height:64px}
+  .top__start{gap:8px}
+  .menubtn{width:40px;height:40px}
+  .logo{width:40px;height:40px}
+  .logo i{font-size:14px}
+  .brand{gap:9px}
+  .brand__txt b{font-size:15px}
+  .brand__txt small{font-size:11px;letter-spacing:.02em}
+  .top .btn{min-height:38px;padding:0 14px;font-size:14px;border-radius:999px;box-shadow:0 6px 18px rgba(46,211,195,.25)}
+
+  .hero__content{align-content:end;gap:14px;padding-top:80px;padding-bottom:calc(44px + env(safe-area-inset-bottom,0px))}
+  .eyebrow[data-hero]{padding:7px 14px;border-radius:999px;background:rgba(12,18,17,.55);border:1px solid rgba(237,228,211,.14);font-size:13px;letter-spacing:.01em}
+  .eyebrow[data-hero]::before,.eyebrow[data-hero]::after{display:none}
+  .hero h1{font-weight:800;font-size:clamp(2.15rem,9.4vw,2.9rem);line-height:1.1;letter-spacing:-.015em;max-width:13ch;text-shadow:0 2px 24px rgba(0,0,0,.45)}
+  .hero__sub{font-size:15.5px;line-height:1.65;color:rgba(237,228,211,.84);max-width:31ch}
+  .hero__cta{width:100%;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:6px;margin-top:10px}
+  .hero__cta .btn{flex:none;width:100%}
+  .hero__cta .btn--lime{min-height:56px;border-radius:16px;font-size:16.5px}
+  .hero__cta .btn--ghost{min-height:46px;border:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;color:var(--sand);font-weight:500;font-size:15px}
+  .hero__cta .btn--ghost svg{width:30px;height:30px;padding:8px;border-radius:50%;border:1.5px solid rgba(227,211,182,.5)}
+  .scrollcue{display:none}
+  .hero__fx{opacity:.4}
+  .fog{opacity:.45}
+  .hero__media::after{background:linear-gradient(180deg,rgba(9,14,13,.45) 0%,rgba(9,14,13,.12) 26%,rgba(9,14,13,.35) 48%,rgba(9,14,13,.82) 70%,rgba(9,14,13,.97) 100%)}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -947,7 +976,7 @@ window.mergeContent = function (saved) {
     // texts
     const txt = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v || ""; };
     txt("heroEyebrow", S.eyebrow); txt("heroTitle", S.title); splitWords($("#heroTitle"));
-    txt("heroLead", S.lead); txt("trust", S.trust); txt("phone", S.phone);
+    txt("heroLead", String(S.lead || "").replace(/Mix Ready/g, "Mix\u00A0Ready")); txt("trust", S.trust); txt("phone", S.phone);
     ["hProcess","hProductions","hSources","pSources","hStudio","hTestimonials","ctaTitle","ctaText"].forEach(k => txt(k, S[k]));
     $("#year").textContent = new Date().getFullYear();
     if(window.SITE_LINKS) $("#adminLink").href = SITE_LINKS.admin;

@@ -178,9 +178,10 @@ window.SITE_DEFAULTS = {
   trust: "ניסיון בהקלטות ובהופעות עם האמנים והמפיקים המובילים בישראל",
 
   whatsapp: "https://wa.me/972532854507",
+  waMessage: "שלום אבישי 👋\nהגעתי אליך דרך האתר.\n\nשמי: \nאשמח לבדוק אם אתה פנוי להקלטת תופים בתאריך: \nסוג הפרויקט: שיר / מחרוזת / אלבום\nז'אנר: \n\nאשלח לך סקיצה ורפרנס כאן. תודה!",
   phone: "053-2854507",
-  heroImage: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/da3fa96a8_IMG_8136.jpeg",
-  bgVideo: "",
+  heroImage: "assets/hero.jpg",
+  bgVideo: "assets/hero.mp4",
   introVideo: "https://youtu.be/SMZbWh5Qp8A",
   studioVideo: "https://youtube.com/shorts/acj-V-isUmU",
   studioTitle: "My Drum Studio",
@@ -188,7 +189,7 @@ window.SITE_DEFAULTS = {
 
   aboutTitle: "אבישי ישר",
   aboutText: "מתופף וסשניסט. מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל, לצד מענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nאת רוב ההקלטות שלי היום אני מבצע מרחוק: מהר, מדויק, עם תקשורת רציפה ועבודה נעימה, מה שחוסך לך כמפיק זמן יקר.\n\nבסשן נתאים את הסאונד בדיוק לפרויקט שלך, כך שהערוצים מגיעים ברמת Mix Ready: סאונד בריא, טבעי ונקי לחלוטין.",
-  aboutImage: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/da3fa96a8_IMG_8136.jpeg",
+  aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
   marquee2: "Mix Ready, Remote Sessions, Live & Studio Drums",
@@ -272,6 +273,11 @@ window.mergeContent = function (saved) {
     if (k === "show") d.show = Object.assign(d.show, saved.show || {});
     else if (saved[k] !== undefined && saved[k] !== null) d[k] = saved[k];
   });
+  // older saved content still pointing at the first photos / no background video
+  const OLD = "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/da3fa96a8_IMG_8136.jpeg";
+  if (d.heroImage === OLD) d.heroImage = window.SITE_DEFAULTS.heroImage;
+  if (d.aboutImage === OLD) d.aboutImage = window.SITE_DEFAULTS.aboutImage;
+  if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
   const all = window.SITE_DEFAULTS.order.concat((d.custom || []).filter(c => c && c.id).map(c => "c_" + c.id));
   d.order = (d.order || []).filter(k => all.includes(k));
   all.forEach(k => { if (!d.order.includes(k)) d.order.push(k); });
@@ -421,10 +427,11 @@ window.mergeContent = function (saved) {
       el("h2", {}, "קישורים ופרטי קשר"),
       el("div", {class:"card"},
         field(S,"whatsapp","קישור וואטסאפ","url","בפורמט https://wa.me/972XXXXXXXXX"),
+        field(S,"waMessage","הודעה מוכנה בוואטסאפ","textarea","הטקסט שמופיע לפונה כשהוא לוחץ על כפתור וואטסאפ באתר. הוא יכול לערוך לפני השליחה."),
         field(S,"phone","טלפון שמוצג בסוף הדף")),
       el("div", {class:"card"},
         field(S,"heroImage","תמונת רקע בפתיחה (קישור לתמונה)","url","מוצגת מאחורי הכותרת עם ערפל"),
-        field(S,"bgVideo","וידאו רקע (לא חובה)","url","אם ממלאים: קישור יוטיוב או MP4 שמתנגן בלי סאונד במקום התמונה. ריק = תמונה עם ערפל"),
+        field(S,"bgVideo","וידאו רקע (לא חובה)","url","קישור MP4 או יוטיוב שמתנגן בלי סאונד בפתיחה. ריק = סרטון האולפן שלך"),
         field(S,"introVideo","סרטון לכפתור \"צפו בסרטון\"","url","קישור יוטיוב"),
         field(S,"studioVideo","סרטון האולפן","url","קישור יוטיוב"),
         field(S,"studioTitle","שם סרטון האולפן"),

@@ -8,9 +8,12 @@
 <meta name="theme-color" content="#0F1716">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="he_IL">
-<meta property="og:title" content="אבישי ישר - מתופף">
-<meta property="og:description" content="הקלטות תופים מרחוק, ערוצים ברמת Mix Ready.">
-<meta property="og:image" content="https://media.base44.com/images/public/6a196c87afba7d8040ba859c/a8063eaf7_IMG_1551.PNG/v1/fill/w_1200,h_630/a8063eaf7_IMG_1551.PNG">
+<meta property="og:title" content="אבישי ישר | Live &amp; Studio Drums">
+<meta property="og:description" content="הקלטות תופים מרחוק, ערוצים נקיים ברמת Mix Ready. שלחו סקיצה ונתחיל.">
+<meta property="og:image" content="https://avishai-drumstudio.github.io/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://avishai-drumstudio.github.io/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%232ED3C3'/><text x='32' y='42' font-family='Arial' font-weight='900' font-size='28' text-anchor='middle' fill='%230F1716'>AY</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -175,7 +178,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:90;pointer-events:none;
 .about__media{position:relative;margin:0;isolation:isolate;width:min(100%,440px);aspect-ratio:1;justify-self:center}
 .about__hoop{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;will-change:transform}
 .about__disc{position:absolute;inset:7%;border-radius:50%;overflow:hidden;background:radial-gradient(100% 80% at 70% 10%,rgba(46,211,195,.25),transparent 60%),linear-gradient(160deg,#1E2B28,#0F1716);box-shadow:0 30px 80px -30px rgba(46,211,195,.6),inset 0 0 0 1px rgba(227,211,182,.12)}
-.about__disc img{position:absolute;inset:-8% 0;width:100%;height:116%;object-fit:cover;will-change:transform}
+.about__disc img{position:absolute;inset:-8% 0;width:100%;height:116%;object-fit:cover;object-position:50% 18%;will-change:transform}
 .about__disc::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 40%,transparent 55%,rgba(15,23,22,.55));}
 .about__media::before{content:"";position:absolute;inset:-10%;border-radius:50%;background:radial-gradient(circle,rgba(46,211,195,.22),transparent 65%);z-index:-1;filter:blur(8px)}
 .about__badge{position:absolute;width:30%;bottom:2%;inset-inline-start:2%;z-index:3;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5))}
@@ -419,6 +422,11 @@ html.menu-open{overflow:hidden}
 .skip button:hover{border-color:var(--lime);color:var(--lime)}
 .skip button svg{width:15px;height:15px}
 .skip__hint{font-size:12px;color:var(--muted);text-align:center;direction:rtl}
+
+/* ---------- studio video in the opening ---------- */
+.hero__mp4,.hero__poster{object-position:74% 30%}
+.hero__media:has(.hero__mp4) .hero__poster{animation:none}
+.hero__media::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(9,14,13,.62) 0%,rgba(9,14,13,.42) 38%,rgba(9,14,13,.5) 62%,rgba(9,14,13,.86) 100%)}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -706,9 +714,10 @@ window.SITE_DEFAULTS = {
   trust: "ניסיון בהקלטות ובהופעות עם האמנים והמפיקים המובילים בישראל",
 
   whatsapp: "https://wa.me/972532854507",
+  waMessage: "שלום אבישי 👋\nהגעתי אליך דרך האתר.\n\nשמי: \nאשמח לבדוק אם אתה פנוי להקלטת תופים בתאריך: \nסוג הפרויקט: שיר / מחרוזת / אלבום\nז'אנר: \n\nאשלח לך סקיצה ורפרנס כאן. תודה!",
   phone: "053-2854507",
-  heroImage: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/da3fa96a8_IMG_8136.jpeg",
-  bgVideo: "",
+  heroImage: "assets/hero.jpg",
+  bgVideo: "assets/hero.mp4",
   introVideo: "https://youtu.be/SMZbWh5Qp8A",
   studioVideo: "https://youtube.com/shorts/acj-V-isUmU",
   studioTitle: "My Drum Studio",
@@ -716,7 +725,7 @@ window.SITE_DEFAULTS = {
 
   aboutTitle: "אבישי ישר",
   aboutText: "מתופף וסשניסט. מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל, לצד מענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nאת רוב ההקלטות שלי היום אני מבצע מרחוק: מהר, מדויק, עם תקשורת רציפה ועבודה נעימה, מה שחוסך לך כמפיק זמן יקר.\n\nבסשן נתאים את הסאונד בדיוק לפרויקט שלך, כך שהערוצים מגיעים ברמת Mix Ready: סאונד בריא, טבעי ונקי לחלוטין.",
-  aboutImage: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/da3fa96a8_IMG_8136.jpeg",
+  aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
   marquee2: "Mix Ready, Remote Sessions, Live & Studio Drums",
@@ -800,6 +809,11 @@ window.mergeContent = function (saved) {
     if (k === "show") d.show = Object.assign(d.show, saved.show || {});
     else if (saved[k] !== undefined && saved[k] !== null) d[k] = saved[k];
   });
+  // older saved content still pointing at the first photos / no background video
+  const OLD = "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/da3fa96a8_IMG_8136.jpeg";
+  if (d.heroImage === OLD) d.heroImage = window.SITE_DEFAULTS.heroImage;
+  if (d.aboutImage === OLD) d.aboutImage = window.SITE_DEFAULTS.aboutImage;
+  if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
   const all = window.SITE_DEFAULTS.order.concat((d.custom || []).filter(c => c && c.id).map(c => "c_" + c.id));
   d.order = (d.order || []).filter(k => all.includes(k));
   all.forEach(k => { if (!d.order.includes(k)) d.order.push(k); });
@@ -915,7 +929,9 @@ window.mergeContent = function (saved) {
 
   function render(S){
     // basics
-    $$(".js-wa").forEach(a => a.href = S.whatsapp);
+    const wa = String(S.whatsapp || "").trim(), msg = String(S.waMessage || "").trim();
+    const waHref = wa && msg ? wa + (wa.includes("?") ? "&" : "?") + "text=" + encodeURIComponent(msg) : wa;
+    $$(".js-wa").forEach(a => a.href = waHref);
     const on = list => (list || []).filter(x => x && x.show !== false);
     S.productions = on(S.productions).filter(p => ytId(p.url));
     S.sources = on(S.sources).filter(s => s.name);
@@ -988,7 +1004,7 @@ window.mergeContent = function (saved) {
     const bg = String(S.bgVideo||"").trim();
     if(!reduce && real(bg) && !/claude/i.test(location.hostname)){
       if(/\.(mp4|webm)(\?|$)/i.test(bg)){
-        $("#heroMedia").insertAdjacentHTML("beforeend", `<video class="hero__mp4" src="${esc(bg)}" autoplay muted loop playsinline preload="auto"></video>`);
+        $("#heroMedia").insertAdjacentHTML("beforeend", `<video class="hero__mp4" src="${esc(bg)}"${real(S.heroImage) ? ` poster="${esc(S.heroImage)}"` : ""} autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>`);
       } else if(ytId(bg)){
         const id = ytId(bg);
         $("#heroMedia").insertAdjacentHTML("beforeend", `<iframe class="hero__yt" id="heroYt" tabindex="-1" aria-hidden="true" title="" src="${embedUrl(id, `&mute=1&loop=1&playlist=${id}&controls=0&disablekb=1&iv_load_policy=3&fs=0`)}" allow="autoplay; encrypted-media"></iframe>`);

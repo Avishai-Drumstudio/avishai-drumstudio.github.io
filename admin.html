@@ -211,6 +211,9 @@ window.SITE_DEFAULTS = {
     { title: "מקבלים ערוצים", text: "ערוצים מופרדים ברמת Mix Ready, מוכנים לעבודה." }
   ],
   hProductions: "שירים שניגנתי בהם",
+  hCovers: "מתופף אחד, הרבה סגנונות",
+  pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
+  covers: [],
   hSources: "ככה נשמעים הערוצים",
   pSources: "ערוצי תופים כמו שהם יוצאים מהאולפן, לפני מיקס.",
   hStudio: "האולפן והציוד",
@@ -218,8 +221,8 @@ window.SITE_DEFAULTS = {
   ctaTitle: "יש לך שיר שמחכה לתופים?",
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
-  order: ["reel", "facts", "process", "sources", "about", "studio", "productions", "testimonials", "marquee", "cta"],
-  show: { reel: true, about: true, marquee: false, facts: true, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
+  order: ["reel", "covers", "facts", "process", "sources", "about", "studio", "productions", "testimonials", "marquee", "cta"],
+  show: { reel: true, covers: true, about: true, marquee: false, facts: true, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
     { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true },
@@ -288,7 +291,9 @@ window.mergeContent = function (saved) {
   if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
   const all = window.SITE_DEFAULTS.order.concat((d.custom || []).filter(c => c && c.id).map(c => "c_" + c.id));
   d.order = (d.order || []).filter(k => all.includes(k));
-  all.forEach(k => { if (!d.order.includes(k)) d.order.push(k); });
+  all.forEach((k, i) => { if (d.order.includes(k)) return;
+    const prev = all.slice(0, i).reverse().find(x => d.order.includes(x)); // new sections land next to their default neighbour
+    prev ? d.order.splice(d.order.indexOf(prev) + 1, 0, k) : d.order.unshift(k); });
   return d;
 };
 
@@ -399,7 +404,7 @@ window.mergeContent = function (saved) {
   }
 
   /* ---------------- panels ---------------- */
-  const SECTION_NAMES = { reel:"הפקות בגלילה לצדדים", about:"קצת עליי", marquee:"פס ז'אנרים נע", facts:"שלוש התיבות", process:"איך זה עובד", productions:"הפקות ברשת (עם \"טען עוד\")", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", cta:"פס יצירת קשר" };
+  const SECTION_NAMES = { reel:"הפקות בגלילה לצדדים", about:"קצת עליי", marquee:"פס ז'אנרים נע", facts:"שלוש התיבות", process:"איך זה עובד", productions:"הפקות ברשת (עם \"טען עוד\")", covers:"קאברים בסגנונות שונים", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", cta:"פס יצירת קשר" };
   const PANELS = [
     { name:"טקסטים", build: () => [
       el("h2", {}, "טקסטים בדף"),
@@ -470,6 +475,11 @@ window.mergeContent = function (saved) {
     { name:"הפקות", build: () => [
       el("h2", {}, "הפקות"), el("p", {}, "כל פריט הוא סרטון יוטיוב. הסדר כאן הוא הסדר באתר, גם בגלילה לצדדים וגם ברשת."),
       listEditor(S.productions, { title:x => x.title, fields:[["url","קישור יוטיוב","url"],["title","שם השיר"]], blank:() => ({url:"",title:"",show:true}), addLabel:"הוספת הפקה" })
+    ]},
+    { name:"קאברים", build: () => [
+      el("h2", {}, "קאברים בסגנונות שונים"), el("p", {}, "3–4 סרטוני יוטיוב, כל אחד בסגנון אחר. החלק מופיע באתר רק כשיש לפחות קאבר אחד."),
+      el("div", {class:"card"}, field(S,"hCovers","כותרת החלק"), field(S,"pCovers","שורה מתחת לכותרת")),
+      listEditor(S.covers, { title:x => [x.style, x.title].filter(Boolean).join(" · "), fields:[["url","קישור יוטיוב","url"],["style","סגנון (למשל: רוק, פאנק, חסידי, ים-תיכוני)"],["title","שם השיר (לא חובה)"]], blank:() => ({url:"",style:"",title:"",show:true}), addLabel:"הוספת קאבר" })
     ]},
     { name:"סורסים", build: () => [
       el("h2", {}, "סורסים"), el("p", {}, "קישור לתופים בלבד מפעיל את הנגן. כשיש גם קישור להפקה המלאה, מופיע סליידר שעובר בין התופים לבד להפקה המלאה. שני הקבצים צריכים להתחיל באותה נקודה ובאותו אורך."),

@@ -508,6 +508,24 @@ html,body{max-width:100%;overflow-x:hidden}
 .hero.is-playing .hero__content{visibility:hidden}
 @keyframes hpIn{from{opacity:0}to{opacity:1}}
 
+/* covers in different styles */
+.covers__chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:-8px 0 22px}
+.covers__chips button{padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--sand);font-size:14.5px;font-weight:600;transition:background .25s,color .25s,border-color .25s}
+.covers__chips button.on{background:var(--tq-grad);color:var(--on-lime);border-color:transparent}
+.covers__track{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:16px}
+.cover{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;min-width:0}
+.cover .video{border-radius:0}
+.cover__body{padding:14px 16px 16px;display:grid;gap:6px}
+.cover__style{color:var(--lime);font-size:13px;font-weight:700;letter-spacing:.02em}
+.cover__body b{font-weight:700;font-size:16px;line-height:1.4}
+@media (max-width:760px){
+  .covers__chips{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter)}
+  .covers__chips::-webkit-scrollbar,.covers__track::-webkit-scrollbar{display:none}
+  .covers__chips button{flex:none}
+  .covers__track{grid-auto-columns:86%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter);scroll-padding-inline:var(--gutter)}
+  .cover{scroll-snap-align:center}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -639,6 +657,19 @@ html,body{max-width:100%;overflow-x:hidden}
         <span class="steps__track" aria-hidden="true"></span>
         <span class="steps__fill" id="stepsFill" aria-hidden="true"></span>
       </ol>
+    </div>
+  </section>
+
+  <!-- ============ COVERS ============ -->
+  <section class="section" id="covers">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow">קאברים</span>
+        <h2 data-split id="hCovers"></h2>
+        <p id="pCovers"></p>
+      </div>
+      <div class="covers__chips" id="coverChips" role="tablist" aria-label="סגנונות"></div>
+      <div class="covers__track" id="coverTrack"></div>
     </div>
   </section>
 
@@ -823,6 +854,9 @@ window.SITE_DEFAULTS = {
     { title: "מקבלים ערוצים", text: "ערוצים מופרדים ברמת Mix Ready, מוכנים לעבודה." }
   ],
   hProductions: "שירים שניגנתי בהם",
+  hCovers: "מתופף אחד, הרבה סגנונות",
+  pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
+  covers: [],
   hSources: "ככה נשמעים הערוצים",
   pSources: "ערוצי תופים כמו שהם יוצאים מהאולפן, לפני מיקס.",
   hStudio: "האולפן והציוד",
@@ -830,8 +864,8 @@ window.SITE_DEFAULTS = {
   ctaTitle: "יש לך שיר שמחכה לתופים?",
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
-  order: ["reel", "facts", "process", "sources", "about", "studio", "productions", "testimonials", "marquee", "cta"],
-  show: { reel: true, about: true, marquee: false, facts: true, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
+  order: ["reel", "covers", "facts", "process", "sources", "about", "studio", "productions", "testimonials", "marquee", "cta"],
+  show: { reel: true, covers: true, about: true, marquee: false, facts: true, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
     { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true },
@@ -900,7 +934,9 @@ window.mergeContent = function (saved) {
   if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
   const all = window.SITE_DEFAULTS.order.concat((d.custom || []).filter(c => c && c.id).map(c => "c_" + c.id));
   d.order = (d.order || []).filter(k => all.includes(k));
-  all.forEach(k => { if (!d.order.includes(k)) d.order.push(k); });
+  all.forEach((k, i) => { if (d.order.includes(k)) return;
+    const prev = all.slice(0, i).reverse().find(x => d.order.includes(x)); // new sections land next to their default neighbour
+    prev ? d.order.splice(d.order.indexOf(prev) + 1, 0, k) : d.order.unshift(k); });
   return d;
 };
 
@@ -1034,20 +1070,21 @@ window.mergeContent = function (saved) {
     S.sources = on(S.sources).filter(s => s.name);
     S.gear = on(S.gear).filter(g => g.name).map(g => ({...g, category: g.category || "כללי"}));
     S.testimonials = on(S.testimonials).filter(t => t.text);
+    S.covers = on(S.covers).filter(c => ytId(c.url));
     S.productionsFirst = parseInt(S.productionsFirst, 10) || 2;
 
     // texts
     const txt = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v || ""; };
     txt("heroEyebrow", S.eyebrow); txt("heroTitle", S.title); splitWords($("#heroTitle"));
     txt("heroLead", String(S.lead || "").replace(/Mix Ready/g, "Mix\u00A0Ready")); txt("trust", S.trust); txt("phone", S.phone);
-    ["hProcess","hProductions","hSources","pSources","hStudio","hTestimonials","ctaTitle","ctaText"].forEach(k => txt(k, S[k]));
+    ["hCovers","pCovers","hProcess","hProductions","hSources","pSources","hStudio","hTestimonials","ctaTitle","ctaText"].forEach(k => txt(k, S[k]));
     $("#year").textContent = new Date().getFullYear();
     if(window.SITE_LINKS) $("#adminLink").href = SITE_LINKS.admin;
     $$("[data-split]").forEach(splitWords);
     $("#heroEyebrow").hidden = !S.eyebrow;
 
     // section order + visibility (hero is always first)
-    const ids = { reel:"reel", about:"about", marquee:"marquee", facts:"facts", process:"process", productions:"productions", sources:"sources", studio:"studio", testimonials:"testimonials", cta:"ctaSection" };
+    const ids = { reel:"reel", about:"about", marquee:"marquee", facts:"facts", process:"process", productions:"productions", covers:"covers", sources:"sources", studio:"studio", testimonials:"testimonials", cta:"ctaSection" };
     const main = $("#main");
     // sections added from the admin
     (S.custom || []).forEach(c => {
@@ -1070,13 +1107,14 @@ window.mergeContent = function (saved) {
     S.order.forEach(k => { const el = document.getElementById(ids[k]); if(el){ main.appendChild(el); el.hidden = S.show[k] === false; } });
 
     // menu: every visible section, in page order
-    const navNames = { reel:"הפקות נבחרות", about:"קצת עליי", marquee:"ז'אנרים", facts:"במה אני שונה", process:"איך זה עובד", productions:"הפקות", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", cta:"יצירת קשר" };
+    const navNames = { reel:"הפקות נבחרות", about:"קצת עליי", marquee:"ז'אנרים", facts:"במה אני שונה", process:"איך זה עובד", covers:"קאברים", productions:"הפקות", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", cta:"יצירת קשר" };
     $("#menuList").innerHTML = S.order.map(k => {
       const el = document.getElementById(ids[k]); if(!el || el.hidden) return "";
       let name = navNames[k];
       if(k.startsWith("c_")){ const c = (S.custom || []).find(x => "c_" + x.id === k); name = c && (c.navTitle || c.title); }
       if(k === "testimonials" && !S.testimonials.length) return "";
       if(k === "reel" && !S.productions.length) return "";
+      if(k === "covers" && !S.covers.length) return "";
       return name ? `<li><a href="#${el.id}" data-go>${esc(name)}</a></li>` : "";
     }).join("");
 
@@ -1145,6 +1183,30 @@ window.mergeContent = function (saved) {
     const fill = g => g.length ? Array(Math.ceil(24 / g.length)).fill(g).flat().map(t => `<span>${esc(t)}</span>`).join("") : "";
     $("#mq1").innerHTML = fill(g1); $("#mq2").innerHTML = fill(g2);
     $("#mq1").hidden = !g1.length; $("#mq2").hidden = !g2.length;
+
+    // covers: one card per style, chips jump between them
+    if(!S.covers.length) $("#covers").hidden = true;
+    else {
+      const ct = $("#coverTrack"), cc = $("#coverChips");
+      ct.innerHTML = S.covers.map((c,i) => { const id = ytId(c.url); return `<article class="cover" data-i="${i}">
+        <div class="video" data-id="${esc(id)}">
+          <span class="video__fb" aria-hidden="true">${esc(c.style || "")}</span>
+          <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()" onload="${thumbFix}">
+          <button type="button" aria-label="נגן: ${esc(c.title || c.style || "")}"><span class="play">${icon('i-play')}</span></button>
+        </div>
+        <div class="cover__body">${c.style ? `<span class="cover__style">${esc(c.style)}</span>` : ""}${c.title ? `<b>${esc(c.title)}</b>` : ""}</div>
+      </article>`; }).join("");
+      cc.innerHTML = S.covers.map((c,i) => `<button type="button" role="tab" data-i="${i}"${i ? "" : ' class="on"'}>${esc(c.style || c.title || "קאבר " + (i+1))}</button>`).join("");
+      const cards = [...ct.children], chips = [...cc.children];
+      const stopOthers = keep => cards.forEach(cd => { if(cd !== keep){ const box = cd.querySelector(".video"); if(box.querySelector("iframe")){ const id = box.dataset.id; box.innerHTML = `<img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt=""><button type="button" aria-label="נגן"><span class="play">${icon('i-play')}</span></button>`; } } });
+      ct.addEventListener("click", e => { const b = e.target.closest(".video button"); if(b) stopOthers(b.closest(".cover")); }, true);
+      cc.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; const el = cards[+b.dataset.i];
+        ct.scrollBy({ left: el.getBoundingClientRect().left - ct.getBoundingClientRect().left - (ct.clientWidth - el.offsetWidth)/2, behavior: reduce ? "auto" : "smooth" }); });
+      const mark = () => { const mid = ct.getBoundingClientRect().left + ct.clientWidth/2; let best = 0, bd = 1e9;
+        cards.forEach((el,i) => { const r = el.getBoundingClientRect(), d = Math.abs(r.left + r.width/2 - mid); if(d < bd){ bd = d; best = i; } });
+        chips.forEach((b,i) => b.classList.toggle("on", i === best)); };
+      ct.addEventListener("scroll", () => requestAnimationFrame(mark), {passive:true});
+    }
 
     // productions
     let shown = 0;

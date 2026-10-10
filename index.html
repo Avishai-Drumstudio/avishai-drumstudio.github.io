@@ -496,6 +496,18 @@ html,body{max-width:100%;overflow-x:hidden}
 .modal{grid-template-rows:auto auto;align-content:center;gap:14px}
 .modal__yt{justify-self:center;color:rgba(237,228,211,.75);font-size:.92rem;text-decoration:underline;text-underline-offset:3px;padding:8px 12px}
 
+/* videos play inside the page */
+.reel__item{cursor:pointer}
+.reel__frame{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:5;background:#000}
+.reel__item.is-playing .reel__play,.reel__item.is-playing .reel__info{opacity:0}
+.hero__player{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:calc(84px + env(safe-area-inset-top,0px)) var(--gutter) 28px;background:rgba(6,9,8,.92);animation:hpIn .35s ease both}
+.hero__player-box{width:min(1000px,100%);aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:#000;box-shadow:0 30px 80px -30px rgba(46,211,195,.45);position:relative}
+.hero__player-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.hero__player-x{width:52px;height:52px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center}
+.hero__player-x svg{width:18px;height:18px}
+.hero.is-playing .hero__content{visibility:hidden}
+@keyframes hpIn{from{opacity:0}to{opacity:1}}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -940,12 +952,12 @@ window.mergeContent = function (saved) {
     const track = $("#reelTrack"), dots = $("#reelDots");
     if(!list.length){ $("#reel").hidden = true; return; }
     track.innerHTML = list.map((v,i) => { const id = ytId(v.url); return `
-      <button class="reel__item" type="button" data-i="${i}" data-id="${esc(id)}" aria-label="${esc(v.title)}">
+      <div class="reel__item" role="button" tabindex="0" data-i="${i}" data-id="${esc(id)}" aria-label="${esc(v.title)}">
         <span class="reel__fb" aria-hidden="true"><i>AY</i></span>
         <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="${i < 3 ? "eager" : "lazy"}" onerror="this.remove()" onload="${thumbFix}">
         <span class="reel__play" aria-hidden="true">${icon('i-play')}</span>
         <span class="reel__info"><b>${esc(v.title)}</b><small>לחצו לצפייה</small></span>
-      </button>`; }).join("");
+      </div>`; }).join("");
     dots.innerHTML = list.map(() => "<i></i>").join("");
     const items = [...track.children], ds = [...dots.children];
     let active = -1, raf = 0;
@@ -960,7 +972,7 @@ window.mergeContent = function (saved) {
         el.style.transform = reduce ? "" : `rotateY(${Math.max(-1,Math.min(1,d)) * -14}deg) scale(${1 - .17*Math.min(ad,1.2)})`;
         el.style.opacity = String(1 - .55*Math.min(ad,1));
       });
-      if(best !== active){ active = best; items.forEach((el,i) => el.classList.toggle("is-active", i === best)); ds.forEach((d,i) => d.classList.toggle("on", i === best)); }
+      if(best !== active){ active = best; stopInline(); items.forEach((el,i) => el.classList.toggle("is-active", i === best)); ds.forEach((d,i) => d.classList.toggle("on", i === best)); }
     };
     const queue = () => { if(!raf) raf = requestAnimationFrame(paint); };
     track.addEventListener("scroll", queue, {passive:true}); addEventListener("resize", queue);
@@ -969,8 +981,15 @@ window.mergeContent = function (saved) {
 
     // tap: centered item plays, side item comes to the center
     let dragged = false;
+    function stopInline(){ items.forEach(el => { if(el.classList.contains("is-playing")){ el.classList.remove("is-playing"); el.querySelector(".reel__frame")?.remove(); } }); }
+    function playInline(it){
+      if(it.classList.contains("is-playing")) return;
+      stopInline(); pauseAudio(); it.classList.add("is-playing");
+      it.insertAdjacentHTML("beforeend", `<iframe class="reel__frame" src="${embedUrl(it.dataset.id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`);
+    }
     track.addEventListener("click", e => { const it = e.target.closest(".reel__item"); if(!it || dragged) return;
-      const i = +it.dataset.i; stopAuto(); if(i === active) openModal(it.dataset.id); else center(i); });
+      const i = +it.dataset.i; stopAuto(); if(i === active) playInline(it); else center(i); });
+    track.addEventListener("keydown", e => { if(e.key !== "Enter" && e.key !== " ") return; const it = e.target.closest(".reel__item"); if(!it) return; e.preventDefault(); it.click(); });
     $("#reelPrev").addEventListener("click", () => { stopAuto(); center(active - 1); });
     $("#reelNext").addEventListener("click", () => { stopAuto(); center(active + 1); });
 
@@ -1108,7 +1127,17 @@ window.mergeContent = function (saved) {
     // intro video in a modal
     const introId = ytId(S.introVideo);
     if(!introId) $("#watchIntro").hidden = true;
-    $("#watchIntro").addEventListener("click", () => openModal(introId));
+    // intro video plays right inside the opening, no popup
+    const closeHeroPlayer = () => { $("#heroPlayer")?.remove(); $("#hero").classList.remove("is-playing"); };
+    $("#watchIntro").addEventListener("click", () => {
+      if(!introId || $("#heroPlayer")) return; pauseAudio();
+      $("#hero").classList.add("is-playing");
+      $("#hero").insertAdjacentHTML("beforeend", `<div class="hero__player" id="heroPlayer">
+        <div class="hero__player-box"><iframe src="${embedUrl(introId)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+        <button type="button" class="hero__player-x" aria-label="סגירת הסרטון"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      </div>`);
+      $("#heroPlayer .hero__player-x").addEventListener("click", closeHeroPlayer);
+    });
 
     // marquee
     const words = s => String(s || "").split(",").map(w => w.trim()).filter(Boolean);

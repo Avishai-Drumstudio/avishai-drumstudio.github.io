@@ -508,25 +508,44 @@ html,body{max-width:100%;overflow-x:hidden}
 .hero.is-playing .hero__content{visibility:hidden}
 @keyframes hpIn{from{opacity:0}to{opacity:1}}
 
-/* covers in different styles */
-.covers__chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:-8px 0 22px}
-.covers__chips button{padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--sand);font-size:14.5px;font-weight:600;transition:background .25s,color .25s,border-color .25s}
-.covers__chips button.on{background:var(--tq-grad);color:var(--on-lime);border-color:transparent}
-.covers__track{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,340px);justify-content:center;align-items:start;gap:16px}
-.cover{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;min-width:0}
-.cover .video{border-radius:0}
-.cover__body{padding:14px 16px 16px;display:grid;gap:6px}
-.cover__style{color:var(--lime);font-size:13px;font-weight:700;letter-spacing:.02em}
-.cover__body b{font-weight:700;font-size:16px;line-height:1.4}
-@media (max-width:760px){
-  .covers__chips{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter)}
-  .covers__chips::-webkit-scrollbar,.covers__track::-webkit-scrollbar{display:none}
-  .covers__chips button{flex:none}
-  .covers__track{grid-auto-columns:86%;justify-content:start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter);scroll-padding-inline:var(--gutter)}
-  .cover{scroll-snap-align:center}
-}
-
 .video--file{background:#000;aspect-ratio:9/16}.video--file.is-wide{aspect-ratio:16/9}.video--file video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+
+/* covers wheel */
+#covers{overflow:hidden;overflow:clip}
+.head--sm{margin-bottom:6px}
+.head--sm h2{font-size:clamp(1.6rem,6vw,2.4rem)}
+.wheel{position:relative;height:clamp(260px,68vw,360px);margin-top:10px}
+.wheel__ring{position:absolute;left:50%;top:44%;width:min(74vw,350px);height:min(74vw,350px);transform:translate(-50%,-50%);pointer-events:none;opacity:.5;
+  -webkit-mask:linear-gradient(to bottom,#000 30%,transparent 78%);mask:linear-gradient(to bottom,#000 35%,transparent 85%)}
+.wheel__ring circle{fill:none;stroke:rgba(237,228,211,.14);stroke-width:.25}
+.wheel__ring line{stroke:rgba(46,211,195,.55);stroke-width:.5;stroke-linecap:round}
+.wheel__stage{position:absolute;inset:0;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.disc{--d:220px;--p:0;position:absolute;left:50%;top:44%;width:var(--d);height:var(--d);border-radius:50%;cursor:pointer;will-change:transform,opacity;-webkit-tap-highlight-color:transparent}
+.disc__face{position:absolute;inset:7%;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 35% 30%,#24312e,#0b1110);box-shadow:0 0 0 2px rgba(237,228,211,.12),0 22px 50px -18px rgba(0,0,0,.8)}
+.disc__face video,.disc__face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.disc__face::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 55%,rgba(8,12,11,.55) 100%);pointer-events:none}
+.disc__yt{position:absolute;top:0;left:50%;height:100%;width:178%;transform:translateX(-50%);border:0;z-index:2}
+.disc__ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none}
+.disc__ring circle{fill:none;stroke:rgba(237,228,211,.16);stroke-width:1.6}
+.disc__ring .p{stroke:url(#none);stroke:#2ED3C3;stroke-width:2.6;stroke-linecap:round;stroke-dasharray:calc(var(--p) * 1) 100;opacity:0;transition:opacity .3s}
+.disc.is-live .disc__ring .p{opacity:1}
+.disc.is-front .disc__ring circle:first-child{stroke:rgba(46,211,195,.35)}
+.disc__btn{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:var(--tq-grad);display:grid;place-items:center;box-shadow:0 0 0 10px rgba(46,211,195,.16);opacity:0;transform:scale(.6);transition:opacity .3s,transform .35s var(--ease);z-index:3;pointer-events:none}
+.disc__btn svg{width:16px;height:16px;fill:var(--on-lime);margin-left:3px}
+.disc.is-front .disc__btn{opacity:1;transform:scale(1)}
+.disc.is-live .disc__btn{opacity:0;transform:scale(.6)}
+.disc.is-front{animation:discGlow 3s ease-in-out infinite}
+@keyframes discGlow{0%,100%{filter:drop-shadow(0 0 0 rgba(46,211,195,0))}50%{filter:drop-shadow(0 0 18px rgba(46,211,195,.35))}}
+.disc.is-live{animation:none}
+.wheel__meta{display:grid;justify-items:center;gap:4px;margin-top:-18px;position:relative;z-index:12;text-align:center}
+.wheel__meta b{font-size:1.35rem;font-weight:800;color:var(--lime)}
+.wheel__meta b.pop{animation:wPop .45s var(--ease)}
+@keyframes wPop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.wheel__meta small{color:var(--muted);font-size:13.5px}
+.wheel__dots{display:flex;gap:6px;margin-top:8px}
+.wheel__dots i{width:7px;height:7px;border-radius:99px;background:rgba(237,228,211,.22);cursor:pointer;transition:width .3s,background .3s}
+.wheel__dots i.on{width:22px;background:var(--lime)}
+@media (prefers-reduced-motion:reduce){.disc.is-front{animation:none}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -665,13 +684,16 @@ html,body{max-width:100%;overflow-x:hidden}
   <!-- ============ COVERS ============ -->
   <section class="section" id="covers">
     <div class="wrap">
-      <div class="head">
+      <div class="head head--sm">
         <span class="eyebrow">קאברים</span>
         <h2 data-split id="hCovers"></h2>
         <p id="pCovers"></p>
       </div>
-      <div class="covers__chips" id="coverChips" role="tablist" aria-label="סגנונות"></div>
-      <div class="covers__track" id="coverTrack"></div>
+      <div class="wheel">
+        <svg class="wheel__ring" id="wheelRing" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(0.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(7.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(15.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(22.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(30.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(37.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(45.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(52.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(60.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(67.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(75.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(82.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(90.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(97.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(105.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(112.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(120.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(127.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(135.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(142.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(150.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(157.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(165.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(172.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(180.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(187.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(195.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(202.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(210.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(217.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(225.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(232.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(240.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(247.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(255.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(262.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(270.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(277.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(285.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(292.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(300.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(307.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(315.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(322.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(330.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="8" transform="rotate(337.5 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(345.0 50 50)"/><line x1="50" y1="1.5" x2="50" y2="5" transform="rotate(352.5 50 50)"/></svg>
+        <div class="wheel__stage" id="wheelStage" aria-label="קאברים – החליקו לצדדים"></div>
+      </div>
+      <div class="wheel__meta"><b id="wheelStyle"></b><small id="wheelHint"></small><span class="wheel__dots" id="wheelDots"></span></div>
     </div>
   </section>
 
@@ -1188,35 +1210,100 @@ window.mergeContent = function (saved) {
     $("#mq1").innerHTML = fill(g1); $("#mq2").innerHTML = fill(g2);
     $("#mq1").hidden = !g1.length; $("#mq2").hidden = !g2.length;
 
-    // covers: one card per style, chips jump between them
+    // covers: a wheel of round "drumheads" — swipe to turn, tap the front one to listen
     if(!S.covers.length) $("#covers").hidden = true;
     else {
-      const ct = $("#coverTrack"), cc = $("#coverChips");
-      ct.innerHTML = S.covers.map((c,i) => { const id = ytId(c.url);
-        if(!id){ const src = String(c.url).trim(); return `<article class="cover" data-i="${i}">
-        <div class="video video--file"><video src="${esc(src)}#t=0.5" ${real(c.poster) ? `poster="${esc(c.poster)}"` : ""} controls playsinline preload="metadata"></video></div>
-        <div class="cover__body">${c.style ? `<span class="cover__style">${esc(c.style)}</span>` : ""}${c.title ? `<b>${esc(c.title)}</b>` : ""}</div>
-      </article>`; }
-        return `<article class="cover" data-i="${i}">
-        <div class="video" data-id="${esc(id)}">
-          <span class="video__fb" aria-hidden="true">${esc(c.style || "")}</span>
-          <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()" onload="${thumbFix}">
-          <button type="button" aria-label="נגן: ${esc(c.title || c.style || "")}"><span class="play">${icon('i-play')}</span></button>
-        </div>
-        <div class="cover__body">${c.style ? `<span class="cover__style">${esc(c.style)}</span>` : ""}${c.title ? `<b>${esc(c.title)}</b>` : ""}</div>
-      </article>`; }).join("");
-      cc.innerHTML = S.covers.map((c,i) => `<button type="button" role="tab" data-i="${i}"${i ? "" : ' class="on"'}>${esc(c.style || c.title || "קאבר " + (i+1))}</button>`).join("");
-      const cards = [...ct.children], chips = [...cc.children];
-      const stopOthers = keep => cards.forEach(cd => { if(cd !== keep){ const box = cd.querySelector(".video"); const fv = box.querySelector("video"); if(fv){ fv.pause(); return; } if(box.querySelector("iframe")){ const id = box.dataset.id; box.innerHTML = `<img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt=""><button type="button" aria-label="נגן"><span class="play">${icon('i-play')}</span></button>`; } } });
-      ct.addEventListener("click", e => { const b = e.target.closest(".video button"); if(b) stopOthers(b.closest(".cover")); }, true);
-      $$("video", ct).forEach(v => v.addEventListener("loadedmetadata", () => { if(v.videoWidth > v.videoHeight) v.parentElement.classList.add("is-wide"); }));
-      ct.addEventListener("play", e => { pauseAudio(); stopOthers(e.target.closest(".cover")); }, true);
-      cc.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; const el = cards[+b.dataset.i];
-        ct.scrollBy({ left: el.getBoundingClientRect().left - ct.getBoundingClientRect().left - (ct.clientWidth - el.offsetWidth)/2, behavior: reduce ? "auto" : "smooth" }); });
-      const mark = () => { const mid = ct.getBoundingClientRect().left + ct.clientWidth/2; let best = 0, bd = 1e9;
-        cards.forEach((el,i) => { const r = el.getBoundingClientRect(), d = Math.abs(r.left + r.width/2 - mid); if(d < bd){ bd = d; best = i; } });
-        chips.forEach((b,i) => b.classList.toggle("on", i === best)); };
-      ct.addEventListener("scroll", () => requestAnimationFrame(mark), {passive:true});
+      const stage = $("#wheelStage"), label = $("#wheelStyle"), hint = $("#wheelHint"), dotsEl = $("#wheelDots");
+      const items = S.covers.map((c,i) => {
+        const id = ytId(c.url), d = document.createElement("div");
+        d.className = "disc"; d.dataset.i = i;
+        d.innerHTML = `<div class="disc__face">${id
+          ? `<img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">`
+          : `<video src="${esc(String(c.url).trim())}" ${real(c.poster) ? `poster="${esc(c.poster)}"` : ""} muted playsinline loop preload="${i ? "none" : "metadata"}"></video>`}</div>
+          <svg class="disc__ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/><circle class="p" cx="50" cy="50" r="48" pathLength="100"/></svg>
+          <span class="disc__btn" aria-hidden="true">${icon('i-play')}</span>`;
+        d.setAttribute("role","button"); d.tabIndex = 0; d.setAttribute("aria-label", "קאבר: " + (c.style || c.title || ""));
+        stage.appendChild(d); return { el:d, c, id, v:d.querySelector("video") };
+      });
+      dotsEl.innerHTML = items.length > 1 ? items.map(() => "<i></i>").join("") : "";
+      const dots = [...dotsEl.children];
+      let pos = 0, target = 0, active = -1, raf = 0, inView = false, live = null; // live = item playing with sound
+      const n = items.length, STEP = 30 * Math.PI / 180;
+      const layout = () => {
+        const W = stage.clientWidth, H = stage.clientHeight, D = Math.min(W * .47, 230), R = D * 2.3;
+        stage.style.setProperty("--d", D + "px");
+        items.forEach((it,i) => {
+          const k = i - pos, a = k * STEP, ak = Math.min(Math.abs(k), 2.2);
+          const x = R * Math.sin(a), y = R * (1 - Math.cos(a));
+          it.el.style.transform = `translate(-50%,-50%) translate(${-x}px,${y}px) rotate(${-a * 57.3}deg) scale(${1 - .3 * Math.min(ak,1.4)})`;
+          it.el.style.opacity = String(Math.max(0, 1 - .38 * ak));
+          it.el.style.zIndex = String(10 - Math.round(ak * 3));
+        });
+      };
+      const setActive = i => {
+        if(i === active) return; active = i;
+        items.forEach((it,j) => { it.el.classList.toggle("is-front", j === i); if(j !== i) quiet(it); });
+        dots.forEach((d,j) => d.classList.toggle("on", j === i));
+        const c = items[i].c; label.textContent = c.style || c.title || "";
+        label.classList.remove("pop"); void label.offsetWidth; label.classList.add("pop");
+        hint.textContent = c.title && c.style ? c.title : "לחצו להאזנה";
+        preview();
+      };
+      // the front disc plays silently while the section is on screen
+      function preview(){ const it = items[active]; if(!it || !it.v || live === it) return;
+        if(inView && !reduce){ it.v.preload = "auto"; it.v.muted = true; it.v.play().catch(() => {}); } else it.v.pause(); }
+      function quiet(it){
+        if(it.v){ it.v.muted = true; if(it !== items[active]) it.v.pause(); }
+        if(it.frame){ it.frame.remove(); it.frame = null; }
+        it.el.classList.remove("is-live"); if(live === it) live = null;
+      }
+      const tick = () => {
+        pos += (target - pos) * .14;
+        if(Math.abs(target - pos) < .001) pos = target;
+        layout(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos))));
+        raf = pos !== target ? requestAnimationFrame(tick) : 0;
+      };
+      const go = t => { target = Math.max(0, Math.min(n - 1, t)); if(!raf) raf = requestAnimationFrame(tick); };
+      // progress ring while listening
+      items.forEach(it => { if(!it.v) return;
+        it.v.addEventListener("timeupdate", () => { if(live === it && it.v.duration) it.el.style.setProperty("--p", (it.v.currentTime / it.v.duration * 100).toFixed(1)); });
+        it.v.addEventListener("ended", () => quiet(it)); });
+      const listen = it => {
+        if(live === it){ // tap again = stop
+          quiet(it); it.v && (it.v.currentTime = 0); preview(); return; }
+        if(live) quiet(live);
+        pauseAudio(); live = it; it.el.classList.add("is-live"); it.el.style.setProperty("--p", 0);
+        if(it.v){ it.v.currentTime = 0; it.v.muted = false; it.v.loop = false; it.v.play().catch(() => { it.v.muted = true; it.v.play().catch(() => {}); }); }
+        else { it.frame = document.createElement("iframe"); it.frame.className = "disc__yt";
+          it.frame.src = embedUrl(it.id); it.frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; it.frame.title = "YouTube";
+          it.el.querySelector(".disc__face").appendChild(it.frame); }
+      };
+      // stop sound when scrolling away
+      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting;
+        if(!inView && live) { const it = live; quiet(it); if(it.v) it.v.loop = true; } preview(); }, {threshold:.25}).observe(stage);
+      else inView = true;
+      // swipe / drag to turn
+      let sx = 0, sy = 0, sp = 0, drag = false, moved = false;
+      stage.addEventListener("pointerdown", e => { sx = e.clientX; sy = e.clientY; sp = target; drag = true; moved = false; });
+      addEventListener("pointermove", e => { if(!drag) return; const dx = e.clientX - sx;
+        if(!moved && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(e.clientY - sy)) moved = true;
+        if(moved){ target = Math.max(-.4, Math.min(n - .6, sp - dx / (stage.clientWidth * .45))); pos = target; layout(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos)))); } }, {passive:true});
+      addEventListener("pointerup", () => { if(!drag) return; drag = false; if(moved){ go(Math.round(target)); setTimeout(() => moved = false, 60); } });
+      addEventListener("pointercancel", () => { drag = false; if(moved) go(Math.round(target)); });
+      stage.addEventListener("click", e => { if(moved) return; const d = e.target.closest(".disc"); if(!d || e.target.closest("iframe")) return;
+        const i = +d.dataset.i; if(i === active) listen(items[i]); else go(i); });
+      stage.addEventListener("keydown", e => { if(e.key === "ArrowLeft") go(active + 1); else if(e.key === "ArrowRight") go(active - 1);
+        else if(e.key === "Enter" || e.key === " "){ e.preventDefault(); listen(items[active]); } });
+      dotsEl.addEventListener("click", e => { const d = e.target.closest("i"); if(d) go(dots.indexOf(d)); });
+      addEventListener("resize", layout);
+      const sec = $("#covers"); sec.addEventListener("scroll", () => { sec.scrollLeft = 0; sec.scrollTop = 0; }); // never let focus shift the section sideways
+      // the outer lug ring turns as the page scrolls
+      const ring = $("#wheelRing"); let rq = 0;
+      if(ring && !reduce) addEventListener("scroll", () => { if(rq) return; rq = requestAnimationFrame(() => { rq = 0;
+        const r = stage.getBoundingClientRect(); ring.style.transform = `translate(-50%,-50%) rotate(${(r.top - innerHeight/2) * .18}deg)`; }); }, {passive:true});
+      // entrance: the wheel spins into place the first time it's seen
+      pos = reduce || n < 2 ? 0 : Math.min(n - 1, 1.6); layout(); setActive(Math.round(pos));
+      if("IntersectionObserver" in window){ const io = new IntersectionObserver(([e]) => { if(e.isIntersecting){ io.disconnect(); go(0); } }, {threshold:.35}); io.observe(stage); } else go(0);
     }
 
     // productions

@@ -512,7 +512,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .covers__chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:-8px 0 22px}
 .covers__chips button{padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--sand);font-size:14.5px;font-weight:600;transition:background .25s,color .25s,border-color .25s}
 .covers__chips button.on{background:var(--tq-grad);color:var(--on-lime);border-color:transparent}
-.covers__track{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:16px}
+.covers__track{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,340px);justify-content:center;align-items:start;gap:16px}
 .cover{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;min-width:0}
 .cover .video{border-radius:0}
 .cover__body{padding:14px 16px 16px;display:grid;gap:6px}
@@ -522,11 +522,11 @@ html,body{max-width:100%;overflow-x:hidden}
   .covers__chips{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter)}
   .covers__chips::-webkit-scrollbar,.covers__track::-webkit-scrollbar{display:none}
   .covers__chips button{flex:none}
-  .covers__track{grid-auto-columns:86%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter);scroll-padding-inline:var(--gutter)}
+  .covers__track{grid-auto-columns:86%;justify-content:start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter);scroll-padding-inline:var(--gutter)}
   .cover{scroll-snap-align:center}
 }
 
-.video--file{background:#000}.video--file video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.video--file{background:#000;aspect-ratio:9/16}.video--file.is-wide{aspect-ratio:16/9}.video--file video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -858,7 +858,9 @@ window.SITE_DEFAULTS = {
   hProductions: "שירים שניגנתי בהם",
   hCovers: "מתופף אחד, הרבה סגנונות",
   pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
-  covers: [],
+  covers: [
+    { url: "assets/covers/funk.mp4", poster: "assets/covers/funk.jpg", style: "פאנק", title: "", show: true }
+  ],
   hSources: "ככה נשמעים הערוצים",
   pSources: "ערוצי תופים כמו שהם יוצאים מהאולפן, לפני מיקס.",
   hStudio: "האולפן והציוד",
@@ -1207,6 +1209,7 @@ window.mergeContent = function (saved) {
       const cards = [...ct.children], chips = [...cc.children];
       const stopOthers = keep => cards.forEach(cd => { if(cd !== keep){ const box = cd.querySelector(".video"); const fv = box.querySelector("video"); if(fv){ fv.pause(); return; } if(box.querySelector("iframe")){ const id = box.dataset.id; box.innerHTML = `<img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt=""><button type="button" aria-label="נגן"><span class="play">${icon('i-play')}</span></button>`; } } });
       ct.addEventListener("click", e => { const b = e.target.closest(".video button"); if(b) stopOthers(b.closest(".cover")); }, true);
+      $$("video", ct).forEach(v => v.addEventListener("loadedmetadata", () => { if(v.videoWidth > v.videoHeight) v.parentElement.classList.add("is-wide"); }));
       ct.addEventListener("play", e => { pauseAudio(); stopOthers(e.target.closest(".cover")); }, true);
       cc.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; const el = cards[+b.dataset.i];
         ct.scrollBy({ left: el.getBoundingClientRect().left - ct.getBoundingClientRect().left - (ct.clientWidth - el.offsetWidth)/2, behavior: reduce ? "auto" : "smooth" }); });

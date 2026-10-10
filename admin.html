@@ -95,6 +95,13 @@ input[dir=ltr]{text-align:left}
 .status.dirty{color:var(--lime)}
 .status.bad{color:var(--danger)}
 .notice{background:rgba(255,138,122,.1);border:1px solid rgba(255,138,122,.3);color:#FFD1C9;border-radius:14px;padding:14px 16px;font-size:14.5px}
+.up{display:grid;gap:10px;margin-top:12px}
+.up__btn{width:100%;justify-content:center}
+.up__bar{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.up__bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2ED3C3,#7FE7DC);transition:width .3s}
+.up__prev{width:100%;border-radius:14px;background:#000;max-height:260px}
+details.card summary{cursor:pointer;font-weight:700;padding:4px 0}
+details.card[open] summary{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -377,6 +384,45 @@ window.mergeContent = function (saved) {
     return el("label", {class:"toggle"}, i, label);
   }
 
+  /* video upload straight from the phone (Cloudinary, chunked) */
+  function videoUploader(item, grid){
+    const inp = el("input", {type:"file", accept:"video/*", style:"display:none"});
+    const bar = el("i", {});
+    const prog = el("div", {class:"up__bar", hidden:""}, bar);
+    const msg = el("span", {class:"hint"}, "");
+    const prev = el("video", {class:"up__prev", playsinline:"", controls:"", preload:"metadata", hidden:""});
+    const show = () => { const u = String(item.url || ""); if(/res\.cloudinary\.com|\.(mp4|mov|webm)(\?|$)/i.test(u)){ prev.src = u; prev.hidden = false; } else prev.hidden = true; };
+    const btn = el("button", {type:"button", class:"btn btn--lime up__btn", onclick:() => {
+      if(!S.cloudName || !S.cloudPreset){ msg.textContent = "קודם צריך למלא את \"הגדרות העלאת סרטונים\" למטה."; return; }
+      inp.click(); }}, "⬆ העלאת סרטון מהטלפון");
+    inp.addEventListener("change", async () => {
+      const f = inp.files[0]; if(!f) return;
+      if(f.size > 100 * 1024 * 1024){ msg.textContent = "הסרטון גדול מ-100MB. כדאי לחתוך אותו קצר יותר (30–60 שניות) ולנסות שוב."; return; }
+      btn.disabled = true; prog.hidden = false; bar.style.width = "0%"; msg.textContent = "מעלה… לא לסגור את הדף";
+      const CH = 6 * 1024 * 1024, uid = "ay" + Date.now(), url = `https://api.cloudinary.com/v1_1/${encodeURIComponent(S.cloudName.trim())}/video/upload`;
+      try{
+        let res = null;
+        for(let start = 0; start < f.size; start += CH){
+          const end = Math.min(start + CH, f.size), fd = new FormData();
+          fd.append("file", f.slice(start, end), f.name || "cover.mp4"); fd.append("upload_preset", S.cloudPreset.trim()); fd.append("folder", "ay-covers");
+          const r = await fetch(url, { method:"POST", body:fd, ...(f.size > CH ? { headers:{ "X-Unique-Upload-Id": uid, "Content-Range": `bytes ${start}-${end-1}/${f.size}` } } : {}) });
+          res = await r.json().catch(() => ({}));
+          if(!r.ok) throw new Error((res.error && res.error.message) || ("שגיאה " + r.status));
+          bar.style.width = Math.round(end / f.size * 100) + "%";
+        }
+        if(!res || !res.secure_url) throw new Error("ההעלאה לא הושלמה");
+        const base = res.secure_url.replace(/\.[a-z0-9]+$/i, "");
+        item.url = base.replace("/upload/", "/upload/q_auto,vc_h264,w_1280,c_limit/") + ".mp4";
+        item.poster = base.replace("/upload/", "/upload/so_1,w_1280,c_limit/") + ".jpg";
+        const u = grid.querySelectorAll("input")[2]; if(u){ u.value = item.url; }
+        markDirty(); show(); msg.textContent = "הועלה ✓ עכשיו ללחוץ שמירה";
+      }catch(e){ msg.textContent = "ההעלאה נכשלה: " + e.message; }
+      btn.disabled = false; prog.hidden = true; inp.value = "";
+    });
+    show();
+    return el("div", {class:"up"}, btn, inp, prog, msg, prev);
+  }
+
   /* list editor: add, delete, reorder, show/hide */
   function listEditor(arr, opts){
     const box = el("div", {class:"panel-list", style:"display:grid;gap:12px"});
@@ -395,6 +441,7 @@ window.mergeContent = function (saved) {
           opts.noShow ? "" : toggle(item, "show", "מוצג", on => card.classList.toggle("is-off", !on)), upB, dnB, opts.noDelete ? "" : del);
         const grid = el("div", {class:"grid2"}, opts.fields.map(f => field(item, f[0], f[1], f[2], f[3])));
         card.append(head, grid);
+        if(opts.extra) card.append(opts.extra(item, grid));
         card.addEventListener("changed", () => title.textContent = opts.title(item) || "פריט חדש");
         box.append(card);
       });
@@ -479,7 +526,10 @@ window.mergeContent = function (saved) {
     { name:"קאברים", build: () => [
       el("h2", {}, "קאברים בסגנונות שונים"), el("p", {}, "3–4 סרטוני יוטיוב, כל אחד בסגנון אחר. החלק מופיע באתר רק כשיש לפחות קאבר אחד."),
       el("div", {class:"card"}, field(S,"hCovers","כותרת החלק"), field(S,"pCovers","שורה מתחת לכותרת")),
-      listEditor(S.covers, { title:x => [x.style, x.title].filter(Boolean).join(" · "), fields:[["url","קישור יוטיוב או קובץ MP4","url"],["style","סגנון (למשל: רוק, פאנק, חסידי, ים-תיכוני)"],["title","שם השיר (לא חובה)"]], blank:() => ({url:"",style:"",title:"",show:true}), addLabel:"הוספת קאבר" })
+      listEditor(S.covers, { title:x => [x.style, x.title].filter(Boolean).join(" · "), fields:[["style","סגנון (למשל: רוק, פאנק, חסידי, ים-תיכוני)"],["title","שם השיר (לא חובה)"],["url","סרטון (מתמלא לבד אחרי העלאה, או קישור יוטיוב)","url"]], blank:() => ({url:"",style:"",title:"",poster:"",show:true}), addLabel:"הוספת קאבר", extra: videoUploader }),
+      el("details", {class:"card"}, el("summary", {}, "הגדרות העלאת סרטונים (פעם אחת)"),
+        field(S,"cloudName","Cloud name","url","מהחשבון ב-Cloudinary"),
+        field(S,"cloudPreset","Upload preset","url","שם ה-preset מסוג Unsigned"))
     ]},
     { name:"סורסים", build: () => [
       el("h2", {}, "סורסים"), el("p", {}, "קישור לתופים בלבד מפעיל את הנגן. כשיש גם קישור להפקה המלאה, מופיע סליידר שעובר בין התופים לבד להפקה המלאה. שני הקבצים צריכים להתחיל באותה נקודה ובאותו אורך."),

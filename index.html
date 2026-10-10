@@ -526,6 +526,8 @@ html,body{max-width:100%;overflow-x:hidden}
   .cover{scroll-snap-align:center}
 }
 
+.video--file{background:#000}.video--file video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1070,7 +1072,7 @@ window.mergeContent = function (saved) {
     S.sources = on(S.sources).filter(s => s.name);
     S.gear = on(S.gear).filter(g => g.name).map(g => ({...g, category: g.category || "כללי"}));
     S.testimonials = on(S.testimonials).filter(t => t.text);
-    S.covers = on(S.covers).filter(c => ytId(c.url));
+    S.covers = on(S.covers).filter(c => ytId(c.url) || /\.(mp4|mov|m4v|webm)(\?|#|$)/i.test(String(c.url || "")));
     S.productionsFirst = parseInt(S.productionsFirst, 10) || 2;
 
     // texts
@@ -1188,7 +1190,12 @@ window.mergeContent = function (saved) {
     if(!S.covers.length) $("#covers").hidden = true;
     else {
       const ct = $("#coverTrack"), cc = $("#coverChips");
-      ct.innerHTML = S.covers.map((c,i) => { const id = ytId(c.url); return `<article class="cover" data-i="${i}">
+      ct.innerHTML = S.covers.map((c,i) => { const id = ytId(c.url);
+        if(!id){ const src = String(c.url).trim(); return `<article class="cover" data-i="${i}">
+        <div class="video video--file"><video src="${esc(src)}#t=0.5" ${real(c.poster) ? `poster="${esc(c.poster)}"` : ""} controls playsinline preload="metadata"></video></div>
+        <div class="cover__body">${c.style ? `<span class="cover__style">${esc(c.style)}</span>` : ""}${c.title ? `<b>${esc(c.title)}</b>` : ""}</div>
+      </article>`; }
+        return `<article class="cover" data-i="${i}">
         <div class="video" data-id="${esc(id)}">
           <span class="video__fb" aria-hidden="true">${esc(c.style || "")}</span>
           <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()" onload="${thumbFix}">
@@ -1198,8 +1205,9 @@ window.mergeContent = function (saved) {
       </article>`; }).join("");
       cc.innerHTML = S.covers.map((c,i) => `<button type="button" role="tab" data-i="${i}"${i ? "" : ' class="on"'}>${esc(c.style || c.title || "קאבר " + (i+1))}</button>`).join("");
       const cards = [...ct.children], chips = [...cc.children];
-      const stopOthers = keep => cards.forEach(cd => { if(cd !== keep){ const box = cd.querySelector(".video"); if(box.querySelector("iframe")){ const id = box.dataset.id; box.innerHTML = `<img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt=""><button type="button" aria-label="נגן"><span class="play">${icon('i-play')}</span></button>`; } } });
+      const stopOthers = keep => cards.forEach(cd => { if(cd !== keep){ const box = cd.querySelector(".video"); const fv = box.querySelector("video"); if(fv){ fv.pause(); return; } if(box.querySelector("iframe")){ const id = box.dataset.id; box.innerHTML = `<img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt=""><button type="button" aria-label="נגן"><span class="play">${icon('i-play')}</span></button>`; } } });
       ct.addEventListener("click", e => { const b = e.target.closest(".video button"); if(b) stopOthers(b.closest(".cover")); }, true);
+      ct.addEventListener("play", e => { pauseAudio(); stopOthers(e.target.closest(".cover")); }, true);
       cc.addEventListener("click", e => { const b = e.target.closest("button"); if(!b) return; const el = cards[+b.dataset.i];
         ct.scrollBy({ left: el.getBoundingClientRect().left - ct.getBoundingClientRect().left - (ct.clientWidth - el.offsetWidth)/2, behavior: reduce ? "auto" : "smooth" }); });
       const mark = () => { const mid = ct.getBoundingClientRect().left + ct.clientWidth/2; let best = 0, bd = 1e9;

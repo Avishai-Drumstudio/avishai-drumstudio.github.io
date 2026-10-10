@@ -479,7 +479,7 @@ window.mergeContent = function (saved) {
     { name:"קאברים", build: () => [
       el("h2", {}, "קאברים בסגנונות שונים"), el("p", {}, "3–4 סרטוני יוטיוב, כל אחד בסגנון אחר. החלק מופיע באתר רק כשיש לפחות קאבר אחד."),
       el("div", {class:"card"}, field(S,"hCovers","כותרת החלק"), field(S,"pCovers","שורה מתחת לכותרת")),
-      listEditor(S.covers, { title:x => [x.style, x.title].filter(Boolean).join(" · "), fields:[["url","קישור יוטיוב","url"],["style","סגנון (למשל: רוק, פאנק, חסידי, ים-תיכוני)"],["title","שם השיר (לא חובה)"]], blank:() => ({url:"",style:"",title:"",show:true}), addLabel:"הוספת קאבר" })
+      listEditor(S.covers, { title:x => [x.style, x.title].filter(Boolean).join(" · "), fields:[["url","קישור יוטיוב או קובץ MP4","url"],["style","סגנון (למשל: רוק, פאנק, חסידי, ים-תיכוני)"],["title","שם השיר (לא חובה)"]], blank:() => ({url:"",style:"",title:"",show:true}), addLabel:"הוספת קאבר" })
     ]},
     { name:"סורסים", build: () => [
       el("h2", {}, "סורסים"), el("p", {}, "קישור לתופים בלבד מפעיל את הנגן. כשיש גם קישור להפקה המלאה, מופיע סליידר שעובר בין התופים לבד להפקה המלאה. שני הקבצים צריכים להתחיל באותה נקודה ובאותו אורך."),

@@ -359,6 +359,7 @@ window.mergeContent = function (saved) {
     try {
       syncOrder();
       const r = await post({ action:"save", password: PW, data: S });
+      try { if(r && r.ok) localStorage.setItem("ay_content", JSON.stringify(S)); } catch(_){} // this phone sees the change right away
       if(r.ok){ dirty = false; status("נשמר. האתר מעודכן."); }
       else if(r.error === "wrong_password"){ status("הסיסמה השתנתה. צאו והיכנסו מחדש.", "bad"); }
       else if(r.error === "too_big"){ status("יותר מדי תוכן לשמירה אחת. קצרו טקסטים ארוכים.", "bad"); $("#save").disabled = false; }

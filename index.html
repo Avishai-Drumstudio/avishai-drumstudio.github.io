@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>אבישי ישר | אולפן תופים – Live &amp; Studio Drums</title>
+<link rel="preload" href="assets/hero.jpg" as="image" fetchpriority="high">
 <meta name="description" content="אבישי ישר – מתופף סשן. הקלטות תופים מרחוק, ערוצים ברמת Mix Ready.">
 <meta name="theme-color" content="#0F1716">
 <meta property="og:type" content="website">
@@ -696,7 +697,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .hero__media::after{background:linear-gradient(180deg,rgba(6,10,9,.6) 0%,rgba(6,10,9,.18) 15%,rgba(6,10,9,.18) 38%,rgba(6,10,9,.6) 54%,rgba(6,10,9,.9) 74%,var(--bg) 100%) !important}
 .fog{opacity:.14 !important}
 .hero__fx{opacity:.18 !important}
-.hero__glow{position:absolute;inset:-20%;z-index:1;pointer-events:none;mix-blend-mode:screen;opacity:.35;
+.hero__glow{position:absolute;inset:-20%;z-index:1;pointer-events:none;opacity:.35;
   background:radial-gradient(35% 28% at 70% 40%,rgba(46,211,195,.14),transparent 70%);
   animation:heroGlow 12s ease-in-out infinite alternate}
 @keyframes heroGlow{from{transform:translate3d(-4%,-2%,0)}to{transform:translate3d(5%,4%,0)}}
@@ -714,7 +715,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .scrollcue.is-gone{opacity:0;pointer-events:none}
 /* natural colour under a soft haze */
 .hero__mp4{filter:saturate(1.04) contrast(1.03) brightness(1) !important}
-.fog{opacity:.5 !important;mix-blend-mode:screen}
+.fog{opacity:.45 !important}
 .hero__haze{position:absolute;inset:0;z-index:1;pointer-events:none;
   background:radial-gradient(90% 55% at 30% 55%,rgba(220,232,228,.16),transparent 70%),linear-gradient(180deg,rgba(200,215,210,.08),rgba(200,215,210,.02) 50%,transparent 70%);
   animation:hazeDrift 16s ease-in-out infinite alternate}
@@ -732,6 +733,9 @@ html,body{max-width:100%;overflow-x:hidden}
 #heroEyebrow{font-size:clamp(15.5px,4.3vw,18px) !important;font-weight:800 !important;color:#3FE3D3 !important;letter-spacing:.01em;text-shadow:0 1px 12px rgba(0,0,0,.65)}
 @media (max-width:760px){.scrollcue{font-size:15.5px !important;font-weight:800;color:#EDE4D3 !important;letter-spacing:0 !important}}
 @media (max-width:760px){.scrollcue{top:33% !important}}
+.c3__media::before{content:"";position:absolute;inset:0;background:#050807;opacity:var(--dim,0);z-index:2;pointer-events:none}
+.c3__card.is-play .c3__media::before{opacity:0}
+@media (pointer:coarse){.fog i:nth-child(3){display:none}.c3__tag{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(10,15,14,.82)}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -769,7 +773,8 @@ html,body{max-width:100%;overflow-x:hidden}
   <section class="hero" id="hero">
     <div class="hero__bg" id="heroBg">
       <div class="hero__media" id="heroMedia">
-        <img class="hero__poster" id="heroImg" alt="" fetchpriority="high" onerror="this.remove()">
+        <img class="hero__poster" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high" onerror="this.remove()">
+        <video class="hero__mp4" id="heroVid" src="assets/hero.mp4" poster="assets/hero.jpg" muted autoplay loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
       </div>
       <div class="fog" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
@@ -1357,15 +1362,15 @@ window.mergeContent = function (saved) {
     const bg = String(S.bgVideo||"").trim();
     if(real(bg) && /\.(mp4|webm)(\?|$)/i.test(bg) && !/claude/i.test(location.hostname)){
       // silent studio clip: built by hand so iPhone treats it as muted and lets it play inline
-      const v = document.createElement("video");
+      const v = $("#heroVid") || document.createElement("video"); // already in the page, so it starts right away
       v.className = "hero__mp4";
       v.muted = true; v.defaultMuted = true; v.setAttribute("muted", "");
       v.playsInline = true; v.setAttribute("playsinline", ""); v.setAttribute("webkit-playsinline", "");
       v.loop = true; v.autoplay = true; v.setAttribute("autoplay", ""); v.preload = "auto";
       v.setAttribute("disablepictureinpicture", ""); v.setAttribute("aria-hidden", "true");
-      if(real(S.heroImage)) v.poster = S.heroImage;
-      v.src = bg;
-      $("#heroMedia").appendChild(v);
+      if(real(S.heroImage) && v.getAttribute("poster") !== S.heroImage) v.poster = S.heroImage;
+      if(v.getAttribute("src") !== bg) v.src = bg;
+      if(!v.parentNode) $("#heroMedia").appendChild(v);
       const tryPlay = () => { v.muted = true; const p = v.play(); if(p && p.catch) p.catch(() => {}); };
       tryPlay(); v.addEventListener("canplay", tryPlay, {once:true});
       // phones in battery-saving mode block autoplay until the first touch or scroll
@@ -1373,6 +1378,7 @@ window.mergeContent = function (saved) {
       ["touchstart","pointerdown","scroll"].forEach(ev => addEventListener(ev, kick, {passive:true}));
       document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") tryPlay(); });
     } else if(!reduce && real(bg) && !/claude/i.test(location.hostname)){
+      $("#heroVid")?.remove();
       if(ytId(bg)){
         const id = ytId(bg);
         $("#heroMedia").insertAdjacentHTML("beforeend", `<iframe class="hero__yt" id="heroYt" tabindex="-1" aria-hidden="true" title="" src="${embedUrl(id, `&mute=1&loop=1&playlist=${id}&controls=0&disablekb=1&iv_load_policy=3&fs=0`)}" allow="autoplay; encrypted-media"></iframe>`);
@@ -1469,7 +1475,8 @@ window.mergeContent = function (saved) {
           el.style.transform = `translate3d(${(Math.sin(a) * r).toFixed(1)}px,0,${(cz * r - r + lift).toFixed(1)}px) rotateY(${rel.toFixed(1)}deg)`;
           el.style.opacity = String(Math.max(.12, .25 + .75 * (cz + 1) / 2 * (cz > 0 ? 1 : .6)).toFixed(3));
           el.style.zIndex = String(Math.round(100 + cz * 100));
-          el.style.filter = cz > .96 ? "none" : `brightness(${(.55 + .45 * Math.max(0, cz)).toFixed(2)})`; }); };
+          el.style.setProperty("--dim", cz > .96 ? 0 : (.45 - .45 * Math.max(0, cz)).toFixed(2));
+          const v = el.querySelector(".c3__media video:not(.c3__full)"); if(v){ const near = cz > .2; if(near !== v._near){ v._near = near; if(near && inView && !reduce){ v.muted = true; v.play().catch(() => {}); } else v.pause(); } } }); };
       const setActive = i => { if(i === active) return; active = i;
         cards.forEach((el,j) => el.classList.toggle("is-front", j === i));
         const c = covers[i].c; label.textContent = c.style || c.title || ""; label.classList.remove("in"); void label.offsetWidth; label.classList.add("in");
@@ -1513,7 +1520,7 @@ window.mergeContent = function (saved) {
       const end = () => { if(!dragging) return; dragging = false; if(moved){ turnTo(Math.round(angle / STEP) * STEP); pauseFor(3500); setTimeout(() => moved = false, 60); } };
       stage.addEventListener("pointerup", end); stage.addEventListener("pointercancel", end);
       // only move / play loops while on screen; first touch wakes loops in battery-saver mode
-      const wake = () => { if(!inView || reduce) return; loops.forEach(v => { v.muted = true; if(v.paused) v.play().catch(() => {}); }); };
+      const wake = () => { if(!inView || reduce) return; loops.forEach(v => { if(v._near === false) return; v.muted = true; if(v.paused) v.play().catch(() => {}); }); };
       if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting;
         if(inView){ wake(); startAuto(); } else { stopAuto(); stopPlay(); loops.forEach(v => v.pause()); } }, {threshold:.25}).observe(stage);
       else { inView = true; startAuto(); }
@@ -1806,7 +1813,7 @@ window.mergeContent = function (saved) {
 
   /* ---------------- hero: drum-head pulse (works even before the video loads) ---------------- */
   function heroFx(){
-    const cv = $("#heroFx"); if(!cv || reduce) return;
+    const cv = $("#heroFx"); if(!cv || reduce || touch){ cv && cv.remove(); return; } // phones: skip the canvas, keeps scrolling smooth
     const ctx = cv.getContext("2d"); let W = 0, H = 0, running = true;
     const TQ = "46,211,195", SD = "227,211,182";
     const rings = [], dust = Array.from({length:40}, () => ({x:Math.random(), y:Math.random(), r:.5+Math.random()*1.6, v:.015+Math.random()*.04, a:.15+Math.random()*.3}));
@@ -1863,9 +1870,15 @@ window.mergeContent = function (saved) {
   async function boot(){
     const started = Date.now();
     let S;
-    try { S = await withTimeout(loadContent(), 3500); } catch(e){ S = mergeContent(null); }
+    // show instantly: last saved content from this device (or the built-in defaults), refresh in the background for next time
+    let cached = null; try { cached = JSON.parse(localStorage.getItem("ay_content") || "null"); } catch(e){}
+    const fresh = (window.siteApi && siteApi.available ? siteApi.get() : Promise.resolve(null))
+      .then(j => { const d = j && j.data; if(d){ try { localStorage.setItem("ay_content", JSON.stringify(d)); } catch(e){} } return d; }).catch(() => null);
+    let data = cached;
+    if(!data){ try { data = await withTimeout(fresh, 2500); } catch(e){ data = null; } }
+    S = mergeContent(data);
     try { render(S); } catch(e){ console.error(e); }
-    const wait = Math.max(0, 650 - (Date.now() - started));
+    const wait = Math.max(0, 350 - (Date.now() - started));
     const safe = f => { try { f(); } catch(e){ console.error(e); } };
     setTimeout(() => {
       safe(motion);

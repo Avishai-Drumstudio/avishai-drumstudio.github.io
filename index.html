@@ -1874,8 +1874,10 @@ window.mergeContent = function (saved) {
     let cached = null; try { cached = JSON.parse(localStorage.getItem("ay_content") || "null"); } catch(e){}
     const fresh = (window.siteApi && siteApi.available ? siteApi.get() : Promise.resolve(null))
       .then(j => { const d = j && j.data; if(d){ try { localStorage.setItem("ay_content", JSON.stringify(d)); } catch(e){} } return d; }).catch(() => null);
-    let data = cached;
-    if(!data){ try { data = await withTimeout(fresh, 2500); } catch(e){ data = null; } }
+    // wait briefly for the latest content (so admin changes show up right away); fall back to the saved copy if Google is slow
+    let data = null;
+    try { data = await withTimeout(fresh, cached ? 1500 : 2500); } catch(e){}
+    if(!data) data = cached;
     S = mergeContent(data);
     try { render(S); } catch(e){ console.error(e); }
     const wait = Math.max(0, 350 - (Date.now() - started));

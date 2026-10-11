@@ -9,3 +9,5 @@ window.FIREBASE_CONFIG = {
 };
 // בעלי האפליקציה: נכנסים תמיד ומאשרים חברים (ההרשאה האמיתית בכללי Firestore)
 window.STUDIO_OWNERS = ['avishy407@gmail.com', 'yasharulpan@gmail.com'];
+// OAuth client (Google Cloud → Credentials → Web client) — לחיבור ליומן גוגל דרך חלון ההתחברות של גוגל
+window.GOOGLE_CLIENT_ID = '196522008239-2ncgd0fmjbmla2j6lteranivnso2q139.apps.googleusercontent.com';

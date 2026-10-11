@@ -9,15 +9,9 @@
 <meta name="apple-mobile-web-app-title" content="Studio Manager">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link rel="preconnect" href="https://www.gstatic.com"><link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = { theme: { extend: {
-  colors: { ink: 'var(--ink)', muted: 'var(--muted)', line: 'var(--glass-line)', glass: 'var(--glass)', glass2: 'var(--glass-2)',
-    ok: 'var(--ok)', warn: 'var(--warn)', bad: 'var(--bad)' },
-  fontFamily: { sans: ['Rubik', 'Arial Hebrew', 'Segoe UI', 'system-ui', 'sans-serif'] }
-} } };
-</script>
+<link rel="stylesheet" href="app.css?v=40c140e3">
 <style>
 :root {
   --bg: #140d2b; --glow-pct: 100%;
@@ -95,6 +89,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 </style>
 </head>
 <body>
+<div class="amb" aria-hidden="true"><b></b><b></b><i></i><i></i></div>
 <div id="root"></div>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -102,15 +97,15 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Studio">
 <meta name="robots" content="noindex, nofollow">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script defer src="firebase-config.js"></script>
 <style>
 #gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;
-  background:radial-gradient(circle at 20% 10%,#7c3aed55,transparent 60%),radial-gradient(circle at 90% 90%,#db277755,transparent 60%),#140a24;color:#fff;font-family:Rubik,system-ui,sans-serif;text-align:center}
+  background:radial-gradient(60% 45% at 75% 15%,rgba(245,158,60,.22),transparent 70%),radial-gradient(55% 40% at 15% 85%,rgba(46,211,195,.10),transparent 70%),#0d0b09;color:#fff;font-family:Rubik,system-ui,sans-serif;text-align:center}
 #gate .card{max-width:360px;width:100%}
-#gate img{width:96px;height:96px;border-radius:24px;box-shadow:0 12px 40px #0008}
+#gate img{display:block;margin:0 auto;width:104px;height:104px;border-radius:26px;box-shadow:0 18px 50px #000a}
 #gate h1{font-size:28px;font-weight:800;margin:18px 0 6px}
 #gate p{opacity:.8;font-size:15px;line-height:1.5;margin:0 0 22px}
 #gate button{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:14px 26px;font:700 16px Rubik,system-ui,sans-serif;background:#fff;color:#222;cursor:pointer}
@@ -118,13 +113,29 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 #gate .err{margin-top:16px;color:#fda4af;font-size:14px;min-height:1em}
 #gate .spin{width:28px;height:28px;border:3px solid #fff4;border-top-color:#fff;border-radius:50%;animation:gs 1s linear infinite;margin:0 auto}
 @keyframes gs{to{transform:rotate(360deg)}}
+/* רקע חי בסגנון דף הנחיתה: ערפל זז לאט + גרעיניות עדינה */
+.amb{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.amb i{position:absolute;inset:-10% 0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='600'%3E%3Cfilter id='f' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0045 .009' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .93 0 0 0 0 .92 0 0 0 0 .88 0 0 0 1.6 -.62'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");background-size:1200px 100%;background-repeat:repeat-x;opacity:.13;animation:ambFog 80s linear infinite;will-change:background-position}
+.amb i:nth-child(2){opacity:.09;background-size:1700px 120%;animation-duration:130s;animation-direction:reverse;top:35%}
+@keyframes ambFog{from{background-position:0 0}to{background-position:-1200px 0}}
+body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opacity:.045;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#root{position:relative;z-index:1}
+.amb b{position:absolute;width:70vmax;height:70vmax;border-radius:50%;filter:blur(40px);opacity:.55;will-change:transform;
+  background:radial-gradient(circle,color-mix(in srgb,var(--accent1,#7c3aed) 45%,transparent) 0%,transparent 62%);animation:ambDrift 38s ease-in-out infinite alternate}
+.amb b:nth-of-type(1){top:-25vmax;right:-20vmax}
+.amb b:nth-of-type(2){bottom:-30vmax;left:-25vmax;animation-duration:52s;animation-delay:-20s;background:radial-gradient(circle,color-mix(in srgb,var(--accent3,#db2777) 40%,transparent) 0%,transparent 62%)}
+@keyframes ambDrift{from{transform:translate(0,0) scale(1)}to{transform:translate(-12vmax,10vmax) scale(1.15)}}
+/* במצב בהיר: ערפל בגוון חם במקום לבן */
+:root[data-theme="light"] .amb i{filter:invert(1) sepia(1) saturate(3) hue-rotate(-15deg);opacity:.07}
+:root[data-theme="light"] .amb b{opacity:.35}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .amb i{filter:invert(1) sepia(1) saturate(3) hue-rotate(-15deg);opacity:.07}:root:not([data-theme="dark"]) .amb b{opacity:.35}}
+@media (prefers-reduced-motion: reduce){.amb i,.amb b{animation:none}}
 </style>
 <script>
 /* ===== גרסת גוגל: התחברות עם Google + שמירה ב-Firestore. מחליף את window.claude של Claude ===== */
 (function () {
-  var OWNERS = (window.STUDIO_OWNERS || window.STUDIO_ALLOWED || []).map(function (e) { return e.toLowerCase(); });
+  var OWNERS = [];
   var uid = null;
-  var configured = !!(window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey);
   var authReady, resolveAuth; authReady = new Promise(function (r) { resolveAuth = r; });
   var fs = null, started = false;
 
@@ -223,27 +234,42 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
   function start() { if (started) return; started = true; hideGate(); if (window.__startApp) window.__startApp(); else window.__startWhenReady = true; }
 
   document.addEventListener('DOMContentLoaded', function () {
-    if (!configured) { gate('<p>האפליקציה עוד לא חוברה ל-Firebase.<br>צריך למלא את הקובץ firebase-config.js.</p>'); return; }
-    gate('<div class="spin"></div>');
+    OWNERS = (window.STUDIO_OWNERS || window.STUDIO_ALLOWED || []).map(function (e) { return e.toLowerCase(); });
+    if (!(window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey) || !window.firebase) { gate('<p>האפליקציה עוד לא חוברה ל-Firebase.<br>צריך למלא את הקובץ firebase-config.js.</p>'); return; }
     firebase.initializeApp(window.FIREBASE_CONFIG);
     fs = firebase.firestore();
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function () {});
+    var cachedUid = null, cachedUser = null;
+    try { cachedUid = localStorage.getItem('studio-last-uid'); cachedUser = JSON.parse(localStorage.getItem('studio-last-user') || 'null'); } catch (e) {}
+    var logout = /[?&]logout\b/.test(location.search);
+    if (logout) { history.replaceState(null, '', location.pathname); cachedUid = null; firebase.auth().signOut(); }
+    // כניסה שכבר נעשתה במכשיר הזה: האפליקציה נפתחת מיד מהזיכרון, והחשבון מאומת ברקע
+    if (cachedUid && cachedUser) {
+      uid = cachedUid; window.__studioUser = cachedUser; window.__studioEmail = cachedUser.email; window.__studioIsOwner = OWNERS.indexOf(cachedUser.email) >= 0;
+      start();
+    } else gate('<div class="spin"></div>');
     firebase.auth().getRedirectResult().catch(function () {});
-    if (/[?&]logout\b/.test(location.search)) { history.replaceState(null, '', location.pathname); firebase.auth().signOut(); }
     firebase.auth().onAuthStateChanged(function (u) {
       if (!u) { showLogin(); return; }
+      if (started && cachedUid && u.uid !== cachedUid) {
+        try { Object.keys(localStorage).forEach(function (k) { if (/^studio/.test(k)) localStorage.removeItem(k); }); localStorage.setItem('studio-last-uid', u.uid); } catch (e) {}
+        location.reload(); return;
+      }
       var email = (u.email || '').toLowerCase(), owner = OWNERS.indexOf(email) >= 0;
       var deny = function () {
+        try { localStorage.removeItem('studio-last-user'); } catch (e) {}
         var g = gate('<p>החשבון <b dir="ltr">' + email + '</b> עוד לא מאושר.<br>שלח את המייל הזה לאבישי כדי שיאשר אותך.</p><button id="gout">כניסה עם חשבון אחר</button>');
         g.querySelector('#gout').onclick = function () { firebase.auth().signOut(); };
       };
       var go = function () {
-        uid = u.uid; window.__studioIsOwner = owner; window.__studioEmail = email; window.__studioUser = { name: u.displayName || '', email: email, photo: u.photoURL || '' };
+        uid = u.uid; window.__studioIsOwner = owner; window.__studioEmail = email;
+        window.__studioUser = { name: u.displayName || '', email: email, photo: u.photoURL || '' };
         try { // מכשיר שעבר בין משתמשים: לא להציג נתונים של משתמש קודם
           var last = localStorage.getItem('studio-last-uid');
           if (last && last !== uid) Object.keys(localStorage).forEach(function (k) { if (/^studio/.test(k)) localStorage.removeItem(k); });
-          localStorage.setItem('studio-last-uid', uid);
+          localStorage.setItem('studio-last-uid', uid); localStorage.setItem('studio-last-user', JSON.stringify(window.__studioUser));
         } catch (e) {}
-        resolveAuth(true); start();
+        resolveAuth(true); hideGate(); start();
       };
       if (owner) return go();
       fs.doc('config/allowed').get().then(function (d) { var l = (d.exists && d.data().emails) || []; l.indexOf(email) >= 0 ? go() : deny(); }).catch(deny);

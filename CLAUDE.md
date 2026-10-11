@@ -9,7 +9,10 @@ so he asks for a change in chat and expects it live on the site (push to `main` 
   URL: https://avishai-drumstudio.github.io/studio/
 
 ## Studio Manager (`studio/`)
-- `studio/index.html` is the whole app in one file: React 18 UMD + htm + Tailwind CDN, Hebrew RTL, Rubik font.
+- `studio/index.html` is the whole app in one file: React 18 UMD + htm, Hebrew RTL, Rubik font. Styles: Tailwind classes
+  precompiled into `studio/app.css` (no Tailwind CDN, for speed) — after adding new Tailwind classes, regenerate it with the
+  Tailwind v3 standalone CLI (content = studio/index.html, theme colors ink/muted/line/glass/glass2/ok/warn/bad = CSS vars,
+  font Rubik) and bump the `app.css?v=` query.
   Edit this file directly — it is the source of truth.
 - `studio/firebase-config.js` — Firebase web config (`window.FIREBASE_CONFIG`) and the owner Google accounts
   (`window.STUDIO_OWNERS`). The config is not secret; security is in Firestore rules.
@@ -20,6 +23,7 @@ so he asks for a change in chat and expects it live on the site (push to `main` 
   - `user`, `downloads` → simple local implementations
   - `mcp` → Google Calendar REST (separate Google sign-in with calendar scope, token in localStorage);
     tools emulated: `list_calendars`, `create_event`, `update_event`, `delete_event`
+  - Login once per device: the last user is cached in localStorage and the app opens instantly, auth is verified in the background.
   - `sample` is not available here (the in-app AI "secretary" and quick-add are hidden).
 - Data model (see `normalize()` in the app): gigs split into half-year docs to keep each doc small; `config`
   holds types/colors/texts/todos; `gsync` maps gig id → Google Calendar event id.

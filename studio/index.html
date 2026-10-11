@@ -192,8 +192,39 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   }
   var gcalBusy = null;
   window.__gcalAccount = function () { return tokOk() ? (gTok.email || 'מחובר') : ''; };
+  // חיבור ליומן דרך Google Identity Services (חלון של גוגל עצמו — עובד טוב גם באייפון). דורש GOOGLE_CLIENT_ID.
+  function saveTok(t, email) {
+    gTok = { t: t, exp: Date.now() + 55 * 60000, email: email || '' };
+    try { localStorage.setItem('studio-gcal-email', gTok.email); localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {}
+    calPrompt(false); toastMsg('יומן גוגל חובר' + (gTok.email ? ' (' + gTok.email + ')' : '') + ' ✓ — אפשר לסנכרן');
+  }
+  var gisClient = null;
+  function gisInit() {
+    if (gisClient || !window.GOOGLE_CLIENT_ID || !(window.google && google.accounts && google.accounts.oauth2)) return gisClient;
+    gisClient = google.accounts.oauth2.initTokenClient({ client_id: window.GOOGLE_CLIENT_ID, scope: 'https://www.googleapis.com/auth/calendar', callback: function () {} });
+    return gisClient;
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!window.GOOGLE_CLIENT_ID) return;
+    var sc = document.createElement('script'); sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true; sc.onload = gisInit; document.head.appendChild(sc);
+  });
+  function gisConnect() {
+    var c = gisInit(); if (!c) return null;
+    var hint = (gTok && gTok.email) || (function () { try { return localStorage.getItem('studio-gcal-email') || ''; } catch (e) { return ''; } })();
+    return new Promise(function (resolve) {
+      c.callback = function (resp) {
+        if (!resp || resp.error || !resp.access_token) { toastMsg('החיבור ליומן לא הצליח' + (resp && resp.error ? ': ' + resp.error : '')); return resolve(); }
+        fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=owner&maxResults=50', { headers: { Authorization: 'Bearer ' + resp.access_token } })
+          .then(function (r) { return r.json(); }).then(function (j) { var pr = (j.items || []).find(function (x) { return x.primary; }); saveTok(resp.access_token, pr ? pr.id : ''); })
+          .catch(function () { saveTok(resp.access_token, ''); }).then(resolve);
+      };
+      c.error_callback = function (err) { if (!(err && err.type === 'popup_closed')) toastMsg('החיבור ליומן לא הצליח: ' + ((err && err.type) || '')); resolve(); };
+      c.requestAccessToken(hint ? { hint: hint, prompt: '' } : { prompt: 'select_account' });
+    });
+  }
   window.__gcalConnect = function () {
     if (gcalBusy) return gcalBusy;
+    var g = gisConnect(); if (g) return g;
     var app2 = firebase.apps.find(function (a) { return a.name === 'gcal'; }) || firebase.initializeApp(window.FIREBASE_CONFIG, 'gcal');
     var p = new firebase.auth.GoogleAuthProvider(); p.addScope('https://www.googleapis.com/auth/calendar');
     var hint = (gTok && gTok.email) || (function () { try { return localStorage.getItem('studio-gcal-email') || ''; } catch (e) { return ''; } })();

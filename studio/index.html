@@ -190,15 +190,22 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     el.querySelector('#gcal-x').onclick = function () { calPrompt(false); };
     el.querySelector('#gcal-go').onclick = function () { window.__gcalConnect(); };
   }
+  var gcalBusy = null;
   window.__gcalConnect = function () {
+    if (gcalBusy) return gcalBusy;
     var app2 = firebase.apps.find(function (a) { return a.name === 'gcal'; }) || firebase.initializeApp(window.FIREBASE_CONFIG, 'gcal');
     var p = new firebase.auth.GoogleAuthProvider(); p.addScope('https://www.googleapis.com/auth/calendar'); p.setCustomParameters({ prompt: 'select_account' });
-    return app2.auth().signInWithPopup(p).then(function (r) {
+    gcalBusy = app2.auth().signInWithPopup(p).then(function (r) {
       var t = r && r.credential && r.credential.accessToken; if (!t) throw new Error('no token');
       gTok = { t: t, exp: Date.now() + 55 * 60000, email: (r.user && r.user.email) || '' };
       try { localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {}
       calPrompt(false); toastMsg('יומן גוגל חובר (' + gTok.email + ') ✓ — אפשר לסנכרן');
-    }).catch(function (e) { if (e && e.code !== 'auth/popup-closed-by-user') toastMsg('החיבור ליומן לא הצליח: ' + ((e && e.code) || '')); });
+    }).catch(function (e) {
+      var c = e && e.code;
+      if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return;
+      toastMsg(c === 'auth/popup-blocked' ? 'הדפדפן חסם את חלון החיבור — לחץ שוב על "חיבור"' : 'החיבור ליומן לא הצליח: ' + (c || ''));
+    }).then(function () { gcalBusy = null; });
+    return gcalBusy;
   };
   function toastMsg(m) { var t = document.createElement('div'); t.textContent = m; t.style.cssText = 'position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:999px;background:#222;color:#fff;font:600 14px Rubik,system-ui,sans-serif;direction:rtl'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); }
   function gfetch(method, path, body) {

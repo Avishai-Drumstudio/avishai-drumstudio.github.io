@@ -189,15 +189,18 @@ body::after{content:"";position:fixed;inset:0;z-index:90;pointer-events:none;opa
 .about__tape{position:absolute;top:14px;left:50%;z-index:2;transform:translateX(-50%) rotate(2deg);padding:7px 16px 6px;background:rgba(232,220,190,.92);color:#2a2620;
   font:700 13px/1 "Marker Felt","Comic Sans MS","Chalkboard SE",ui-rounded,system-ui,sans-serif;letter-spacing:.06em;direction:ltr;white-space:nowrap;
   box-shadow:0 4px 10px rgba(0,0,0,.35);clip-path:polygon(2% 0,98% 4%,100% 50%,97% 100%,3% 96%,0 50%)}
-.about__strip{position:absolute;inset:auto 14px 14px;z-index:2;display:flex;justify-content:space-between;gap:8px;direction:ltr;font:600 10.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;color:rgba(237,228,211,.75)}
-.about__strip b:first-child{color:var(--lime)}
-.about__meter{position:relative;direction:ltr;display:grid;grid-template-columns:repeat(2,10px);grid-template-rows:auto auto;gap:6px 5px;padding:10px 8px;border-radius:12px;background:#0b1110;box-shadow:inset 0 0 0 1px rgba(227,211,182,.1);align-self:center}
-.about__meter small{font:600 9px/1 ui-monospace,monospace;color:var(--muted);text-align:center}
-.led{display:flex;flex-direction:column-reverse;gap:3px}
-.led i{width:10px;height:7px;border-radius:2px;background:rgba(46,211,195,.12)}
-.led i:nth-child(n+10){background:rgba(240,190,80,.12)}.led i:nth-child(n+13){background:rgba(255,90,80,.12)}
-.led i.on{background:#2ED3C3;box-shadow:0 0 6px rgba(46,211,195,.7)}
-.led i:nth-child(n+10).on{background:#F0BE50;box-shadow:0 0 6px rgba(240,190,80,.7)}.led i:nth-child(n+13).on{background:#FF5A50;box-shadow:0 0 6px rgba(255,90,80,.7)}
+.fader{--v:.3;position:relative;width:46px;height:min(68vw,300px);align-self:center;flex:none;touch-action:none;cursor:grab}
+.fader__slot{position:absolute;left:50%;top:8px;bottom:8px;width:6px;margin-left:-3px;border-radius:6px;background:#070b0a;box-shadow:inset 0 1px 3px rgba(0,0,0,.9),0 0 0 1px rgba(227,211,182,.08)}
+.fader__lvl{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v) * 100%);border-radius:6px;background:linear-gradient(to top,rgba(46,211,195,.15),#2ED3C3);box-shadow:0 0 10px rgba(46,211,195,.5)}
+.fader__scale{position:absolute;inset:8px 0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.fader__scale i{display:block;height:1px;width:9px;background:rgba(227,211,182,.28)}
+.fader__scale i:nth-child(odd){width:13px;background:rgba(227,211,182,.4)}
+.fader__scale i:nth-child(3){background:#2ED3C3;width:15px}
+.fader__cap{position:absolute;left:50%;width:34px;height:20px;margin:-10px 0 0 -17px;top:calc(8px + (1 - var(--v)) * (100% - 16px));border-radius:5px;
+  background:linear-gradient(#e9e4d8,#b9b2a3 45%,#8f887a 50%,#cfc8b9 55%,#f1ece0);box-shadow:0 6px 12px -3px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.7)}
+.fader__cap::after{content:"";position:absolute;left:4px;right:4px;top:50%;height:2px;margin-top:-1px;background:#1b1a17;border-radius:2px}
+.fader.is-drag{cursor:grabbing}
+.fader.is-drag .fader__cap{box-shadow:0 8px 18px -3px rgba(0,0,0,.8),0 0 0 3px rgba(46,211,195,.35),inset 0 1px 0 rgba(255,255,255,.7)}
 .about__text{display:grid;gap:16px;justify-items:start}
 .about__text h2{font-weight:900;font-size:clamp(2.3rem,8vw,3.8rem);line-height:1.04;letter-spacing:-.01em}
 .about__body{display:grid;gap:12px}
@@ -709,9 +712,12 @@ html,body{max-width:100%;overflow-x:hidden}
         <div class="about__card">
           <img id="aboutImg" alt="אבישי ישר" loading="lazy" onerror="this.remove()">
           <span class="about__tape" aria-hidden="true">DRUMS · AVISHAI</span>
-          <span class="about__strip" aria-hidden="true"><b>CH 01</b><b>KICK · SNR · OH · ROOM</b></span>
         </div>
-        <div class="about__meter" aria-hidden="true"><span class="led"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="led"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><small>L</small><small>R</small></div>
+        <div class="fader" id="aboutFader" aria-hidden="true">
+          <span class="fader__scale"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          <span class="fader__slot"><span class="fader__lvl"></span></span>
+          <span class="fader__cap"></span>
+        </div>
       </figure>
       <div class="about__text">
         <span class="eyebrow">קצת עליי</span>
@@ -1325,14 +1331,18 @@ window.mergeContent = function (saved) {
           p.style.setProperty("--x", (Math.cos(a) * d).toFixed(1) + "px"); p.style.setProperty("--y", (Math.sin(a) * d).toFixed(1) + "px"); ic.appendChild(p); setTimeout(() => p.remove(), 700); } };
       addEventListener("scroll", () => { if(!q) q = requestAnimationFrame(upd); }, {passive:true}); addEventListener("resize", upd); upd(); })();
 
-    // about: little level meters bounce while the section is on screen
-    (() => { const cols = $$(".about__meter .led"); if(!cols.length || reduce) return; let on = false, t = 0;
-      const leds = cols.map(c => [...c.children]); const lv = [0,0];
-      const step = () => { if(!on) return; t += .016;
-        cols.forEach((c,k) => { const want = 6 + 5 * Math.abs(Math.sin(t * (3.1 + k * .7))) + Math.random() * 3.2; lv[k] += (want - lv[k]) * .5;
-          leds[k].forEach((d,j) => d.classList.toggle("on", j < lv[k])); });
-        setTimeout(() => requestAnimationFrame(step), 70); };
-      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { const was = on; on = e.isIntersecting; if(on && !was) step(); }).observe(cols[0].parentElement);
+    // about: a studio fader — rides up with the scroll, and you can push it with a finger
+    (() => { const f = $("#aboutFader"); if(!f) return; let held = false, cur = .3, want = .3, raf = 0;
+      const set = v => { cur = v; f.style.setProperty("--v", v.toFixed(3)); };
+      const ease = () => { cur += (want - cur) * .12; set(cur); raf = Math.abs(want - cur) > .002 ? requestAnimationFrame(ease) : 0; };
+      const aim = v => { want = Math.max(0, Math.min(1, v)); if(!raf) raf = requestAnimationFrame(ease); };
+      const fromScroll = () => { if(held) return; const r = f.getBoundingClientRect(); aim(.15 + .6 * Math.max(0, Math.min(1, (innerHeight - r.top) / (innerHeight + r.height)))); };
+      if(!reduce) addEventListener("scroll", fromScroll, {passive:true}); fromScroll();
+      const at = e => { const r = f.getBoundingClientRect(); return 1 - (e.clientY - r.top - 8) / (r.height - 16); };
+      f.addEventListener("pointerdown", e => { held = true; f.classList.add("is-drag"); try{ f.setPointerCapture(e.pointerId); }catch(_){} aim(at(e)); });
+      f.addEventListener("pointermove", e => { if(held){ want = Math.max(0, Math.min(1, at(e))); set(want); } });
+      const up = () => { if(!held) return; held = false; f.classList.remove("is-drag"); setTimeout(fromScroll, 1500); };
+      f.addEventListener("pointerup", up); f.addEventListener("pointercancel", up);
     })();
 
     // covers: a golden reel — drag it round, tap any circle to hear it

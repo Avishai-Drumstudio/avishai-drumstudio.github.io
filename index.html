@@ -704,6 +704,14 @@ html,body{max-width:100%;overflow-x:hidden}
 @media (prefers-reduced-motion:reduce){.hero__mp4,.hero__glow{animation:none}}
 .top:not(.is-solid) .brand,.top:not(.is-solid) .brand *{text-shadow:0 1px 10px rgba(0,0,0,.6)}
 @media (max-width:760px){.hero__content{padding-bottom:calc(11vh + env(safe-area-inset-bottom,0px)) !important}}
+/* scroll cue: bottom-left on phones, fades away once you scroll */
+@media (max-width:760px){
+  .scrollcue{display:grid !important;left:26px;right:auto;transform:none;bottom:calc(26px + env(safe-area-inset-bottom,0px));gap:8px;font-size:12px;letter-spacing:.02em;color:rgba(237,228,211,.6);transition:opacity .5s}
+  .scrollcue i{height:46px;width:1.5px}
+}
+.scrollcue i::before{content:"";position:absolute;left:50%;top:0;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#2ED3C3;box-shadow:0 0 8px #2ED3C3;animation:cueDot 1.8s cubic-bezier(.6,0,.3,1) infinite;z-index:1}
+@keyframes cueDot{0%{transform:translateY(-6px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(46px);opacity:0}}
+.scrollcue.is-gone{opacity:0;pointer-events:none}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1387,6 +1395,9 @@ window.mergeContent = function (saved) {
         for(let k = 0; k < 10; k++){ const p = document.createElement("i"); p.className = "spark"; const a = k / 10 * Math.PI * 2 + Math.random() * .4, d = 34 + Math.random() * 26;
           p.style.setProperty("--x", (Math.cos(a) * d).toFixed(1) + "px"); p.style.setProperty("--y", (Math.sin(a) * d).toFixed(1) + "px"); ic.appendChild(p); setTimeout(() => p.remove(), 700); } };
       addEventListener("scroll", () => { if(!q) q = requestAnimationFrame(upd); }, {passive:true}); addEventListener("resize", upd); upd(); })();
+
+    // scroll cue fades out after the first scroll
+    (() => { const c = $(".scrollcue"); if(!c) return; const f = () => c.classList.toggle("is-gone", scrollY > 60); addEventListener("scroll", f, {passive:true}); f(); })();
 
     // about: a studio fader — rides up with the scroll, and you can push it with a finger
     (() => { const f = $("#aboutFader"); if(!f) return; let held = false, cur = .3, want = .3, raf = 0;

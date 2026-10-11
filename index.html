@@ -712,6 +712,22 @@ html,body{max-width:100%;overflow-x:hidden}
 .scrollcue i::before{content:"";position:absolute;left:50%;top:0;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#2ED3C3;box-shadow:0 0 8px #2ED3C3;animation:cueDot 1.8s cubic-bezier(.6,0,.3,1) infinite;z-index:1}
 @keyframes cueDot{0%{transform:translateY(-6px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(46px);opacity:0}}
 .scrollcue.is-gone{opacity:0;pointer-events:none}
+/* natural colour under a soft haze */
+.hero__mp4{filter:saturate(1.04) contrast(1.03) brightness(1) !important}
+.fog{opacity:.5 !important;mix-blend-mode:screen}
+.hero__haze{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(90% 55% at 30% 55%,rgba(220,232,228,.16),transparent 70%),linear-gradient(180deg,rgba(200,215,210,.08),rgba(200,215,210,.02) 50%,transparent 70%);
+  animation:hazeDrift 16s ease-in-out infinite alternate}
+@keyframes hazeDrift{from{opacity:.75;transform:translate3d(-2%,0,0)}to{opacity:1;transform:translate3d(2%,-1%,0)}}
+.hero__media::after{background:linear-gradient(180deg,rgba(6,10,9,.5) 0%,rgba(6,10,9,.06) 15%,rgba(6,10,9,.06) 38%,rgba(6,10,9,.55) 54%,rgba(6,10,9,.9) 74%,var(--bg) 100%) !important}
+/* bigger scroll cue, higher on the left */
+@media (max-width:760px){
+  .scrollcue{left:22px !important;bottom:auto !important;top:44%;gap:10px;font-size:13.5px !important;color:rgba(237,228,211,.8) !important;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+  .scrollcue i{height:96px !important;width:2px !important;background:rgba(237,228,211,.28) !important}
+  .scrollcue i::before{width:8px;height:8px;margin-left:-4px}
+}
+@keyframes cueDot{0%{transform:translateY(-8px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(96px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.hero__haze{animation:none}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -753,6 +769,7 @@ html,body{max-width:100%;overflow-x:hidden}
       </div>
       <div class="fog" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
+    <span class="hero__haze" aria-hidden="true"></span>
     <span class="hero__glow" aria-hidden="true"></span>
     <canvas class="hero__fx" id="heroFx" aria-hidden="true"></canvas>
     <div class="wrap hero__content" id="heroContent">

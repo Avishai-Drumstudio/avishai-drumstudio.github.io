@@ -195,10 +195,13 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   window.__gcalConnect = function () {
     if (gcalBusy) return gcalBusy;
     var app2 = firebase.apps.find(function (a) { return a.name === 'gcal'; }) || firebase.initializeApp(window.FIREBASE_CONFIG, 'gcal');
-    var p = new firebase.auth.GoogleAuthProvider(); p.addScope('https://www.googleapis.com/auth/calendar'); p.setCustomParameters({ prompt: 'select_account' });
+    var p = new firebase.auth.GoogleAuthProvider(); p.addScope('https://www.googleapis.com/auth/calendar');
+    var hint = (gTok && gTok.email) || (function () { try { return localStorage.getItem('studio-gcal-email') || ''; } catch (e) { return ''; } })();
+    p.setCustomParameters(hint ? { login_hint: hint } : { prompt: 'select_account' });
     gcalBusy = app2.auth().signInWithPopup(p).then(function (r) {
       var t = r && r.credential && r.credential.accessToken; if (!t) throw new Error('no token');
       gTok = { t: t, exp: Date.now() + 55 * 60000, email: (r.user && r.user.email) || '' };
+      try { localStorage.setItem('studio-gcal-email', gTok.email); } catch (e) {}
       try { localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {}
       calPrompt(false); toastMsg('יומן גוגל חובר (' + gTok.email + ') ✓ — אפשר לסנכרן');
     }).catch(function (e) {
@@ -224,9 +227,24 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     if (a.colorId) b.colorId = String(a.colorId); return b;
   }
   function calId(a) { return encodeURIComponent(a.calendarId || 'primary'); }
+  var adopted = {};
   var calTools = {
     list_calendars: function () { return gfetch('GET', '/users/me/calendarList?maxResults=250').then(function (j) { return { calendars: (j.items || []).map(function (c) { return { id: c.id, summary: c.summaryOverride || c.summary, primary: !!c.primary, accessRole: c.accessRole }; }) }; }); },
-    create_event: function (a) { return gfetch('POST', '/calendars/' + calId(a) + '/events?sendUpdates=none', evBody(a)).then(function (j) { return { id: j.id }; }); },
+    // לא ליצור כפולים: אם כבר יש ביומן אירוע באותו יום בשעה קרובה — מקשרים אליו במקום ליצור חדש
+    create_event: function (a) {
+      var day = String(a.startTime || '').slice(0, 10), st = Date.parse(a.startTime);
+      var tz = String(a.startTime || '').slice(19) || '+03:00';
+      var q = '/calendars/' + calId(a) + '/events?singleEvents=true&maxResults=50&timeMin=' + encodeURIComponent(day + 'T00:00:00' + tz) + '&timeMax=' + encodeURIComponent(day + 'T23:59:59' + tz);
+      return gfetch('GET', q).then(function (j) {
+        var hit = (j.items || []).find(function (e) {
+          if (e.status === 'cancelled' || adopted[e.id]) return false;
+          if (e.start && e.start.dateTime) return Math.abs(Date.parse(e.start.dateTime) - st) <= 60 * 60000;
+          return e.start && e.start.date === day;
+        });
+        if (hit) { adopted[hit.id] = 1; return { id: hit.id, adopted: true }; }
+        return gfetch('POST', '/calendars/' + calId(a) + '/events?sendUpdates=none', evBody(a)).then(function (k) { return { id: k.id }; });
+      });
+    },
     update_event: function (a) { return gfetch('PATCH', '/calendars/' + calId(a) + '/events/' + encodeURIComponent(a.eventId) + '?sendUpdates=none', evBody(a)).then(function (j) { return { id: j.id }; }); },
     delete_event: function (a) { return gfetch('DELETE', '/calendars/' + calId(a) + '/events/' + encodeURIComponent(a.eventId) + '?sendUpdates=none').then(function () { return {}; }); }
   };
@@ -2289,7 +2307,7 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
             <${Btn} onClick=${() => window.__gcalConnect && window.__gcalConnect().then(gsync.loadCalendars)}>🔗 חיבור חשבון יומן<//>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            <div className="w-full rounded-2xl glass-soft px-3 py-2 text-sm">${window.__gcalAccount && window.__gcalAccount() ? html`<span className="text-ok font-bold">● מחובר ליומן של </span><b dir="ltr">${window.__gcalAccount()}</b>` : html`<span className="text-warn font-bold">● יומן גוגל עוד לא מחובר במכשיר הזה</span>`}<span className="block text-xs text-muted">בסנכרון הבא: ${gsync.planNew} חדשים · ${gsync.planUpd} עדכונים · ${gsync.planDel} מחיקות</span></div>
+            <div className="w-full rounded-2xl glass-soft px-3 py-2 text-sm">${window.__gcalAccount && window.__gcalAccount() ? html`<span className="text-ok font-bold">● מחובר ליומן של </span><b dir="ltr">${window.__gcalAccount()}</b>` : html`<span className="text-warn font-bold">● יומן גוגל עוד לא מחובר במכשיר הזה</span>`}<span className="block text-xs text-muted">בסנכרון הבא: ${gsync.planNew} חדשים · ${gsync.planUpd} עדכונים · ${gsync.planDel} מחיקות${gsync.planNew ? ' — אירוע שכבר נמצא ביומן באותו יום ובשעה קרובה יקושר אליו ולא ישוכפל' : ''}</span></div>
             <${Btn} kind="grad" disabled=${gsync.running} onClick=${gsync.run}>${gsync.running ? 'מסנכרן ' + gsync.done + '/' + gsync.total + '…' : '📅 סנכרון עכשיו'}<//>
             <span className="text-xs text-muted">${data.gsync && data.gsync.last ? 'סנכרון אחרון: ' + new Date(data.gsync.last).toLocaleString('he-IL') : 'עוד לא סונכרן'}</span>
           </div>

@@ -728,6 +728,10 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 @keyframes cueDot{0%{transform:translateY(-8px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(96px);opacity:0}}
 @media (prefers-reduced-motion:reduce){.hero__haze{animation:none}}
+/* bigger, bolder kicker + cue */
+#heroEyebrow{font-size:clamp(15.5px,4.3vw,18px) !important;font-weight:800 !important;color:#3FE3D3 !important;letter-spacing:.01em;text-shadow:0 1px 12px rgba(0,0,0,.65)}
+@media (max-width:760px){.scrollcue{font-size:15.5px !important;font-weight:800;color:#EDE4D3 !important;letter-spacing:0 !important}}
+@media (max-width:760px){.scrollcue{top:33% !important}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -781,7 +785,7 @@ html,body{max-width:100%;overflow-x:hidden}
         <button class="btn btn--ghost" type="button" id="watchIntro"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play"/></svg><span>צפו בסרטון</span></button>
       </div>
     </div>
-    <div class="scrollcue" aria-hidden="true"><i></i>גללו</div>
+    <div class="scrollcue" aria-hidden="true"><i></i>גלו עוד</div>
   </section>
 
   <!-- ============ REEL ============ -->

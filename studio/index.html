@@ -191,6 +191,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     el.querySelector('#gcal-go').onclick = function () { window.__gcalConnect(); };
   }
   var gcalBusy = null;
+  window.__gcalAccount = function () { return tokOk() ? (gTok.email || 'מחובר') : ''; };
   window.__gcalConnect = function () {
     if (gcalBusy) return gcalBusy;
     var app2 = firebase.apps.find(function (a) { return a.name === 'gcal'; }) || firebase.initializeApp(window.FIREBASE_CONFIG, 'gcal');
@@ -2288,6 +2289,7 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
             <${Btn} onClick=${() => window.__gcalConnect && window.__gcalConnect().then(gsync.loadCalendars)}>🔗 חיבור חשבון יומן<//>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-3">
+            <div className="w-full rounded-2xl glass-soft px-3 py-2 text-sm">${window.__gcalAccount && window.__gcalAccount() ? html`<span className="text-ok font-bold">● מחובר ליומן של </span><b dir="ltr">${window.__gcalAccount()}</b>` : html`<span className="text-warn font-bold">● יומן גוגל עוד לא מחובר במכשיר הזה</span>`}<span className="block text-xs text-muted">בסנכרון הבא: ${gsync.planNew} חדשים · ${gsync.planUpd} עדכונים · ${gsync.planDel} מחיקות</span></div>
             <${Btn} kind="grad" disabled=${gsync.running} onClick=${gsync.run}>${gsync.running ? 'מסנכרן ' + gsync.done + '/' + gsync.total + '…' : '📅 סנכרון עכשיו'}<//>
             <span className="text-xs text-muted">${data.gsync && data.gsync.last ? 'סנכרון אחרון: ' + new Date(data.gsync.last).toLocaleString('he-IL') : 'עוד לא סונכרן'}</span>
           </div>
@@ -2634,7 +2636,8 @@ function App() {
   const gPending = mcpOk ? syncPlan(data).filter(t => !t.keep).length : 0;
   const fullPending = mcpOk ? syncPlan(data, true).filter(t => !t.keep).length : 0;
   const runFull = () => ask('להעביר ליומן גוגל את כל ההיסטוריה — ' + fullPending + ' אירועים? זה לוקח כמה דקות; השאר את האפליקציה פתוחה עד הסוף. מכאן והלאה הסנכרון הרגיל ימשיך לעדכן רק מהחודש האחרון.', { ok: 'התחל סנכרון מלא' }).then(ok => ok && runSync(true));
-  const gsyncApi = { fullPending, runFull, ok: mcpOk, pending: gPending, running: gsRun.running, done: gsRun.done, total: gsRun.total, error: gsRun.error, run: runSync, calendars: gCals, loadCalendars, setCalendar };
+  const planNow = mcpOk ? syncPlan(data) : [], planNew = planNow.filter(t => t.op === 'create').length, planUpd = planNow.filter(t => t.op === 'update').length, planDel = planNow.filter(t => t.op === 'delete' && !t.keep).length;
+  const gsyncApi = { planNew, planUpd, planDel, fullPending, runFull, ok: mcpOk, pending: gPending, running: gsRun.running, done: gsRun.done, total: gsRun.total, error: gsRun.error, run: runSync, calendars: gCals, loadCalendars, setCalendar };
   const gsyncUI = mcpOk && gigs.length > 0 ? html`
     <div className="mt-3 flex items-center gap-2 px-1">
       <button onClick=${runSync} disabled=${gsRun.running} className=${'flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ' + (gPending ? 'grad' : 'glass-soft text-muted')}>

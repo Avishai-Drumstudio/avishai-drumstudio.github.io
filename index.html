@@ -785,13 +785,8 @@ html,body{max-width:100%;overflow-x:hidden}
               <span class="dial__x" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
             </button>
           </div>
-          <div class="deck" aria-hidden="true">
-            <svg class="vu" viewBox="0 0 120 64"><path class="vu__arc" d="M14 52 A50 50 0 0 1 106 52"/><path class="vu__red" d="M88 22 A50 50 0 0 1 106 52"/>
-              <g class="vu__ticks"><path d="M14 52l6-3M22 33l5 3M36 19l3 5M60 12v6M84 19l-3 5M98 33l-5 3M106 52l-6-3"/></g>
-              <text x="60" y="44" text-anchor="middle">VU</text><line class="vu__needle" id="vuNeedle" x1="60" y1="60" x2="60" y2="14"/><circle cx="60" cy="60" r="3.2"/></svg>
-            <span class="counter" id="tapeCounter">00:00</span>
-          </div>
-          <div class="wheel__meta"><b id="wheelStyle"></b><small id="wheelHint"></small><span class="wheel__dots" id="wheelDots"></span></div>
+
+          <div class="wheel__meta"><b id="wheelStyle"></b><small id="wheelHint"></small></div>
         </div>
       </div>
     </div>
@@ -1372,8 +1367,8 @@ window.mergeContent = function (saved) {
             : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" onerror="this.remove()">` : "")
           : ""}${cv && (cv.c.style || cv.c.title) ? `<b class="hole__tag">${esc(cv.c.style || cv.c.title)}</b>` : ""}</div></div>`; }).join("");
       const holes = [...plate.children], holeVids = $$("video", plate);
-      dotsEl.innerHTML = n > 1 ? covers.map(() => "<i></i>").join("") : "";
-      const dots = [...dotsEl.children];
+      if(dotsEl) dotsEl.innerHTML = n > 1 ? covers.map(() => "<i></i>").join("") : "";
+      const dots = dotsEl ? [...dotsEl.children] : [];
 
       // one persistent player for the full clip with sound (created once, so the first tap always plays)
       const face = center.querySelector(".dial__face");
@@ -1386,7 +1381,7 @@ window.mergeContent = function (saved) {
       };
       // VU needle + tape counter while listening
       let vuRaf = 0, lvl = 0;
-      const vu = () => { if(!listening){ needle.style.transform = "rotate(-48deg)"; vuRaf = 0; return; }
+      const vu = () => { if(!needle || !counter){ vuRaf = 0; return; } if(!listening){ needle.style.transform = "rotate(-48deg)"; vuRaf = 0; return; }
         const t = performance.now() / 1000, want = full.paused ? 0 : .55 + .25 * Math.sin(t * 7.3) * Math.sin(t * 2.1) + Math.random() * .22;
         lvl += (want - lvl) * .35; needle.style.transform = `rotate(${-48 + Math.min(1, lvl) * 92}deg)`;
         const s = Math.floor(full.currentTime || 0); counter.textContent = `${String(Math.floor(s / 60)).padStart(2,"0")}:${String(s % 60).padStart(2,"0")}`;
@@ -1396,7 +1391,7 @@ window.mergeContent = function (saved) {
       full.addEventListener("waiting", () => center.classList.add("is-loading"));
       full.addEventListener("playing", () => center.classList.remove("is-loading"));
       function stopSound(){ if(!listening && !frame) return; listening = false; center.classList.remove("is-live", "is-loading"); dialEl.classList.remove("is-big");
-        center.style.setProperty("--p", 0); counter.textContent = "00:00"; full.pause(); if(frame){ frame.remove(); frame = null; } }
+        center.style.setProperty("--p", 0); if(counter) counter.textContent = "00:00"; full.pause(); if(frame){ frame.remove(); frame = null; } }
       function preview(){ if(!pv || listening) return; if(inView && !reduce){ pv.muted = true; pv.play().catch(() => {}); } else pv.pause(); }
       const setActive = i => {
         if(i === active) return; const first = active < 0; active = i;
@@ -1464,7 +1459,7 @@ window.mergeContent = function (saved) {
       // tap any circle: it turns to the top and starts playing with sound — one tap
       plate.addEventListener("click", e => { if(dragMoved) return; const h = e.target.closest(".hole.has"); if(!h) return; const i = +h.dataset.i;
         if(i !== active){ seeking = true; go(i); } listen(i); });
-      dotsEl.addEventListener("click", e => { const d = e.target.closest("i"); if(!d) return; const i = dots.indexOf(d); if(i !== active){ go(i); } });
+      if(dotsEl) dotsEl.addEventListener("click", e => { const d = e.target.closest("i"); if(!d) return; const i = dots.indexOf(d); if(i !== active){ go(i); } });
       // tap the middle: listen (tap again to stop)
       center.addEventListener("click", () => { if(dragMoved) return; if(listening){ stopSound(); preview(); return; } listen(active); });
 

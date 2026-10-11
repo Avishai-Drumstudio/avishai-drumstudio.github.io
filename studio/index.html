@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link rel="preconnect" href="https://www.gstatic.com"><link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=7f35047b">
+<link rel="stylesheet" href="app.css?v=7959d052">
 <style>
 :root {
   --bg: #140d2b; --glow-pct: 100%;
@@ -78,6 +78,12 @@ select.field option { color: #1d1238; background: #fff; }
 .scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .scroll-x::-webkit-scrollbar { display: none; }
 .pop { animation: pop .22s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes todayRing { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent2) 70%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
+.today-ping { animation: todayRing 1s ease-out 3; }
+@keyframes todayIn { from { transform: translateY(30px) scale(.8); opacity: 0; } to { transform: none; opacity: 1; } }
+.today-fab { animation: todayIn .35s cubic-bezier(.2,.9,.3,1.3); }
+.today-fab .tile { transition: transform .2s; }
+.today-fab:active .tile { transform: rotate(-8deg) scale(.95); }
 @keyframes calIn { from { transform: translateX(var(--from, 0)); opacity: .3; } to { transform: none; opacity: 1; } }
 @keyframes pop { from { transform: translateY(14px) scale(.98); opacity: 0; } to { transform: none; opacity: 1; } }
 .shine { position: relative; overflow: hidden; }
@@ -1552,7 +1558,7 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
   const [showLegend, setShowLegend] = useState(false);
   const t = todayISO();
   const [cursor, setCursor] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
-  const [selected, setSelected] = useState(t);
+  const [selected, setSelected] = useState(t), [ping, setPing] = useState(false);
   const [hidden, setHidden] = useState({});
   const visible = gigs.filter(g => !hidden[g.type]);
   const byDate = useMemo(() => {
@@ -1567,6 +1573,8 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
   while (cells.length % 7) cells.push(null);
   const [slide, setSlide] = useState(0);
   const move = n => { setSlide(n); setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + n, 1)); };
+  const curYM = t.slice(0, 7), viewYM = toISO(cursor).slice(0, 7), away = viewYM !== curYM;
+  const goToday = () => { setSlide(viewYM > curYM ? -1 : 1); const d = D(t); setCursor(new Date(d.getFullYear(), d.getMonth(), 1)); setSelected(t); setPing(true); setTimeout(() => setPing(false), 3200); };
   /* החלקה ימינה/שמאלה על היומן מעבירה חודש (כמו ביומן גוגל). בעברית: גרירה ימינה = החודש הבא */
   const swipe = useRef(null), gridRef = useRef(null);
   const onTS = e => { const t = e.touches[0]; swipe.current = { x: t.clientX, y: t.clientY, dx: 0, lock: null }; };
@@ -1608,7 +1616,7 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
             const tint = evs.length ? colorOf(evs.slice().sort(mineFirst)[0]).dot : null;
             return html`
               <button key=${iso} onClick=${() => { setSelected(iso); (byDate[iso] || []).length ? setSheet(iso) : prepByDate[iso] ? setPrepView(prepByDate[iso][0]) : onAdd(iso); }} aria-label=${fmtDay(iso) + (evs.length ? ', ' + evs.length + ' אירועים' : '')}
-                className=${'relative flex flex-col items-stretch min-w-0 min-h-[3.9rem] sm:min-h-[6.5rem] rounded-xl sm:rounded-2xl p-1 sm:p-2 text-right transition border '
+                className=${'relative flex flex-col items-stretch min-w-0 min-h-[3.9rem] sm:min-h-[6.5rem] rounded-xl sm:rounded-2xl p-1 sm:p-2 text-right transition border ' + (isToday && ping ? 'today-ping ' : '')
                   + (isSel ? 'border-[var(--accent2)] ' : CFG.cellBoxes ? 'border-[var(--glass-line)] hover:border-[var(--accent2)] ' : 'border-transparent hover:border-[var(--glass-line)] ')
                   + (iso < t ? 'opacity-50 ' : '')}
                 style=${{ background: tint ? `linear-gradient(160deg, ${tint}50, ${tint}14 75%)` : (CFG.cellBoxes ? 'var(--glass)' : 'transparent') }}>
@@ -1675,6 +1683,13 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
             ${admin && Number(g.fee) > 0 ? html`<${Status} s=${payStatus(g)} />` : html`<${TypeChip} type=${g.type} small />`}
           </button></li>`)}</ul>`)}
       <//>`}
+      ${away && html`<button onClick=${goToday} aria-label="חזרה להיום" className="today-fab fixed z-30 flex items-center gap-2.5 rounded-full glass py-1.5 pe-4 ps-1.5 shadow-2xl" style=${{ left: '14px', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 6.4rem)', backdropFilter: 'blur(16px)' }}>
+        <span className="tile flex h-11 w-11 flex-col overflow-hidden rounded-xl bg-white text-center shadow-md">
+          <span className="grad block py-px text-[9px] font-bold leading-[13px]">${D(t).toLocaleDateString('he-IL', { month: 'short' })}</span>
+          <span className="block flex-1 text-xl font-extrabold leading-[28px] text-[#1c1917]">${Number(t.slice(8))}</span>
+        </span>
+        <span className="text-right leading-tight"><b className="block text-sm">היום</b><span className="block text-[11px] text-muted">${viewYM > curYM ? 'חזרה' : 'קדימה'} ${Math.abs((+viewYM.slice(0, 4) - +curYM.slice(0, 4)) * 12 + (+viewYM.slice(5) - +curYM.slice(5)))} חו׳</span></span>
+      </button>`}
     </div>`;
 }
 

@@ -233,9 +233,9 @@ body::after{content:"";position:fixed;inset:0;z-index:90;pointer-events:none;opa
 /* ---------- process ---------- */
 .rings{position:absolute;width:min(760px,130vw);aspect-ratio:1;max-width:none;top:50%;left:50%;translate:-50% -50%;z-index:-1;opacity:.5;pointer-events:none}
 .steps{list-style:none;display:grid;gap:38px;position:relative;max-width:620px;margin-inline:auto;padding-top:24px}
-.steps__track,.steps__fill{position:absolute;top:0;bottom:0;left:50%;width:2px;border-radius:2px;transform:translateX(-50%);z-index:0}
+.steps__track,.steps__fill{position:absolute;top:0;bottom:0;left:50%;width:6px;border-radius:6px;transform:translateX(-50%);z-index:0}
 .steps__track{background:var(--line)}
-.steps__fill{background:var(--lime);transform-origin:top;transform:translateX(-50%) scaleY(0);box-shadow:0 0 18px rgba(46,211,195,.5)}
+.steps__fill{background:linear-gradient(to bottom,#7FE7DC,#2ED3C3);transform-origin:top;transform:translateX(-50%) scaleY(0);box-shadow:0 0 14px rgba(46,211,195,.75),0 0 34px rgba(46,211,195,.35)}
 .step{--f:0;position:relative;z-index:1;background:rgba(22,28,25,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:20px;padding:36px 22px 22px;text-align:center;transition:border-color .5s;overflow:visible}
 .step::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:linear-gradient(to bottom,rgba(46,211,195,.20),rgba(46,211,195,.07) 85%,rgba(46,211,195,.28) 100%);
@@ -587,6 +587,19 @@ html,body{max-width:100%;overflow-x:hidden}
 .wheel__dots i{width:7px;height:7px;border-radius:99px;background:rgba(237,228,211,.22);cursor:pointer;transition:width .3s,background .3s}
 .wheel__dots i.on{width:22px;background:var(--lime)}
 @media (prefers-reduced-motion:reduce){.dial__btn{animation:none}}
+
+/* steps: pop when a card fills up */
+.step.is-full{border-color:rgba(46,211,195,.55)}
+.step.pop{animation:stepPop .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes stepPop{0%{transform:scale(1)}35%{transform:scale(1.045)}65%{transform:scale(.985)}100%{transform:scale(1)}}
+.step.pop::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;box-shadow:0 0 0 2px #2ED3C3,0 0 40px rgba(46,211,195,.55);animation:stepFlash .7s ease-out forwards}
+@keyframes stepFlash{from{opacity:1}to{opacity:0}}
+.step.pop .step__icon{animation:iconPop .55s cubic-bezier(.34,1.56,.64,1)}
+@keyframes iconPop{0%{transform:scale(1)}40%{transform:scale(1.35) rotate(-8deg)}100%{transform:scale(1)}}
+.spark{position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:#7FE7DC;box-shadow:0 0 8px #2ED3C3;pointer-events:none;animation:spark .65s ease-out forwards}
+.spark:nth-child(3n){background:#F0BE50;box-shadow:0 0 8px #F0BE50}
+@keyframes spark{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}}
+@media (prefers-reduced-motion:reduce){.step.pop,.step.pop .step__icon,.spark{animation:none}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1270,7 +1283,13 @@ window.mergeContent = function (saved) {
         if(reduce){ fill.style.transform = "translateX(-50%) scaleY(1)"; cards.forEach(c => { c.style.setProperty("--f", 1); c.classList.add("is-on"); }); return; }
         fill.style.transform = `translateX(-50%) scaleY(${Math.max(0, Math.min(1, (line - b.top) / b.height)).toFixed(3)})`;
         cards.forEach(c => { const r = c.getBoundingClientRect(), f = Math.max(0, Math.min(1, (line - r.top) / r.height));
-          c.style.setProperty("--f", f.toFixed(3)); c.classList.toggle("is-on", f > 0); }); };
+          c.style.setProperty("--f", f.toFixed(3)); c.classList.toggle("is-on", f > 0);
+          // game-style "level complete" pop the moment a card fills up
+          if(f >= .985 && !c.classList.contains("is-full")){ c.classList.add("is-full", "pop"); burst(c); setTimeout(() => c.classList.remove("pop"), 700); }
+          else if(f < .6) c.classList.remove("is-full"); }); };
+      const burst = c => { const ic = c.querySelector(".step__icon"); if(!ic) return;
+        for(let k = 0; k < 10; k++){ const p = document.createElement("i"); p.className = "spark"; const a = k / 10 * Math.PI * 2 + Math.random() * .4, d = 34 + Math.random() * 26;
+          p.style.setProperty("--x", (Math.cos(a) * d).toFixed(1) + "px"); p.style.setProperty("--y", (Math.sin(a) * d).toFixed(1) + "px"); ic.appendChild(p); setTimeout(() => p.remove(), 700); } };
       addEventListener("scroll", () => { if(!q) q = requestAnimationFrame(upd); }, {passive:true}); addEventListener("resize", upd); upd(); })();
 
     // about: little level meters bounce while the section is on screen

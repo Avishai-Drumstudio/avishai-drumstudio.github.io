@@ -21,8 +21,11 @@ so he asks for a change in chat and expects it live on the site (push to `main` 
   `window.claude.use()` shim so the app code (written originally for a Claude artifact) runs unchanged:
   - `db` → Firestore docs `users/{uid}/data/{studio | gigs-YYYY-1|2 | phonebook}` (every user has his own data)
   - `user`, `downloads` → simple local implementations
-  - `mcp` → Google Calendar REST (separate Google sign-in with calendar scope, token in localStorage);
-    tools emulated: `list_calendars`, `create_event`, `update_event`, `delete_event`
+  - `mcp` → Google Calendar REST. Calendar access via Google Identity Services token client (`window.GOOGLE_CLIENT_ID`
+    in firebase-config.js; origin https://avishai-drumstudio.github.io is authorized on that OAuth client), token ~1h in
+    localStorage; the calendar account may differ from the login account (Avishai: login avishy407, calendar yasharulpan).
+    Tools emulated: `list_calendars`, `create_event` (first links to an existing event same day within 60 min instead of
+    duplicating), `update_event`, `delete_event`.
   - Login once per device: the last user is cached in localStorage and the app opens instantly, auth is verified in the background.
   - `sample` is not available here (the in-app AI "secretary" and quick-add are hidden).
 - Data model (see `normalize()` in the app): gigs split into half-year docs to keep each doc small; `config`

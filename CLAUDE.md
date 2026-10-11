@@ -11,12 +11,12 @@ so he asks for a change in chat and expects it live on the site (push to `main` 
 ## Studio Manager (`studio/`)
 - `studio/index.html` is the whole app in one file: React 18 UMD + htm + Tailwind CDN, Hebrew RTL, Rubik font.
   Edit this file directly — it is the source of truth.
-- `studio/firebase-config.js` — Firebase web config (`window.FIREBASE_CONFIG`) and the allowed Google accounts
-  (`window.STUDIO_ALLOWED`). The config is not secret; security is in Firestore rules.
-- `studio/firestore.rules` — copy of the rules pasted in the Firebase console (data lives under `studio/main/data/*`).
+- `studio/firebase-config.js` — Firebase web config (`window.FIREBASE_CONFIG`) and the owner Google accounts
+  (`window.STUDIO_OWNERS`). The config is not secret; security is in Firestore rules.
+- `studio/firestore.rules` — copy of the rules pasted in the Firebase console (per-user data under `users/{uid}/data/*`; approved friends in `config/allowed.emails`, managed by owners in Settings → חברים מורשים).
 - The script block at the top of `index.html` (after the Firebase SDK tags) is the "gate": Google sign-in, and a
   `window.claude.use()` shim so the app code (written originally for a Claude artifact) runs unchanged:
-  - `db` → Firestore docs `studio/main/data/{studio | gigs-YYYY-1|2 | phonebook}`
+  - `db` → Firestore docs `users/{uid}/data/{studio | gigs-YYYY-1|2 | phonebook}` (every user has his own data)
   - `user`, `downloads` → simple local implementations
   - `mcp` → Google Calendar REST (separate Google sign-in with calendar scope, token in localStorage);
     tools emulated: `list_calendars`, `create_event`, `update_event`, `delete_event`

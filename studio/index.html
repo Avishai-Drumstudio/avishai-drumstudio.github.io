@@ -122,7 +122,8 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <script>
 /* ===== גרסת גוגל: התחברות עם Google + שמירה ב-Firestore. מחליף את window.claude של Claude ===== */
 (function () {
-  var ALLOWED = (window.STUDIO_ALLOWED || []).map(function (e) { return e.toLowerCase(); });
+  var OWNERS = (window.STUDIO_OWNERS || window.STUDIO_ALLOWED || []).map(function (e) { return e.toLowerCase(); });
+  var uid = null;
   var configured = !!(window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey);
   var authReady, resolveAuth; authReady = new Promise(function (r) { resolveAuth = r; });
   var fs = null, started = false;
@@ -148,10 +149,14 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
       showLogin('ההתחברות לא הצליחה (' + (c || 'שגיאה') + '). נסה שוב.');
     });
   }
+  window.__studioFriends = {
+    list: function () { return fs.doc('config/allowed').get().then(function (d) { return (d.exists && d.data().emails) || []; }); },
+    set: function (emails) { return fs.doc('config/allowed').set({ emails: emails, updated: Date.now() }); }
+  };
   window.__studioSignOut = function () { firebase.auth().signOut().then(function () { location.reload(); }); };
 
   // window.claude: אותו ממשק שהאפליקציה מכירה, רק על Firebase
-  function mapPath(path) { return path.replace(/^data\/users\/[^/]+$/, 'studio/main/data'); }
+  function mapPath(path) { return path.replace(/^data\/users\/[^/]+$/, 'users/' + uid + '/data'); }
   function docApi(ref) {
     return {
       get: function () { return ref.get().then(function (s) { return { exists: s.exists, data: function () { return s.data(); } }; }); },
@@ -225,13 +230,22 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
     firebase.auth().getRedirectResult().catch(function () {});
     firebase.auth().onAuthStateChanged(function (u) {
       if (!u) { showLogin(); return; }
-      var email = (u.email || '').toLowerCase();
-      if (ALLOWED.length && ALLOWED.indexOf(email) < 0) {
-        var g = gate('<p>החשבון ' + email + ' לא מורשה להיכנס.</p><button id="gout">כניסה עם חשבון אחר</button>');
+      var email = (u.email || '').toLowerCase(), owner = OWNERS.indexOf(email) >= 0;
+      var deny = function () {
+        var g = gate('<p>החשבון <b dir="ltr">' + email + '</b> עוד לא מאושר.<br>שלח את המייל הזה לאבישי כדי שיאשר אותך.</p><button id="gout">כניסה עם חשבון אחר</button>');
         g.querySelector('#gout').onclick = function () { firebase.auth().signOut(); };
-        return;
-      }
-      resolveAuth(true); start();
+      };
+      var go = function () {
+        uid = u.uid; window.__studioIsOwner = owner; window.__studioEmail = email;
+        try { // מכשיר שעבר בין משתמשים: לא להציג נתונים של משתמש קודם
+          var last = localStorage.getItem('studio-last-uid');
+          if (last && last !== uid) Object.keys(localStorage).forEach(function (k) { if (/^studio/.test(k)) localStorage.removeItem(k); });
+          localStorage.setItem('studio-last-uid', uid);
+        } catch (e) {}
+        resolveAuth(true); start();
+      };
+      if (owner) return go();
+      fs.doc('config/allowed').get().then(function (d) { var l = (d.exists && d.data().emails) || []; l.indexOf(email) >= 0 ? go() : deny(); }).catch(deny);
     });
   });
 })();
@@ -2054,6 +2068,19 @@ function TypeEditor({ cfg, gigs, setConfig, renameType, toast }) {
   </div>`;
 }
 
+
+function FriendsSection({ toast }) {
+  const [list, setList] = useState(null), [email, setEmail] = useState(''), [busy, setBusy] = useState(false);
+  useEffect(() => { window.__studioFriends.list().then(setList).catch(() => setList([])); }, []);
+  const save = l => { setBusy(true); window.__studioFriends.set(l).then(() => { setList(l); toast('נשמר'); }).catch(() => toast('השמירה נכשלה')).finally(() => setBusy(false)); };
+  const add = () => { const e = email.trim().toLowerCase(); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) { toast('כתובת מייל לא תקינה'); return; } if ((list || []).includes(e)) { setEmail(''); return; } save((list || []).concat([e])); setEmail(''); };
+  return html`<div>
+    <p className="text-sm text-muted">כל חבר שתאשר נכנס עם הגוגל שלו ומקבל אפליקציה נפרדת משלו — הנתונים, אנשי הקשר והיומן שלו. הוא לא רואה את שלך ואתה לא את שלו.</p>
+    <div className="mt-3 flex gap-2"><input className="field flex-1" dir="ltr" type="email" placeholder="friend@gmail.com" value=${email} onChange=${e => setEmail(e.target.value)} onKeyDown=${e => e.key === 'Enter' && add()} /><${Btn} kind="grad" disabled=${busy || !email.trim()} onClick=${add}>אישור<//></div>
+    ${list === null ? html`<p className="mt-3 text-sm text-muted">טוען…</p>` : list.length === 0 ? html`<p className="mt-3 text-sm text-muted">עוד לא אישרת אף אחד.</p>` : html`<ul className="mt-3 divide-y divide-[var(--glass-line)]">${list.map(e => html`<li key=${e} className="flex items-center gap-2 py-2 text-sm"><span dir="ltr" className="flex-1 text-right">${e}</span><button disabled=${busy} onClick=${() => ask('להסיר את ' + e + '? הוא לא יוכל להיכנס יותר (הנתונים שלו נשמרים).', { danger: true, ok: 'הסרה' }).then(ok => ok && save(list.filter(x => x !== e)))} className="text-xs text-bad">הסרה</button></li>`)}</ul>`}
+    <p className="mt-3 text-xs text-muted">שלח לחבר את הקישור: avishai-drumstudio.github.io/studio</p>
+  </div>`;
+}
 function Settings({ data, book = [], setBook, gsync, freshData, setData, setConfig, renameType, mode, lastSync, theme, setTheme, backup, toast }) {
   const fileRef = useRef(null);
   const [open, setOpen] = useState('look');
@@ -2181,6 +2208,7 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
           <p className="text-sm"><span className="text-warn font-bold">● שמור במכשיר הזה בלבד</span> — אין חיבור לחשבון כרגע. בדוק את האינטרנט ופתח שוב.</p>`}
       <//>
 
+      ${window.__studioIsOwner && window.__studioFriends && html`<${Section} icon="👥" title="חברים מורשים" sub="מי יכול להיכנס לאפליקציה" open=${open === 'friends'} onToggle=${() => tog('friends')}><${FriendsSection} toast=${toast} /><//>`}
       <${Section} icon="💾" title="גיבוי" sub="הורדה ושחזור של כל הנתונים" open=${open === 'backup'} onToggle=${() => tog('backup')}>
         <p className="text-sm text-muted">הקובץ כולל אירועים, לקוחות, מחליפים, אנשי קשר, הסיסמה וההגדרות. שמור אותו בתיקייה בגוגל דרייב.</p>
         <div className="mt-3 flex flex-wrap gap-2">

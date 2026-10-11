@@ -1,10 +1,19 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /studio/main/{document=**} {
-      allow read, write: if request.auth != null
-        && request.auth.token.email_verified == true
-        && request.auth.token.email in ['avishy407@gmail.com', 'yasharulpan@gmail.com'];
+    function signedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function isOwner() { return signedIn() && request.auth.token.email in ['avishy407@gmail.com', 'yasharulpan@gmail.com']; }
+    function isAllowed() {
+      return isOwner() || (signedIn()
+        && exists(/databases/$(database)/documents/config/allowed)
+        && request.auth.token.email.lower() in get(/databases/$(database)/documents/config/allowed).data.emails);
+    }
+    match /config/allowed {
+      allow read: if signedIn();
+      allow write: if isOwner();
+    }
+    match /users/{uid}/{document=**} {
+      allow read, write: if isAllowed() && request.auth.uid == uid;
     }
   }
 }

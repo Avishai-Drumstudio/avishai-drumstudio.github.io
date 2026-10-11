@@ -7,5 +7,5 @@ window.FIREBASE_CONFIG = {
   messagingSenderId: "196522008239",
   appId: "1:196522008239:web:9b2f34c16155c8d327fe5a"
 };
-// רק החשבונות האלה יכולים להיכנס לאפליקציה
-window.STUDIO_ALLOWED = ['avishy407@gmail.com', 'yasharulpan@gmail.com'];
+// בעלי האפליקציה: נכנסים תמיד ומאשרים חברים (ההרשאה האמיתית בכללי Firestore)
+window.STUDIO_OWNERS = ['avishy407@gmail.com', 'yasharulpan@gmail.com'];

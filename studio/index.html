@@ -228,6 +228,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
     firebase.initializeApp(window.FIREBASE_CONFIG);
     fs = firebase.firestore();
     firebase.auth().getRedirectResult().catch(function () {});
+    if (/[?&]logout\b/.test(location.search)) { history.replaceState(null, '', location.pathname); firebase.auth().signOut(); }
     firebase.auth().onAuthStateChanged(function (u) {
       if (!u) { showLogin(); return; }
       var email = (u.email || '').toLowerCase(), owner = OWNERS.indexOf(email) >= 0;
@@ -2205,7 +2206,8 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
           <p className="text-sm"><span className="text-ok font-bold">● מסונכרן</span> — הנתונים שמורים בחשבון הגוגל שלך (Firebase) ונטענים בכל מכשיר שבו נכנסת.</p>
           ${window.__studioSignOut && html`<button onClick=${() => window.__studioSignOut()} className="mt-2 text-sm font-semibold text-muted underline">התנתקות מהחשבון</button>`}
           ${lastSync && html`<p className="mt-1 text-xs text-muted">סנכרון אחרון: ${new Date(lastSync).toLocaleString('he-IL')}</p>`}` : html`
-          <p className="text-sm"><span className="text-warn font-bold">● שמור במכשיר הזה בלבד</span> — אין חיבור לחשבון כרגע. בדוק את האינטרנט ופתח שוב.</p>`}
+          <p className="text-sm"><span className="text-warn font-bold">● שמור במכשיר הזה בלבד</span> — אין חיבור לחשבון כרגע. בדוק את האינטרנט ופתח שוב.</p>
+          ${window.__studioSignOut && html`<button onClick=${() => window.__studioSignOut()} className="mt-2 text-sm font-semibold text-muted underline">התנתקות מהחשבון</button>`}`}
       <//>
 
       ${window.__studioIsOwner && window.__studioFriends && html`<${Section} icon="👥" title="חברים מורשים" sub="מי יכול להיכנס לאפליקציה" open=${open === 'friends'} onToggle=${() => tog('friends')}><${FriendsSection} toast=${toast} /><//>`}

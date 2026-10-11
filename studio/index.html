@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link rel="preconnect" href="https://www.gstatic.com"><link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=40c140e3">
+<link rel="stylesheet" href="app.css?v=7f35047b">
 <style>
 :root {
   --bg: #140d2b; --glow-pct: 100%;
@@ -1114,6 +1114,7 @@ const planPrep = (date, lead, n, time, busy) => {
   }
   return out.sort().map(d => ({ date: d, time: time || '11:00', done: false }));
 };
+const prepWho = g => cleanName(g.client) || cleanName(g.title) || autoTitle(g);
 const prepOf = g => g.prep && g.prep.on && PREP_TYPES.includes(g.type) ? (g.prep.sessions || []) : [];
 const SpeechRec = (() => { try { return window.SpeechRecognition || window.webkitSpeechRecognition || null; } catch (e) { return null; } })();
 const secRules = (gigs, clients, subs, todos) => {
@@ -1545,8 +1546,8 @@ function GigDetails({ gig, sub, admin, book = [], update, hasSync, onEdit, onPay
 }
 
 /* ===== יומן ===== */
-function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin }) {
-  const [sheet, setSheet] = useState(null);
+function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDone }) {
+  const [sheet, setSheet] = useState(null), [prepView, setPrepView] = useState(null);
   const [showLegend, setShowLegend] = useState(false);
   const t = todayISO();
   const [cursor, setCursor] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
@@ -1595,7 +1596,7 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin }) {
             const isToday = iso === t, isSel = iso === selected;
             const tint = evs.length ? colorOf(evs.slice().sort(mineFirst)[0]).dot : null;
             return html`
-              <button key=${iso} onClick=${() => { setSelected(iso); (byDate[iso] || []).length ? setSheet(iso) : prepByDate[iso] ? onOpen(prepByDate[iso][0].g.id) : onAdd(iso); }} aria-label=${fmtDay(iso) + (evs.length ? ', ' + evs.length + ' אירועים' : '')}
+              <button key=${iso} onClick=${() => { setSelected(iso); (byDate[iso] || []).length ? setSheet(iso) : prepByDate[iso] ? setPrepView(prepByDate[iso][0]) : onAdd(iso); }} aria-label=${fmtDay(iso) + (evs.length ? ', ' + evs.length + ' אירועים' : '')}
                 className=${'relative flex flex-col items-stretch min-w-0 min-h-[3.9rem] sm:min-h-[6.5rem] rounded-xl sm:rounded-2xl p-1 sm:p-2 text-right transition border '
                   + (isSel ? 'border-[var(--accent2)] ' : CFG.cellBoxes ? 'border-[var(--glass-line)] hover:border-[var(--accent2)] ' : 'border-transparent hover:border-[var(--glass-line)] ')
                   + (iso < t ? 'opacity-50 ' : '')}
@@ -1605,7 +1606,7 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin }) {
                 <span className="flex flex-col gap-0.5 sm:gap-1 mt-0.5 sm:mt-1 min-w-0">
                   ${evs.slice().sort(mineFirst).slice(0, 2).map(g => html`<span key=${g.id} className=${'block truncate rounded-md sm:rounded-full px-1 sm:px-2 py-px sm:py-0.5 text-[9px] sm:text-[11px] leading-tight font-semibold text-white ' + (g.subId ? 'opacity-80' : '')} style=${{ background: g.subId ? subChipBg(g) : colorOf(g).g }}>${g.subId ? SUB_ICON + ' ' : ''}${g.title}</span>`)}
                   ${evs.length > 2 && html`<span className="text-[9px] sm:text-[11px] leading-tight text-muted">+${evs.length - 2}</span>`}
-                  ${(prepByDate[iso] || []).slice(0, 1).map(({ g, x }) => html`<span key=${'p' + g.id} title=${'הכנת חומר: ' + autoTitle(g)} className=${'block truncate rounded-md sm:rounded-full border border-dashed border-[var(--accent2)] px-1 sm:px-2 py-px text-[9px] sm:text-[11px] leading-tight font-semibold ' + (x.done ? 'opacity-50 line-through' : '')}>🎼 ${g.client || autoTitle(g)}</span>`)}
+                  ${(prepByDate[iso] || []).slice(0, 1).map(({ g, x }) => html`<span key=${'p' + g.id} title=${'ללמוד חומר: ' + prepWho(g)} className=${'block truncate rounded-md sm:rounded-full border border-dashed border-[var(--accent2)] px-1 sm:px-2 py-px text-[9px] sm:text-[11px] leading-tight font-semibold ' + (x.done ? 'opacity-50 line-through' : '')}>🎼 ללמוד · ${prepWho(g)}</span>`)}
                 </span>
               </button>`;
           })}
@@ -1634,8 +1635,25 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin }) {
         })}</div>
         <${Btn} className="mt-4 w-full" onClick=${() => { const d = new Date(); setCursor(new Date(d.getFullYear(), d.getMonth(), 1)); setPick(null); }}>חזרה להיום<//>
       <//>`}
+      ${prepView && (() => { const { g } = prepView, ss = (g.prep && g.prep.sessions) || [], i = ss.findIndex(s => s.date === prepView.x.date && s.time === prepView.x.time), x = ss[i] || prepView.x;
+        return html`<${Modal} title="🎼 ללמוד חומר" onClose=${() => setPrepView(null)}>
+        <div className="text-center">
+          <p className="text-sm text-muted">${fmtDay(x.date)}${x.time ? ' · ' + x.time : ''}</p>
+          <p className="mt-1 text-3xl font-extrabold leading-tight">${prepWho(g)}</p>
+          <p className="mt-2 text-sm text-muted">ישיבה ${i + 1} מתוך ${ss.length} · ההופעה ב${fmtDay(g.date)}</p>
+          <div className="mt-3 flex justify-center gap-1.5">${ss.map((s, j) => html`<span key=${j} className=${'h-2.5 w-6 rounded-full ' + (s.done ? 'grad' : j === i ? 'bg-[var(--accent2)] opacity-60' : 'bg-[var(--glass-line)]')}></span>`)}</div>
+        </div>
+        ${g.notes && html`<p className="mt-4 whitespace-pre-line rounded-2xl glass-soft px-3 py-2 text-sm">${g.notes}</p>`}
+        <div className="mt-5 flex gap-2">
+          ${onPrepDone && i >= 0 && html`<${Btn} kind=${x.done ? 'glass' : 'grad'} className="flex-1 py-3" onClick=${() => { onPrepDone(g, i, !x.done); setPrepView(null); }}>${x.done ? '↺ לא בוצע' : '✓ בוצע'}<//>`}
+          <${Btn} onClick=${() => { setPrepView(null); onOpen(g.id); }}>להופעה ‹<//>
+        </div>
+      <//>`; })()}
       ${sheet && html`<${Modal} title=${fmtDay(sheet) + ' · ' + hebDate(sheet).day + ' ' + hebDate(sheet).month} onClose=${() => setSheet(null)}>
         <button onClick=${() => { const d = sheet; setSheet(null); onAdd(d); }} className="grad shine flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-lg font-bold">＋ הוספת אירוע ביום הזה</button>
+        ${(prepByDate[sheet] || []).length > 0 && html`<h3 className="mt-5 mb-2 text-sm font-semibold text-muted">🎼 ללמוד חומר</h3>
+        <ul className="space-y-2">${prepByDate[sheet].map(p => html`<li key=${p.g.id + p.x.time}><button onClick=${() => { setSheet(null); setPrepView(p); }} className=${'flex w-full items-center gap-3 rounded-2xl border border-dashed border-[var(--accent2)] p-3 text-right ' + (p.x.done ? 'opacity-50' : '')}>
+          <span className="ltr w-12 text-sm font-bold">${p.x.time || '—'}</span><span className="min-w-0 flex-1 truncate font-semibold">${prepWho(p.g)}</span>${p.x.done && html`<span className="text-xs text-ok">✓ בוצע</span>`}</button></li>`)}</ul>`}
         ${[['🥁 אני מנגן', (byDate[sheet] || []).filter(g => !g.subId)], [SUB_ICON + ' מחליף מנגן', (byDate[sheet] || []).filter(g => g.subId)]].filter(x => x[1].length).map(([head, list]) => html`
         <h3 key=${head} className="mt-5 mb-2 text-sm font-semibold text-muted">${head} · ${list.length}</h3>
         <ul key=${head + 'l'} className="space-y-2">${list.map(g => html`
@@ -2920,11 +2938,11 @@ function App() {
             return (due.length + preps.length) > 0 && html`<div className="glass mb-3 rounded-3xl p-3">
             <p className="mb-1.5 text-sm font-bold">🔔 תזכורות שלך</p>
             <ul className="space-y-1.5">
-              ${preps.map(({ g, x, i }) => html`<li key=${'p' + g.id + i} className="flex items-center gap-2 text-sm"><button onClick=${() => setOpenId(g.id)} className="min-w-0 flex-1 text-right">🎼 לשבת באולפן על החומר — ${autoTitle(g)}<span className="block text-xs text-muted">היום · ${x.time} · ישיבה ${i + 1} מתוך ${g.prep.sessions.length} · ההופעה ${fmtDay(g.date)}</span></button>
+              ${preps.map(({ g, x, i }) => html`<li key=${'p' + g.id + i} className="flex items-center gap-2 text-sm"><span className="min-w-0 flex-1 text-right">🎼 ללמוד חומר — <b>${prepWho(g)}</b><span className="block text-xs text-muted">היום · ${x.time} · ישיבה ${i + 1} מתוך ${g.prep.sessions.length} · ההופעה ${fmtDay(g.date)}</span></span>
                 <button onClick=${() => doneSession(g, i)} className="rounded-full grad px-3 py-1 text-xs font-bold">✓ בוצע</button></li>`)}
               ${due.map(x => html`<li key=${x.id} className="flex items-center gap-2 text-sm"><span className="min-w-0 flex-1">${x.text}<span className="block text-xs text-muted">${x.date < t0 ? fmtDay(x.date) : 'היום'}${x.time ? ' · ' + x.time : ''}</span></span>
               <button onClick=${() => onTodo(x.id, 'done')} className="rounded-full grad px-3 py-1 text-xs font-bold">✓ בוצע</button></li>`)}</ul></div>`; })()}
-          ${tab === 'calendar' && html`<${CalendarView} gigs=${gigs} subs=${subs} admin=${unlocked} gsyncUI=${gsyncUI} onOpen=${setOpenId} onAdd=${d => setEditing(blankGig(d))} />
+          ${tab === 'calendar' && html`<${CalendarView} gigs=${gigs} subs=${subs} admin=${unlocked} gsyncUI=${gsyncUI} onOpen=${setOpenId} onAdd=${d => setEditing(blankGig(d))} onPrepDone=${(g, i, done) => update(g.id, { prep: Object.assign({}, g.prep, { sessions: g.prep.sessions.map((s, j) => j === i ? Object.assign({}, s, { done }) : s) }) })} />
             ${unlocked && html`<${QuickStats} gigs=${gigs} go=${setTab} />`}`}
           ${tab === 'list' && html`<${GigList} gigs=${gigs} subs=${subs} onOpen=${setOpenId} admin=${unlocked} />`}
           ${tab === 'clients' && html`<${Clients} book=${book} admin=${false} gigs=${gigs} clients=${clients} setClients=${setClients} onRename=${(o, n) => setGigs(l => l.map(g => sameName(g.client, o) ? Object.assign({}, g, { client: n }) : g))} onOpen=${setOpenId} />`}

@@ -531,7 +531,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .head--sm{margin-bottom:18px;gap:8px}
 .head--sm h2{font-size:clamp(1.55rem,6vw,2.3rem)}
 .head--sm p{font-size:15px}
-.dial{--s:min(78vw,340px);position:relative;touch-action:none;-webkit-user-select:none;user-select:none;width:var(--s);height:var(--s);margin:0 auto}
+.dial{--s:min(78vw,340px);position:relative;touch-action:pan-y;-webkit-user-select:none;user-select:none;width:var(--s);height:var(--s);margin:0 auto}
 .dial__tape{position:absolute;inset:-4%;border-radius:50%;background:repeating-radial-gradient(circle,#2a1d16 0 1px,#1c1410 1px 2.4px);
   -webkit-mask:radial-gradient(circle,transparent 61%,#000 61.5%);mask:radial-gradient(circle,transparent 61%,#000 61.5%);box-shadow:0 30px 70px -30px rgba(0,0,0,.9)}
 .dial__tape::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(255,255,255,.07),transparent 18%,rgba(255,255,255,.05) 40%,transparent 60%,rgba(255,255,255,.07) 85%,transparent)}
@@ -543,7 +543,7 @@ html,body{max-width:100%;overflow-x:hidden}
 @keyframes dialSpin{from{rotate:-300deg}to{rotate:0deg}}
 .hole{--h:calc(var(--s) * .235);position:absolute;left:50%;top:50%;width:var(--h);height:var(--h);margin:calc(var(--h) / -2);border-radius:50%;transform:rotate(var(--a)) translateY(calc(var(--s) * -.355))}
 .hole__in{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:#0a0f0e;box-shadow:inset 0 4px 10px rgba(0,0,0,.85),0 0 0 3px rgba(0,0,0,.25),0 1px 0 3px rgba(255,255,255,.35)}
-.hole__in img,.hole__in video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.7;pointer-events:none}
+.hole__in img,.hole__in video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;pointer-events:none}
 .hole.has{cursor:pointer}
 .hole.is-on .hole__in{box-shadow:0 0 0 3px #2ED3C3,0 0 20px rgba(46,211,195,.6)}
 .hole.is-on .hole__in img,.hole.is-on .hole__in video{opacity:1}
@@ -1321,16 +1321,23 @@ window.mergeContent = function (saved) {
         const c = document.createElement("input"); c.type = "checkbox"; c.setAttribute("switch", ""); l.appendChild(c);
         document.head.appendChild(l); l.click(); l.remove(); }catch(_){} };
       const n = S.covers.length, SLOTS = Math.max(6, n), STEP = 360 / SLOTS, dialEl = $("#dial"), needle = $("#vuNeedle"), counter = $("#tapeCounter");
-      const covers = S.covers.map(c => ({ c, id: ytId(c.url), src: String(c.url).trim(), thumb: ytId(c.url) ? `https://i.ytimg.com/vi/${ytId(c.url)}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }));
+      // small silent loops (a few seconds, ~60KB) so every circle moves without eating data
+      const previewOf = (c, src) => { if(real(c.preview)) return c.preview;
+        if(/res\.cloudinary\.com/.test(src)) return src.replace(/\/upload\/[^/]*\/(v\d+\/)/, "/upload/so_8,du_6,w_240,h_240,c_fill,q_auto:low,ac_none/$1");
+        if(/^assets\/covers\/[^/]+\.mp4$/.test(src)) return src.replace(/\.mp4$/, "_p.mp4");
+        return ""; };
+      const covers = S.covers.map(c => { const src = String(c.url).trim(), id = ytId(c.url);
+        return { c, id, src, prev: id ? "" : previewOf(c, src), thumb: id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }; });
       plate.innerHTML = Array.from({length:SLOTS}, (_,i) => {
         const cv = covers[i];
         return `<div class="hole${cv ? " has" : ""}" data-i="${i}" style="--a:${i * STEP}deg"><div class="hole__in">${cv
-          ? (cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" onerror="this.remove()">` : `<video src="${esc(cv.src)}#t=1" muted playsinline preload="metadata"></video>`)
+          ? (cv.prev ? `<video src="${esc(cv.prev)}" ${cv.thumb ? `poster="${esc(cv.thumb)}"` : ""} muted loop playsinline autoplay preload="auto"></video>`
+            : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" onerror="this.remove()">` : "")
           : ""}</div></div>`; }).join("");
       const holes = [...plate.children];
       dotsEl.innerHTML = n > 1 ? covers.map(() => "<i></i>").join("") : "";
       const dots = [...dotsEl.children];
-      let pos = 0, target = 0, active = -1, raf = 0, inView = false, listening = false, v = null, frame = null;
+      let pos = 0, target = 0, active = -1, raf = 0, inView = false, listening = false, v = null, frame = null, full = null;
       const paint = () => {
         plate.style.transform = `rotate(${-pos * STEP}deg)`;
         holes.forEach((h,i) => { h.firstChild.style.transform = `rotate(${pos * STEP - i * STEP}deg)`; }); // pictures stay upright
@@ -1340,10 +1347,10 @@ window.mergeContent = function (saved) {
       const vu = () => { if(!listening){ needle.style.transform = "rotate(-48deg)"; vuRaf = 0; return; }
         const t = performance.now() / 1000; const want = .55 + .25 * Math.sin(t * 7.3) * Math.sin(t * 2.1) + Math.random() * .22;
         lvl += (want - lvl) * .35; needle.style.transform = `rotate(${-48 + Math.min(1, lvl) * 92}deg)`;
-        if(v){ const s = Math.floor(v.currentTime); counter.textContent = `${String(Math.floor(s / 60)).padStart(2,"0")}:${String(s % 60).padStart(2,"0")}`; }
+        if(full){ const s = Math.floor(full.currentTime); counter.textContent = `${String(Math.floor(s / 60)).padStart(2,"0")}:${String(s % 60).padStart(2,"0")}`; }
         vuRaf = requestAnimationFrame(vu); };
       function stopSound(){ listening = false; center.classList.remove("is-live"); dialEl.classList.remove("is-big"); center.style.setProperty("--p", 0); counter.textContent = "00:00";
-        if(frame){ frame.remove(); frame = null; } if(v){ v.muted = true; v.loop = true; } }
+        if(frame){ frame.remove(); frame = null; } if(full){ full.pause(); full.remove(); full = null; } if(v) v.hidden = false; }
       function preview(){ if(!v || listening) return; if(inView && !reduce){ v.muted = true; v.play().catch(() => {}); } else v.pause(); }
       const setActive = i => {
         if(i === active) return; const first = active < 0; active = i; stopSound();
@@ -1352,7 +1359,7 @@ window.mergeContent = function (saved) {
         dots.forEach((d,j) => d.classList.toggle("on", j === i));
         const cv = covers[i];
         label.textContent = cv.c.style || cv.c.title || ""; label.classList.remove("pop"); void label.offsetWidth; label.classList.add("pop");
-        hint.textContent = (cv.c.title && cv.c.style ? cv.c.title + " · " : "") + (n > 1 ? "סובבו את הגלגל · לחצו להאזנה" : "לחצו להאזנה");
+        hint.textContent = (cv.c.title && cv.c.style ? cv.c.title + " · " : "") + (n > 1 ? "החליקו לצדדים · לחצו להאזנה" : "לחצו להאזנה");
         clearTimeout(loadT); loadT = setTimeout(loadCenter, first ? 0 : 160);
       };
       let loadT = 0, shown = -1;
@@ -1361,10 +1368,8 @@ window.mergeContent = function (saved) {
         if(shown === active) return; shown = active;
         const cv = covers[active], face = center.querySelector(".dial__face");
         face.innerHTML = cv.id ? `<img src="${esc(cv.thumb)}" alt="" onerror="this.remove()">`
-          : `<video src="${esc(cv.src)}" ${real(cv.c.poster) ? `poster="${esc(cv.c.poster)}"` : ""} muted playsinline loop preload="auto"></video>`;
+          : `<video src="${esc(cv.prev || cv.src)}" ${cv.thumb ? `poster="${esc(cv.thumb)}"` : ""} muted playsinline loop autoplay preload="auto"></video>`;
         v = face.querySelector("video");
-        if(v){ v.addEventListener("timeupdate", () => { if(listening && v.duration) center.style.setProperty("--p", (v.currentTime / v.duration * 100).toFixed(1)); });
-          v.addEventListener("ended", () => { stopSound(); preview(); }); }
         center.classList.remove("swap"); void center.offsetWidth; center.classList.add("swap");
         preview();
       }
@@ -1379,20 +1384,21 @@ window.mergeContent = function (saved) {
       const go = (t, v0) => { target = Math.max(0, Math.min(n - 1, t)); if(v0 !== undefined) vel = v0; if(!raf){ last = 0; raf = requestAnimationFrame(tick); } };
       // the page scrolls freely; the reel turns only when you drag it (round and round, like a dial)
       pin.style.height = "";
-      let dragMoved = false, a0 = 0, t0 = 0, cx = 0, cy = 0, samples = [], dq = 0;
-      const ang = e => Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
-      dialEl.addEventListener("pointerdown", e => { if(n < 2 || listening) return; const r = dialEl.getBoundingClientRect(); cx = r.left + r.width / 2; cy = r.top + r.height / 2;
-        if(raf){ cancelAnimationFrame(raf); raf = 0; } dragOn = true; dragMoved = false; a0 = ang(e); t0 = pos; target = pos; vel = 0; samples = [[performance.now(), pos]]; });
-      dialEl.addEventListener("pointermove", e => { if(!dragOn) return; let d = ang(e) - a0; if(d > 180) d -= 360; if(d < -180) d += 360;
-        if(!dragMoved && Math.abs(d) > 4){ dragMoved = true; try{ dialEl.setPointerCapture(e.pointerId); }catch(_){} }
-        if(!dragMoved) return; const t = t0 - d / STEP; a0 = ang(e); t0 = t;
-        pos = t < 0 ? t * .35 : t > n - 1 ? n - 1 + (t - n + 1) * .35 : t; // soft edges
+      // swipe sideways anywhere on the reel to turn it (up/down still scrolls the page)
+      let dragMoved = false, x0 = 0, y0 = 0, p0 = 0, samples = [], dq = 0;
+      const PX = () => dialEl.offsetWidth * .3; // px per cover
+      dialEl.addEventListener("pointerdown", e => { if(n < 2 || listening) return;
+        if(raf){ cancelAnimationFrame(raf); raf = 0; } dragOn = true; dragMoved = false; x0 = e.clientX; y0 = e.clientY; p0 = pos; target = pos; vel = 0; samples = [[performance.now(), pos]]; });
+      dialEl.addEventListener("pointermove", e => { if(!dragOn) return; const dx = e.clientX - x0;
+        if(!dragMoved){ if(Math.abs(dx) < 6) return; if(Math.abs(e.clientY - y0) > Math.abs(dx)){ dragOn = false; go(Math.round(pos)); return; }
+          dragMoved = true; try{ dialEl.setPointerCapture(e.pointerId); }catch(_){} x0 = e.clientX; }
+        const t = p0 - (e.clientX - x0) / PX();
+        pos = t < 0 ? t * .35 : t > n - 1 ? n - 1 + (t - n + 1) * .35 : t;
         const now = performance.now(); samples.push([now, pos]); while(samples.length > 2 && now - samples[0][0] > 90) samples.shift();
         if(!dq) dq = requestAnimationFrame(() => { dq = 0; paint(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos)))); }); });
       const dragEnd = () => { if(!dragOn) return; dragOn = false; if(!dragMoved) return;
-        const a = samples[0], b = samples[samples.length - 1], v0 = b && a && b[0] > a[0] ? (b[1] - a[1]) / ((b[0] - a[0]) / 1000) : 0; // covers per second
-        const land = Math.round(pos + Math.max(-3, Math.min(3, v0 * .18)));
-        go(land, Math.max(-14, Math.min(14, v0))); setTimeout(() => dragMoved = false, 80); };
+        const a = samples[0], b = samples[samples.length - 1], v0 = b && a && b[0] > a[0] ? (b[1] - a[1]) / ((b[0] - a[0]) / 1000) : 0;
+        go(Math.round(pos + Math.max(-3, Math.min(3, v0 * .2))), Math.max(-14, Math.min(14, v0))); setTimeout(() => dragMoved = false, 80); };
       dialEl.addEventListener("pointerup", dragEnd); dialEl.addEventListener("pointercancel", dragEnd);
       // tap a hole: the reel turns to it, clicking past each one
       plate.addEventListener("click", e => { if(dragMoved) return; const h = e.target.closest(".hole.has"); if(!h) return; go(+h.dataset.i); });
@@ -1400,14 +1406,21 @@ window.mergeContent = function (saved) {
       // tap the middle: listen with sound (tap again to stop)
       center.addEventListener("click", () => {
         if(dragMoved) return;
-        if(listening){ stopSound(); if(v) v.currentTime = 0; preview(); return; }
+        if(listening){ stopSound(); preview(); return; }
         const cv = covers[active]; pauseAudio(); listening = true; center.classList.add("is-live"); dialEl.classList.add("is-big"); center.style.setProperty("--p", 0);
         if(!vuRaf) vuRaf = requestAnimationFrame(vu);
-        if(v){ v.currentTime = 0; v.loop = false; v.muted = false; v.play().catch(() => { v.muted = true; v.play().catch(() => {}); }); }
+        if(!cv.id){ // full clip with sound, loaded only now
+          full = document.createElement("video"); full.src = cv.src; full.playsInline = true; full.setAttribute("playsinline", ""); full.preload = "auto"; if(cv.thumb) full.poster = cv.thumb;
+          full.addEventListener("timeupdate", () => { if(full && full.duration) center.style.setProperty("--p", (full.currentTime / full.duration * 100).toFixed(1)); });
+          full.addEventListener("ended", () => { stopSound(); preview(); });
+          center.querySelector(".dial__face").appendChild(full); if(v){ v.pause(); }
+          full.play().catch(() => { if(full){ full.muted = true; full.play().catch(() => {}); } }); }
         else { frame = document.createElement("iframe"); frame.className = "dial__yt"; frame.src = embedUrl(cv.id);
           frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; frame.title = "YouTube"; center.querySelector(".dial__face").appendChild(frame); }
       });
-      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; if(!inView && listening) stopSound(); preview(); }, {threshold:.3}).observe(center);
+      const holeVids = $$("video", plate);
+      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; if(!inView && listening) stopSound(); preview();
+        holeVids.forEach(x => { if(inView && !reduce){ x.muted = true; x.play().catch(() => {}); } else x.pause(); }); }, {threshold:.15}).observe(dialEl);
       else inView = true;
       // outer tick ring turns with the page; first sight = a quick dial spin
       const ring = $("#wheelRing"); let rq = 0;

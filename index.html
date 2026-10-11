@@ -608,6 +608,36 @@ html,body{max-width:100%;overflow-x:hidden}
 @keyframes stopTick{0%{transform:scaleY(1)}40%{transform:scaleY(1.6) translateY(2px)}100%{transform:scaleY(1)}}
 .dial__hint{display:block;text-align:center;color:var(--muted);font-size:12.5px;margin-top:6px}
 
+/* ===== golden cymbal reel ===== */
+.dial__tape{inset:-3.5%;background:radial-gradient(circle,#3a2a0e 60%,#1a1206 71%);-webkit-mask:none;mask:none;box-shadow:0 34px 80px -30px rgba(0,0,0,.95),0 0 60px -20px rgba(214,170,70,.35)}
+.dial__tape::after{display:none}
+.dial__plate{background:
+  radial-gradient(circle,#6b4a12 0 3%,#f3d58a 3.5% 5%,#8a6420 5.5% 6.5%,transparent 7%),
+  repeating-radial-gradient(circle,rgba(255,240,200,.16) 0 .6px,rgba(80,52,10,.16) .9px 1.8px),
+  radial-gradient(circle,#f6dc95 0%,#d9ae4f 22%,#b8862c 48%,#e2bb62 70%,#9c6d1f 100%);
+  box-shadow:inset 0 0 0 2px rgba(255,236,180,.55),inset 0 0 0 6px rgba(90,60,10,.35),inset 0 0 30px rgba(60,38,6,.5),0 18px 40px -18px rgba(0,0,0,.85)}
+.dial__plate::before{inset:2.5%;border:1px solid rgba(90,60,10,.35)}
+.dial__sheen{position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:2;mix-blend-mode:screen;opacity:.55;
+  background:conic-gradient(from 210deg,transparent 0deg,rgba(255,248,220,.75) 18deg,transparent 46deg,transparent 170deg,rgba(255,240,200,.45) 196deg,transparent 228deg,transparent 360deg)}
+.hole__in{box-shadow:inset 0 4px 10px rgba(0,0,0,.85),0 0 0 3px rgba(70,46,8,.55),0 1px 0 4px rgba(255,232,170,.55)}
+.hole{transition:filter .3s}
+.hole:not(.is-on) .hole__in video,.hole:not(.is-on) .hole__in img{opacity:.8}
+.hole.is-on .hole__in{box-shadow:0 0 0 3px #F3D58A,0 0 26px rgba(243,213,138,.75)}
+.hole__tag{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);padding:2px 7px;border-radius:99px;background:rgba(10,12,10,.72);color:#F3D58A;font-size:9.5px;font-weight:700;white-space:nowrap;z-index:2;pointer-events:none}
+.hole.is-on .hole__tag{opacity:0}
+.dial__stop{background:linear-gradient(#f6dc95,#b8862c);box-shadow:0 0 14px rgba(243,213,138,.7)}
+.dial__face{box-shadow:0 0 0 3px #3a2a0e,0 0 0 6px #e2bb62,0 0 0 7px rgba(60,40,6,.6),0 18px 40px -16px rgba(0,0,0,.9)}
+.dial__full{position:absolute;inset:5%;width:90%;height:90%;border-radius:inherit;object-fit:cover;background:#000;opacity:0;pointer-events:none;transition:opacity .3s;z-index:2}
+.dial.is-big .dial__full{inset:0;width:100%;height:100%;border-radius:24px;opacity:1}
+.dial__center.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px;border-radius:50%;border:3px solid rgba(243,213,138,.25);border-top-color:#F3D58A;animation:spin .8s linear infinite;z-index:5}
+.dial__btn{background:linear-gradient(135deg,#f6dc95,#c8963a)}
+.dial__btn svg{fill:#2a1d06}
+.dial__prog .p{stroke:#F3D58A}
+.wheel__meta b{color:#F3D58A}
+.wheel__dots i.on{background:#F3D58A}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dial.is-big .dial__face,.dial.is-big .dial__full{box-shadow:0 0 0 2px #E2BB62,0 30px 70px -20px rgba(0,0,0,.95),0 0 60px -10px rgba(243,213,138,.4)}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -746,6 +776,7 @@ html,body{max-width:100%;overflow-x:hidden}
           <div class="dial" id="dial">
             <div class="dial__tape" aria-hidden="true"></div>
             <div class="dial__plate" id="dialPlate"></div>
+            <div class="dial__sheen" aria-hidden="true"></div>
             <span class="dial__stop" aria-hidden="true"></span>
             <button class="dial__center" id="dialCenter" type="button" aria-label="האזנה לקאבר">
               <span class="dial__face"></span>
@@ -1309,44 +1340,46 @@ window.mergeContent = function (saved) {
       if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { const was = on; on = e.isIntersecting; if(on && !was) step(); }).observe(cols[0].parentElement);
     })();
 
-    // covers: a rotary-phone dial — scrolling turns it, the cover at the top plays in the middle
+    // covers: a golden reel — drag it round, tap any circle to hear it
     if(!S.covers.length) $("#covers").hidden = true;
     else {
       const plate = $("#dialPlate"), center = $("#dialCenter"), label = $("#wheelStyle"), hint = $("#wheelHint"), dotsEl = $("#wheelDots"), pin = $("#dialPin");
-      // a tiny "click" you feel in the hand: vibrate on Android, the hidden-switch trick on iPhone (iOS 18+)
+      const dialEl = $("#dial"), needle = $("#vuNeedle"), counter = $("#tapeCounter");
+      pin.style.height = "";
+      // feel: vibrate where allowed (Android); iPhone gets a soft tick sound + a visual click instead
       const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-      const haptic = () => { try{
-        if(!isIOS && navigator.vibrate) { navigator.vibrate(10); return; }
-        const l = document.createElement("label"); l.ariaHidden = "true"; l.style.display = "none";
-        const c = document.createElement("input"); c.type = "checkbox"; c.setAttribute("switch", ""); l.appendChild(c);
-        document.head.appendChild(l); l.click(); l.remove(); }catch(_){} };
-      // soft mechanical "tick" (sound) while turning — iPhone no longer lets websites vibrate
+      const haptic = () => { try{ if(!isIOS && navigator.vibrate) navigator.vibrate(10); }catch(_){} };
       let actx = null;
       const unlockTick = () => { try{ if(!actx){ const AC = window.AudioContext || window.webkitAudioContext; if(AC) actx = new AC(); } if(actx && actx.state === "suspended") actx.resume(); }catch(_){} };
-      const tickSound = () => { if(!actx || actx.state !== "running") return; try{
-        const t = actx.currentTime, len = Math.floor(actx.sampleRate * .018), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
-        for(let k = 0; k < len; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / len, 4);
+      const tickSound = () => { if(!actx || actx.state !== "running" || listening) return; try{
+        const t = actx.currentTime, len = Math.floor(actx.sampleRate * .02), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
+        for(let k = 0; k < len; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / len, 5);
         const src = actx.createBufferSource(), bp = actx.createBiquadFilter(), g = actx.createGain();
-        bp.type = "bandpass"; bp.frequency.value = 2400; bp.Q.value = 1.4; g.gain.value = .22;
+        bp.type = "bandpass"; bp.frequency.value = 3200; bp.Q.value = 1.2; g.gain.value = .2;
         src.buffer = buf; src.connect(bp); bp.connect(g); g.connect(actx.destination); src.start(t); }catch(_){} };
-      const n = S.covers.length, SLOTS = Math.max(6, n), STEP = 360 / SLOTS, dialEl = $("#dial"), needle = $("#vuNeedle"), counter = $("#tapeCounter");
-      // small silent loops (a few seconds, ~60KB) so every circle moves without eating data
+
+      const n = S.covers.length, SLOTS = Math.max(6, n), STEP = 360 / SLOTS;
+      // tiny silent loops (~60KB each) so every circle moves without eating data
       const previewOf = (c, src) => { if(real(c.preview)) return c.preview;
         if(/res\.cloudinary\.com/.test(src)) return src.replace(/\/upload\/[^/]*\/(v\d+\/)/, "/upload/so_8,du_6,w_240,h_240,c_fill,q_auto:low,ac_none/$1");
         if(/^assets\/covers\/[^/]+\.mp4$/.test(src)) return src.replace(/\.mp4$/, "_p.mp4");
         return ""; };
       const covers = S.covers.map(c => { const src = String(c.url).trim(), id = ytId(c.url);
         return { c, id, src, prev: id ? "" : previewOf(c, src), thumb: id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }; });
-      plate.innerHTML = Array.from({length:SLOTS}, (_,i) => {
-        const cv = covers[i];
+      plate.innerHTML = Array.from({length:SLOTS}, (_,i) => { const cv = covers[i];
         return `<div class="hole${cv ? " has" : ""}" data-i="${i}" style="--a:${i * STEP}deg"><div class="hole__in">${cv
           ? (cv.prev ? `<video src="${esc(cv.prev)}" ${cv.thumb ? `poster="${esc(cv.thumb)}"` : ""} muted loop playsinline autoplay preload="auto"></video>`
             : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" onerror="this.remove()">` : "")
-          : ""}</div></div>`; }).join("");
-      const holes = [...plate.children];
+          : ""}${cv && (cv.c.style || cv.c.title) ? `<b class="hole__tag">${esc(cv.c.style || cv.c.title)}</b>` : ""}</div></div>`; }).join("");
+      const holes = [...plate.children], holeVids = $$("video", plate);
       dotsEl.innerHTML = n > 1 ? covers.map(() => "<i></i>").join("") : "";
       const dots = [...dotsEl.children];
-      let pos = 0, target = 0, active = -1, raf = 0, inView = false, listening = false, v = null, frame = null, full = null;
+
+      // one persistent player for the full clip with sound (created once, so the first tap always plays)
+      const face = center.querySelector(".dial__face");
+      const full = document.createElement("video"); full.className = "dial__full"; full.playsInline = true; full.setAttribute("playsinline", ""); full.preload = "none";
+      center.insertBefore(full, face.nextSibling);
+      let pos = 0, target = 0, active = -1, raf = 0, inView = false, listening = false, pv = null, frame = null, seeking = false;
       const paint = () => {
         plate.style.transform = `rotate(${-pos * STEP}deg)`;
         holes.forEach((h,i) => { h.firstChild.style.transform = `rotate(${pos * STEP - i * STEP}deg)`; }); // pictures stay upright
@@ -1354,31 +1387,36 @@ window.mergeContent = function (saved) {
       // VU needle + tape counter while listening
       let vuRaf = 0, lvl = 0;
       const vu = () => { if(!listening){ needle.style.transform = "rotate(-48deg)"; vuRaf = 0; return; }
-        const t = performance.now() / 1000; const want = .55 + .25 * Math.sin(t * 7.3) * Math.sin(t * 2.1) + Math.random() * .22;
+        const t = performance.now() / 1000, want = full.paused ? 0 : .55 + .25 * Math.sin(t * 7.3) * Math.sin(t * 2.1) + Math.random() * .22;
         lvl += (want - lvl) * .35; needle.style.transform = `rotate(${-48 + Math.min(1, lvl) * 92}deg)`;
-        if(full){ const s = Math.floor(full.currentTime); counter.textContent = `${String(Math.floor(s / 60)).padStart(2,"0")}:${String(s % 60).padStart(2,"0")}`; }
+        const s = Math.floor(full.currentTime || 0); counter.textContent = `${String(Math.floor(s / 60)).padStart(2,"0")}:${String(s % 60).padStart(2,"0")}`;
         vuRaf = requestAnimationFrame(vu); };
-      function stopSound(){ listening = false; center.classList.remove("is-live"); dialEl.classList.remove("is-big"); center.style.setProperty("--p", 0); counter.textContent = "00:00";
-        if(frame){ frame.remove(); frame = null; } if(full){ full.pause(); full.remove(); full = null; } if(v) v.hidden = false; }
-      function preview(){ if(!v || listening) return; if(inView && !reduce){ v.muted = true; v.play().catch(() => {}); } else v.pause(); }
+      full.addEventListener("timeupdate", () => { if(listening && full.duration) center.style.setProperty("--p", (full.currentTime / full.duration * 100).toFixed(1)); });
+      full.addEventListener("ended", () => { stopSound(); preview(); });
+      full.addEventListener("waiting", () => center.classList.add("is-loading"));
+      full.addEventListener("playing", () => center.classList.remove("is-loading"));
+      function stopSound(){ if(!listening && !frame) return; listening = false; center.classList.remove("is-live", "is-loading"); dialEl.classList.remove("is-big");
+        center.style.setProperty("--p", 0); counter.textContent = "00:00"; full.pause(); if(frame){ frame.remove(); frame = null; } }
+      function preview(){ if(!pv || listening) return; if(inView && !reduce){ pv.muted = true; pv.play().catch(() => {}); } else pv.pause(); }
       const setActive = i => {
-        if(i === active) return; const first = active < 0; active = i; stopSound();
+        if(i === active) return; const first = active < 0; active = i;
+        if(!seeking) stopSound();
         if(!first){ haptic(); tickSound(); dialEl.classList.remove("click"); void dialEl.offsetWidth; dialEl.classList.add("click"); }
         holes.forEach((h,j) => h.classList.toggle("is-on", j === i));
         dots.forEach((d,j) => d.classList.toggle("on", j === i));
         const cv = covers[i];
         label.textContent = cv.c.style || cv.c.title || ""; label.classList.remove("pop"); void label.offsetWidth; label.classList.add("pop");
-        hint.textContent = (cv.c.title && cv.c.style ? cv.c.title + " · " : "") + (n > 1 ? "גלגלו את הגלגל · לחצו להאזנה" : "לחצו להאזנה");
+        hint.textContent = (cv.c.title && cv.c.style ? cv.c.title + " · " : "") + (n > 1 ? "גלגלו את הגלגל · לחצו על סרטון להאזנה" : "לחצו להאזנה");
         clearTimeout(loadT); loadT = setTimeout(loadCenter, first ? 0 : 160);
       };
       let loadT = 0, shown = -1;
       function loadCenter(){
         if(moving()){ loadT = setTimeout(loadCenter, 120); return; }
         if(shown === active) return; shown = active;
-        const cv = covers[active], face = center.querySelector(".dial__face");
+        const cv = covers[active];
         face.innerHTML = cv.id ? `<img src="${esc(cv.thumb)}" alt="" onerror="this.remove()">`
           : `<video src="${esc(cv.prev || cv.src)}" ${cv.thumb ? `poster="${esc(cv.thumb)}"` : ""} muted playsinline loop autoplay preload="auto"></video>`;
-        v = face.querySelector("video");
+        pv = face.querySelector("video");
         center.classList.remove("swap"); void center.offsetWidth; center.classList.add("swap");
         preview();
       }
@@ -1389,52 +1427,52 @@ window.mergeContent = function (saved) {
         const acc = -160 * (pos - target) - 25 * vel; vel += acc * dt; pos += vel * dt;
         if(Math.abs(pos - target) < .0015 && Math.abs(vel) < .02){ pos = target; vel = 0; }
         paint(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos))));
-        if(pos !== target || vel !== 0){ raf = requestAnimationFrame(tick); } else { raf = 0; last = 0; } };
+        if(pos !== target || vel !== 0){ raf = requestAnimationFrame(tick); } else { raf = 0; last = 0; seeking = false; } };
       const go = (t, v0) => { target = Math.max(0, Math.min(n - 1, t)); if(v0 !== undefined) vel = v0; if(!raf){ last = 0; raf = requestAnimationFrame(tick); } };
-      // the page scrolls freely; the reel turns only when you drag it (round and round, like a dial)
-      pin.style.height = "";
-      // swipe sideways anywhere on the reel to turn it (up/down still scrolls the page)
+
+      // listen: must start right inside the tap (iPhone rule), so the player is ready and we only swap its source
+      function listen(i){
+        const cv = covers[i]; if(!cv) return;
+        stopSound(); pauseAudio(); listening = true; center.classList.add("is-live"); dialEl.classList.add("is-big"); center.style.setProperty("--p", 0);
+        if(!cv.id){
+          if(full.getAttribute("src") !== cv.src){ full.src = cv.src; if(cv.thumb) full.poster = cv.thumb; }
+          full.muted = false; try{ full.currentTime = 0; }catch(_){}
+          center.classList.add("is-loading");
+          const p = full.play(); if(p && p.catch) p.catch(() => { center.classList.remove("is-loading"); listening = false; center.classList.remove("is-live"); dialEl.classList.remove("is-big"); });
+        } else {
+          frame = document.createElement("iframe"); frame.className = "dial__yt"; frame.src = embedUrl(cv.id);
+          frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; frame.title = "YouTube"; face.appendChild(frame);
+        }
+        if(!vuRaf) vuRaf = requestAnimationFrame(vu);
+      }
+
+      // drag the reel any way you like (up/left one way, down/right the other); the page doesn't scroll on it
       let dragMoved = false, x0 = 0, y0 = 0, p0 = 0, samples = [], dq = 0;
       const PX = () => dialEl.offsetWidth * .3; // px per cover
       dialEl.addEventListener("pointerdown", e => { if(n < 2 || listening) return;
-        unlockTick(); if(raf){ cancelAnimationFrame(raf); raf = 0; } dragOn = true; dragMoved = false; x0 = e.clientX; y0 = e.clientY; p0 = pos; target = pos; vel = 0; samples = [[performance.now(), pos]]; });
+        if(raf){ cancelAnimationFrame(raf); raf = 0; seeking = false; } dragOn = true; dragMoved = false; x0 = e.clientX; y0 = e.clientY; p0 = pos; target = pos; vel = 0; samples = [[performance.now(), pos]]; });
       dialEl.addEventListener("pointermove", e => { if(!dragOn) return; const dx = e.clientX - x0, dy = e.clientY - y0;
         if(!dragMoved){ if(Math.hypot(dx, dy) < 6) return; dragMoved = true; try{ dialEl.setPointerCapture(e.pointerId); }catch(_){} x0 = e.clientX; y0 = e.clientY; }
-        // up or left = turn one way, down or right = the other
         const t = p0 - ((e.clientX - x0) + (e.clientY - y0)) / PX();
         pos = t < 0 ? t * .35 : t > n - 1 ? n - 1 + (t - n + 1) * .35 : t;
         const now = performance.now(); samples.push([now, pos]); while(samples.length > 2 && now - samples[0][0] > 90) samples.shift();
         if(!dq) dq = requestAnimationFrame(() => { dq = 0; paint(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos)))); }); });
-      const dragEnd = () => { if(!dragOn) return; dragOn = false; if(!dragMoved) return;
+      const dragEnd = () => { unlockTick(); if(!dragOn) return; dragOn = false; if(!dragMoved) return;
         const a = samples[0], b = samples[samples.length - 1], v0 = b && a && b[0] > a[0] ? (b[1] - a[1]) / ((b[0] - a[0]) / 1000) : 0;
         go(Math.round(pos + Math.max(-3, Math.min(3, v0 * .2))), Math.max(-14, Math.min(14, v0))); setTimeout(() => dragMoved = false, 80); };
       dialEl.addEventListener("pointerup", dragEnd); dialEl.addEventListener("pointercancel", dragEnd);
-      // tap a hole: the reel turns to it, clicking past each one
-      plate.addEventListener("click", e => { unlockTick(); if(dragMoved) return; const h = e.target.closest(".hole.has"); if(!h) return; go(+h.dataset.i); });
-      dotsEl.addEventListener("click", e => { const d = e.target.closest("i"); if(d) holes[dots.indexOf(d)].click(); });
-      // tap the middle: listen with sound (tap again to stop)
-      center.addEventListener("click", () => {
-        if(dragMoved) return;
-        if(listening){ stopSound(); preview(); return; }
-        const cv = covers[active]; pauseAudio(); listening = true; center.classList.add("is-live"); dialEl.classList.add("is-big"); center.style.setProperty("--p", 0);
-        if(!vuRaf) vuRaf = requestAnimationFrame(vu);
-        if(!cv.id){ // full clip with sound, loaded only now
-          full = document.createElement("video"); full.src = cv.src; full.playsInline = true; full.setAttribute("playsinline", ""); full.preload = "auto"; if(cv.thumb) full.poster = cv.thumb;
-          full.addEventListener("timeupdate", () => { if(full && full.duration) center.style.setProperty("--p", (full.currentTime / full.duration * 100).toFixed(1)); });
-          full.addEventListener("ended", () => { stopSound(); preview(); });
-          center.querySelector(".dial__face").appendChild(full); if(v){ v.pause(); }
-          full.play().catch(() => { if(full){ full.muted = true; full.play().catch(() => {}); } }); }
-        else { frame = document.createElement("iframe"); frame.className = "dial__yt"; frame.src = embedUrl(cv.id);
-          frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; frame.title = "YouTube"; center.querySelector(".dial__face").appendChild(frame); }
-      });
-      const holeVids = $$("video", plate);
-      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; if(!inView && listening) stopSound(); preview();
-        holeVids.forEach(x => { if(inView && !reduce){ x.muted = true; x.play().catch(() => {}); } else x.pause(); }); }, {threshold:.15}).observe(dialEl);
+      // tap any circle: it turns to the top and starts playing with sound — one tap
+      plate.addEventListener("click", e => { if(dragMoved) return; const h = e.target.closest(".hole.has"); if(!h) return; const i = +h.dataset.i;
+        if(i !== active){ seeking = true; go(i); } listen(i); });
+      dotsEl.addEventListener("click", e => { const d = e.target.closest("i"); if(!d) return; const i = dots.indexOf(d); if(i !== active){ go(i); } });
+      // tap the middle: listen (tap again to stop)
+      center.addEventListener("click", () => { if(dragMoved) return; if(listening){ stopSound(); preview(); return; } listen(active); });
+
+      // small loops play only while the reel is on screen; a first touch anywhere wakes them (battery-saver mode)
+      const wake = () => { if(!inView || reduce) return; holeVids.forEach(x => { x.muted = true; if(x.paused) x.play().catch(() => {}); }); preview(); };
+      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; if(!inView){ if(listening) stopSound(); holeVids.forEach(x => x.pause()); if(pv) pv.pause(); } else wake(); }, {threshold:.15}).observe(dialEl);
       else inView = true;
-      // outer tick ring turns with the page; first sight = a quick dial spin
-      const ring = $("#wheelRing"); let rq = 0;
-      if(ring && !reduce) addEventListener("scroll", () => { if(rq) return; rq = requestAnimationFrame(() => { rq = 0;
-        ring.style.transform = `rotate(${(center.getBoundingClientRect().top - innerHeight/2) * .2}deg)`; }); }, {passive:true});
+      ["touchstart","pointerdown","scroll"].forEach(ev => addEventListener(ev, wake, {passive:true}));
       const sec = $("#covers"); sec.addEventListener("scroll", () => { sec.scrollLeft = 0; });
       paint(); setActive(0);
       if(!reduce && "IntersectionObserver" in window){ const io = new IntersectionObserver(([e]) => { if(!e.isIntersecting) return; io.disconnect();

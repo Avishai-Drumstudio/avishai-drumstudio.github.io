@@ -691,13 +691,13 @@ html,body{max-width:100%;overflow-x:hidden}
 .hero__bg::after{background:
   linear-gradient(to top,var(--bg) 0%,rgba(15,23,22,.62) 26%,rgba(15,23,22,0) 52%),
   linear-gradient(to bottom,rgba(15,23,22,.5) 0%,rgba(15,23,22,0) 16%)}
-.hero__mp4{filter:saturate(1.18) contrast(1.06) brightness(1.1);transform-origin:62% 38%;animation:heroZoom 18s ease-in-out infinite alternate}
+.hero__mp4{filter:saturate(.82) contrast(1.04) brightness(.96);transform-origin:62% 38%;animation:heroZoom 18s ease-in-out infinite alternate}
 @keyframes heroZoom{from{transform:scale(1.02) translate3d(0,0,0)}to{transform:scale(1.14) translate3d(-1.5%,1%,0)}}
-.hero__media::after{background:linear-gradient(180deg,rgba(6,10,9,.55) 0%,rgba(6,10,9,0) 15%,rgba(6,10,9,0) 44%,rgba(6,10,9,.6) 60%,rgba(6,10,9,.9) 78%,var(--bg) 100%) !important}
+.hero__media::after{background:linear-gradient(180deg,rgba(6,10,9,.6) 0%,rgba(6,10,9,.18) 15%,rgba(6,10,9,.18) 44%,rgba(6,10,9,.6) 60%,rgba(6,10,9,.9) 78%,var(--bg) 100%) !important}
 .fog{opacity:.14 !important}
 .hero__fx{opacity:.18 !important}
-.hero__glow{position:absolute;inset:-20%;z-index:1;pointer-events:none;mix-blend-mode:screen;opacity:.55;
-  background:radial-gradient(40% 30% at 30% 30%,rgba(255,196,120,.22),transparent 70%),radial-gradient(35% 28% at 75% 55%,rgba(46,211,195,.18),transparent 70%);
+.hero__glow{position:absolute;inset:-20%;z-index:1;pointer-events:none;mix-blend-mode:screen;opacity:.35;
+  background:radial-gradient(35% 28% at 70% 40%,rgba(46,211,195,.14),transparent 70%);
   animation:heroGlow 12s ease-in-out infinite alternate}
 @keyframes heroGlow{from{transform:translate3d(-4%,-2%,0)}to{transform:translate3d(5%,4%,0)}}
 .hero__content h1,.hero__sub{text-shadow:0 2px 18px rgba(0,0,0,.55)}

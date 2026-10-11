@@ -31,6 +31,9 @@ so he asks for a change in chat and expects it live on the site (push to `main` 
 - Data model (see `normalize()` in the app): gigs split into half-year docs to keep each doc small; `config`
   holds types/colors/texts/todos; `gsync` maps gig id → Google Calendar event id.
 - Before pushing: extract the main `<script>` and run `node --check` on it; keep Hebrew UI text natural.
+- On every change to the app, bump the version in BOTH `studio/version.txt` and `window.STUDIO_VERSION` in
+  `studio/index.html` (same value, e.g. YYYYMMDDHHMMSS). Open apps poll version.txt and reload to `?v=<new>`, which
+  bypasses GitHub Pages' 10-minute cache — so changes show up on his phone right away.
 
 ## Commits
 End commit messages with the attribution lines the session gives you.

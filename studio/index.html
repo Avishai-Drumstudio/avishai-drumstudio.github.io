@@ -237,7 +237,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
         g.querySelector('#gout').onclick = function () { firebase.auth().signOut(); };
       };
       var go = function () {
-        uid = u.uid; window.__studioIsOwner = owner; window.__studioEmail = email;
+        uid = u.uid; window.__studioIsOwner = owner; window.__studioEmail = email; window.__studioUser = { name: u.displayName || '', email: email, photo: u.photoURL || '' };
         try { // מכשיר שעבר בין משתמשים: לא להציג נתונים של משתמש קודם
           var last = localStorage.getItem('studio-last-uid');
           if (last && last !== uid) Object.keys(localStorage).forEach(function (k) { if (/^studio/.test(k)) localStorage.removeItem(k); });
@@ -2082,6 +2082,27 @@ function FriendsSection({ toast }) {
     <p className="mt-3 text-xs text-muted">שלח לחבר את הקישור: avishai-drumstudio.github.io/studio</p>
   </div>`;
 }
+
+function AccountMenu() {
+  const u = window.__studioUser, [open, setOpen] = useState(false), [imgOk, setImgOk] = useState(true);
+  if (!u) return null;
+  const initial = (u.name || u.email || '?').trim().charAt(0).toUpperCase();
+  const avatar = sz => u.photo && imgOk ? html`<img src=${u.photo} alt="" referrerPolicy="no-referrer" onError=${() => setImgOk(false)} className="rounded-full object-cover" style=${{ width: sz, height: sz }} />`
+    : html`<span className="flex items-center justify-center rounded-full grad font-bold" style=${{ width: sz, height: sz, fontSize: sz * 0.45 }}>${initial}</span>`;
+  return html`<div className="relative shrink-0">
+    <button onClick=${() => setOpen(o => !o)} aria-label=${'החשבון שלי: ' + u.email} aria-expanded=${open} className="flex h-9 w-9 items-center justify-center rounded-full ring-2 ring-[var(--glass-line)] hover:ring-[var(--accent2)]">${avatar(34)}</button>
+    ${open && html`<div className="fixed inset-0 z-40" onClick=${() => setOpen(false)}></div>
+      <div className="pop absolute left-0 top-full z-50 mt-2 w-72 rounded-3xl border border-[var(--glass-line)] p-4 text-center shadow-2xl" style=${{ background: 'color-mix(in srgb, var(--bg) 94%, #7c3aed 6%)' }}>
+        <div className="flex justify-center">${avatar(64)}</div>
+        ${u.name && html`<p className="mt-2 font-bold">${u.name}</p>`}
+        <p dir="ltr" className="text-sm text-muted">${u.email}</p>
+        <div className="mt-4 flex flex-col gap-2">
+          <button onClick=${() => window.__studioSignOut()} className="rounded-full glass-soft px-4 py-2.5 text-sm font-semibold hover:bg-[var(--glass-2)]">🔄 החלפת חשבון</button>
+          <button onClick=${() => window.__studioSignOut()} className="rounded-full px-4 py-2.5 text-sm font-semibold text-bad hover:bg-[var(--glass)]">התנתקות</button>
+        </div>
+      </div>`}
+  </div>`;
+}
 function Settings({ data, book = [], setBook, gsync, freshData, setData, setConfig, renameType, mode, lastSync, theme, setTheme, backup, toast }) {
   const fileRef = useRef(null);
   const [open, setOpen] = useState('look');
@@ -2783,6 +2804,7 @@ function App() {
           </h1>
           ${sampleOk && html`<button onClick=${() => unlocked ? setSecOpen(true) : setQuickOpen(true)} aria-label=${unlocked ? 'המזכירה' : 'הוספה מהירה במשפט'} title=${unlocked ? 'המזכירה' : 'הוספה מהירה'} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full glass-soft text-base hover:bg-[var(--glass-2)]">${unlocked ? '🎙️' : '✨'}</button>`}
           <${Btn} kind="grad" onClick=${() => setEditing(blankGig())}>+ אירוע<//>
+          <${AccountMenu} />
         </div>
       </header>
 

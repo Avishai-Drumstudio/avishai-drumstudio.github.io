@@ -1314,9 +1314,12 @@ window.mergeContent = function (saved) {
     else {
       const plate = $("#dialPlate"), center = $("#dialCenter"), label = $("#wheelStyle"), hint = $("#wheelHint"), dotsEl = $("#wheelDots"), pin = $("#dialPin");
       // a tiny "click" you feel in the hand: vibrate on Android, the hidden-switch trick on iPhone (iOS 18+)
-      const hapLabel = (() => { const l = document.createElement("label"); l.setAttribute("aria-hidden","true"); l.style.cssText = "position:fixed;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;left:-9px;top:0";
-        const c = document.createElement("input"); c.type = "checkbox"; c.setAttribute("switch",""); c.tabIndex = -1; l.appendChild(c); document.body.appendChild(l); return l; })();
-      const haptic = () => { try{ if(navigator.vibrate && !/iP(hone|ad|od)/.test(navigator.userAgent)) navigator.vibrate(12); else hapLabel.click(); }catch(_){} };
+      const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const haptic = () => { try{
+        if(!isIOS && navigator.vibrate) { navigator.vibrate(10); return; }
+        const l = document.createElement("label"); l.ariaHidden = "true"; l.style.display = "none";
+        const c = document.createElement("input"); c.type = "checkbox"; c.setAttribute("switch", ""); l.appendChild(c);
+        document.head.appendChild(l); l.click(); l.remove(); }catch(_){} };
       const n = S.covers.length, SLOTS = Math.max(6, n), STEP = 360 / SLOTS, dialEl = $("#dial"), needle = $("#vuNeedle"), counter = $("#tapeCounter");
       const covers = S.covers.map(c => ({ c, id: ytId(c.url), src: String(c.url).trim(), thumb: ytId(c.url) ? `https://i.ytimg.com/vi/${ytId(c.url)}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }));
       plate.innerHTML = Array.from({length:SLOTS}, (_,i) => {
@@ -1347,31 +1350,49 @@ window.mergeContent = function (saved) {
         if(!first){ haptic(); dialEl.classList.remove("click"); void dialEl.offsetWidth; dialEl.classList.add("click"); }
         holes.forEach((h,j) => h.classList.toggle("is-on", j === i));
         dots.forEach((d,j) => d.classList.toggle("on", j === i));
-        const cv = covers[i], face = center.querySelector(".dial__face");
+        const cv = covers[i];
+        label.textContent = cv.c.style || cv.c.title || ""; label.classList.remove("pop"); void label.offsetWidth; label.classList.add("pop");
+        hint.textContent = (cv.c.title && cv.c.style ? cv.c.title + " · " : "") + (n > 1 ? "סובבו את הגלגל · לחצו להאזנה" : "לחצו להאזנה");
+        clearTimeout(loadT); loadT = setTimeout(loadCenter, first ? 0 : 160);
+      };
+      let loadT = 0, shown = -1;
+      function loadCenter(){
+        if(moving()){ loadT = setTimeout(loadCenter, 120); return; }
+        if(shown === active) return; shown = active;
+        const cv = covers[active], face = center.querySelector(".dial__face");
         face.innerHTML = cv.id ? `<img src="${esc(cv.thumb)}" alt="" onerror="this.remove()">`
           : `<video src="${esc(cv.src)}" ${real(cv.c.poster) ? `poster="${esc(cv.c.poster)}"` : ""} muted playsinline loop preload="auto"></video>`;
         v = face.querySelector("video");
         if(v){ v.addEventListener("timeupdate", () => { if(listening && v.duration) center.style.setProperty("--p", (v.currentTime / v.duration * 100).toFixed(1)); });
           v.addEventListener("ended", () => { stopSound(); preview(); }); }
         center.classList.remove("swap"); void center.offsetWidth; center.classList.add("swap");
-        label.textContent = cv.c.style || cv.c.title || ""; label.classList.remove("pop"); void label.offsetWidth; label.classList.add("pop");
-        hint.textContent = (cv.c.title && cv.c.style ? cv.c.title + " · " : "") + (n > 1 ? "סובבו את הגלגל · לחצו להאזנה" : "לחצו להאזנה");
         preview();
-      };
-      const tick = () => { pos += (target - pos) * .16; if(Math.abs(target - pos) < .002) pos = target;
-        paint(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos)))); raf = pos !== target ? requestAnimationFrame(tick) : 0; };
-      const go = t => { target = Math.max(0, Math.min(n - 1, t)); if(!raf) raf = requestAnimationFrame(tick); };
+      }
+      // smooth spring: carries the flick's speed, then settles exactly on a cover
+      let vel = 0, last = 0, dragOn = false;
+      const moving = () => dragOn || raf !== 0;
+      const tick = now => { const dt = Math.min(.034, (now - (last || now)) / 1000 || .016); last = now;
+        const acc = -160 * (pos - target) - 25 * vel; vel += acc * dt; pos += vel * dt;
+        if(Math.abs(pos - target) < .0015 && Math.abs(vel) < .02){ pos = target; vel = 0; }
+        paint(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos))));
+        if(pos !== target || vel !== 0){ raf = requestAnimationFrame(tick); } else { raf = 0; last = 0; } };
+      const go = (t, v0) => { target = Math.max(0, Math.min(n - 1, t)); if(v0 !== undefined) vel = v0; if(!raf){ last = 0; raf = requestAnimationFrame(tick); } };
       // the page scrolls freely; the reel turns only when you drag it (round and round, like a dial)
       pin.style.height = "";
-      let dragOn = false, dragMoved = false, a0 = 0, t0 = 0, cx = 0, cy = 0;
+      let dragMoved = false, a0 = 0, t0 = 0, cx = 0, cy = 0, samples = [], dq = 0;
       const ang = e => Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
       dialEl.addEventListener("pointerdown", e => { if(n < 2 || listening) return; const r = dialEl.getBoundingClientRect(); cx = r.left + r.width / 2; cy = r.top + r.height / 2;
-        dragOn = true; dragMoved = false; a0 = ang(e); t0 = target; });
+        if(raf){ cancelAnimationFrame(raf); raf = 0; } dragOn = true; dragMoved = false; a0 = ang(e); t0 = pos; target = pos; vel = 0; samples = [[performance.now(), pos]]; });
       dialEl.addEventListener("pointermove", e => { if(!dragOn) return; let d = ang(e) - a0; if(d > 180) d -= 360; if(d < -180) d += 360;
         if(!dragMoved && Math.abs(d) > 4){ dragMoved = true; try{ dialEl.setPointerCapture(e.pointerId); }catch(_){} }
-        if(!dragMoved) return; const t = t0 - d / STEP; target = t < 0 ? t * .3 : t > n - 1 ? n - 1 + (t - n + 1) * .3 : t;
-        a0 = ang(e); t0 = target; pos = target; paint(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos)))); });
-      const dragEnd = () => { if(!dragOn) return; dragOn = false; if(dragMoved){ go(Math.round(target)); setTimeout(() => dragMoved = false, 80); } };
+        if(!dragMoved) return; const t = t0 - d / STEP; a0 = ang(e); t0 = t;
+        pos = t < 0 ? t * .35 : t > n - 1 ? n - 1 + (t - n + 1) * .35 : t; // soft edges
+        const now = performance.now(); samples.push([now, pos]); while(samples.length > 2 && now - samples[0][0] > 90) samples.shift();
+        if(!dq) dq = requestAnimationFrame(() => { dq = 0; paint(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos)))); }); });
+      const dragEnd = () => { if(!dragOn) return; dragOn = false; if(!dragMoved) return;
+        const a = samples[0], b = samples[samples.length - 1], v0 = b && a && b[0] > a[0] ? (b[1] - a[1]) / ((b[0] - a[0]) / 1000) : 0; // covers per second
+        const land = Math.round(pos + Math.max(-3, Math.min(3, v0 * .18)));
+        go(land, Math.max(-14, Math.min(14, v0))); setTimeout(() => dragMoved = false, 80); };
       dialEl.addEventListener("pointerup", dragEnd); dialEl.addEventListener("pointercancel", dragEnd);
       // tap a hole: the reel turns to it, clicking past each one
       plate.addEventListener("click", e => { if(dragMoved) return; const h = e.target.closest(".hole.has"); if(!h) return; go(+h.dataset.i); });

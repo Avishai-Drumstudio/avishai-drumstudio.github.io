@@ -641,6 +641,53 @@ html,body{max-width:100%;overflow-x:hidden}
 @keyframes spin{to{transform:rotate(360deg)}}
 .dial.is-big .dial__face,.dial.is-big .dial__full{box-shadow:0 0 0 2px #E2BB62,0 30px 70px -20px rgba(0,0,0,.95),0 0 60px -10px rgba(243,213,138,.4)}
 
+/* ===== covers: floating 3D carousel ===== */
+#covers{overflow:hidden;overflow:clip;padding-block:clamp(70px,10vw,120px)}
+.c3{position:relative;height:clamp(310px,84vw,440px);perspective:1100px;perspective-origin:50% 40%;touch-action:pan-y;-webkit-user-select:none;user-select:none;margin-top:6px}
+.c3__ring{position:absolute;inset:0;transform-style:preserve-3d}
+.c3__card{--w:clamp(150px,44vw,230px);position:absolute;left:50%;top:44%;width:var(--w);aspect-ratio:4/5;margin:calc(var(--w) * -.625) 0 0 calc(var(--w) / -2);transform-style:preserve-3d;cursor:pointer;will-change:transform,opacity;-webkit-tap-highlight-color:transparent}
+.c3__float{position:absolute;inset:0;animation:c3float 5s ease-in-out infinite}
+@keyframes c3float{0%,100%{transform:translateY(-6px)}50%{transform:translateY(6px)}}
+.c3__media{position:absolute;inset:0;border-radius:22px;overflow:hidden;background:#0b1110;box-shadow:0 0 0 1px rgba(237,228,211,.12),0 30px 60px -24px rgba(0,0,0,.9);transition:box-shadow .5s,transform .5s var(--ease)}
+.c3__media video,.c3__media img,.c3__full,.c3__yt{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0}
+.c3__full{z-index:2;background:#000}
+.c3__yt{z-index:3}
+.c3__media::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(8,12,11,.75),transparent 45%);pointer-events:none;z-index:1}
+.c3__glare{position:absolute;inset:0;border-radius:22px;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.14) 45%,transparent 60%);background-size:250% 100%;background-position:100% 0;z-index:2;opacity:0;transition:opacity .4s}
+.c3__card.is-front .c3__glare{opacity:1;animation:c3glare 3.2s ease-in-out infinite}
+@keyframes c3glare{0%{background-position:120% 0}60%,100%{background-position:-60% 0}}
+.c3__tag{position:absolute;right:12px;bottom:12px;z-index:3;padding:5px 11px;border-radius:99px;background:rgba(10,15,14,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--text);font-size:12.5px;font-weight:700;box-shadow:inset 0 0 0 1px rgba(237,228,211,.14)}
+.c3__play{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px;border-radius:50%;background:var(--tq-grad);display:grid;place-items:center;z-index:3;opacity:0;transform:scale(.6);transition:opacity .35s,transform .45s var(--ease);box-shadow:0 0 0 10px rgba(46,211,195,.16),0 10px 30px -6px rgba(46,211,195,.6)}
+.c3__play svg{width:18px;height:18px;fill:var(--on-lime);margin-left:3px}
+.c3__card.is-front .c3__play{opacity:1;transform:scale(1)}
+.c3__card.is-front .c3__media{box-shadow:0 0 0 1.5px rgba(46,211,195,.65),0 34px 70px -22px rgba(0,0,0,.95),0 0 50px -10px rgba(46,211,195,.45)}
+.c3__shadow{position:absolute;left:12%;right:12%;bottom:-34px;height:20px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);filter:blur(4px);animation:c3shadow 5s ease-in-out infinite;transform:translateZ(-1px)}
+@keyframes c3shadow{0%,100%{transform:scale(1.05);opacity:.55}50%{transform:scale(.85);opacity:.35}}
+.c3__halo{position:absolute;left:50%;top:44%;width:min(110vw,620px);height:min(70vw,380px);transform:translate(-50%,-50%);background:radial-gradient(closest-side,rgba(46,211,195,.18),transparent 70%);filter:blur(10px);pointer-events:none}
+.c3__floor{position:absolute;left:50%;bottom:4%;width:min(90vw,520px);height:60px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(46,211,195,.12),transparent);pointer-events:none}
+/* playing: the front card grows a little, everything else steps back */
+.c3__card.is-play{z-index:400 !important;filter:none !important;opacity:1 !important}
+.c3__card.is-play .c3__media{box-shadow:0 0 0 2px #2ED3C3,0 40px 90px -20px rgba(0,0,0,.95),0 0 70px -10px rgba(46,211,195,.55)}
+.c3__card.is-play .c3__float{animation-play-state:paused}
+.c3__card.is-play .c3__play,.c3__card.is-play .c3__tag,.c3__card.is-play .c3__glare{opacity:0}
+.c3.is-playing .c3__card:not(.is-play){opacity:.12 !important}
+.c3__x{position:absolute;top:10px;left:10px;z-index:5;width:38px;height:38px;border-radius:50%;background:rgba(10,15,14,.85);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 1px rgba(237,228,211,.2)}
+.c3__x svg{width:16px;height:16px}
+.c3__prog{position:absolute;left:10px;right:10px;bottom:10px;height:3px;border-radius:3px;background:rgba(255,255,255,.18);z-index:4;overflow:hidden}
+.c3__prog i{display:block;height:100%;width:0;background:#2ED3C3;transition:width .25s linear}
+.c3__meta{display:grid;justify-items:center;gap:8px;margin-top:4px;text-align:center}
+.c3__meta b{font-size:clamp(1.5rem,6vw,2rem);font-weight:900;letter-spacing:-.01em;background:linear-gradient(135deg,#EDE4D3,#2ED3C3);-webkit-background-clip:text;background-clip:text;color:transparent;min-height:1.3em}
+.c3__meta b.in{animation:c3in .6s var(--ease)}
+@keyframes c3in{from{opacity:0;transform:translateY(12px) scale(.96);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+.c3__bar{width:70px;height:3px;border-radius:3px;background:rgba(237,228,211,.12);overflow:hidden}
+.c3__bar i{display:block;height:100%;width:0;background:#2ED3C3}
+.c3__bar.run i{animation:c3bar var(--t,2200ms) linear}
+@keyframes c3bar{from{width:0}to{width:100%}}
+.c3__meta small{color:var(--muted);font-size:13.5px}
+@media (prefers-reduced-motion:reduce){.c3__float,.c3__shadow,.c3__card.is-front .c3__glare{animation:none}}
+.c3__ring{pointer-events:none}.c3__card{pointer-events:auto}
+.c3.lift .c3__card{transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .4s}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -771,29 +818,21 @@ html,body{max-width:100%;overflow-x:hidden}
 
   <!-- ============ COVERS ============ -->
   <section class="section" id="covers">
-    <div class="dial-pin" id="dialPin">
-      <div class="dial-sticky">
-        <div class="wrap">
-          <div class="head head--sm">
-            <span class="eyebrow">קאברים</span>
-            <h2 data-split id="hCovers"></h2>
-            <p id="pCovers"></p>
-          </div>
-          <div class="dial" id="dial">
-            <div class="dial__tape" aria-hidden="true"></div>
-            <div class="dial__plate" id="dialPlate"></div>
-            <div class="dial__sheen" aria-hidden="true"></div>
-            <span class="dial__stop" aria-hidden="true"></span>
-            <button class="dial__center" id="dialCenter" type="button" aria-label="האזנה לקאבר">
-              <span class="dial__face"></span>
-              <svg class="dial__prog" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/><circle class="p" cx="50" cy="50" r="48" pathLength="100"/></svg>
-              <span class="dial__btn" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-play"/></svg></span>
-              <span class="dial__x" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
-            </button>
-          </div>
-
-          <div class="wheel__meta"><b id="wheelStyle"></b><small id="wheelHint"></small></div>
-        </div>
+    <div class="wrap">
+      <div class="head head--sm">
+        <span class="eyebrow">קאברים</span>
+        <h2 data-split id="hCovers"></h2>
+        <p id="pCovers"></p>
+      </div>
+      <div class="c3" id="c3Stage">
+        <span class="c3__halo" aria-hidden="true"></span>
+        <div class="c3__ring" id="c3d"></div>
+        <span class="c3__floor" aria-hidden="true"></span>
+      </div>
+      <div class="c3__meta">
+        <b id="c3Style"></b>
+        <span class="c3__bar" id="c3Bar"><i></i></span>
+        <small id="c3Sub"></small>
       </div>
     </div>
   </section>
@@ -1345,143 +1384,95 @@ window.mergeContent = function (saved) {
       f.addEventListener("pointerup", up); f.addEventListener("pointercancel", up);
     })();
 
-    // covers: a golden reel — drag it round, tap any circle to hear it
+    // covers: floating 3D carousel — turns by itself, a new style every couple of seconds; tap to listen
     if(!S.covers.length) $("#covers").hidden = true;
     else {
-      const plate = $("#dialPlate"), center = $("#dialCenter"), label = $("#wheelStyle"), hint = $("#wheelHint"), dotsEl = $("#wheelDots"), pin = $("#dialPin");
-      const dialEl = $("#dial"), needle = $("#vuNeedle"), counter = $("#tapeCounter");
-      pin.style.height = "";
-      // feel: vibrate where allowed (Android); iPhone gets a soft tick sound + a visual click instead
-      const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-      const haptic = () => { try{ if(!isIOS && navigator.vibrate) navigator.vibrate(10); }catch(_){} };
-      let actx = null;
-      const unlockTick = () => { try{ if(!actx){ const AC = window.AudioContext || window.webkitAudioContext; if(AC) actx = new AC(); } if(actx && actx.state === "suspended") actx.resume(); }catch(_){} };
-      const tickSound = () => { if(!actx || actx.state !== "running" || listening) return; try{
-        const t = actx.currentTime, len = Math.floor(actx.sampleRate * .02), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
-        for(let k = 0; k < len; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / len, 5);
-        const src = actx.createBufferSource(), bp = actx.createBiquadFilter(), g = actx.createGain();
-        bp.type = "bandpass"; bp.frequency.value = 3200; bp.Q.value = 1.2; g.gain.value = .2;
-        src.buffer = buf; src.connect(bp); bp.connect(g); g.connect(actx.destination); src.start(t); }catch(_){} };
-
-      const n = S.covers.length, SLOTS = Math.max(6, n), STEP = 360 / SLOTS;
-      // tiny silent loops (~60KB each) so every circle moves without eating data
+      const ring = $("#c3d"), label = $("#c3Style"), sub = $("#c3Sub"), bar = $("#c3Bar"), stage = $("#c3Stage");
+      const n = S.covers.length, STEP = 360 / Math.max(n, 3), AUTO = 2200;
       const previewOf = (c, src) => { if(real(c.preview)) return c.preview;
         if(/res\.cloudinary\.com/.test(src)) return src.replace(/\/upload\/[^/]*\/(v\d+\/)/, "/upload/so_8,du_6,w_240,h_240,c_fill,q_auto:low,ac_none/$1");
         if(/^assets\/covers\/[^/]+\.mp4$/.test(src)) return src.replace(/\.mp4$/, "_p.mp4");
         return ""; };
       const covers = S.covers.map(c => { const src = String(c.url).trim(), id = ytId(c.url);
         return { c, id, src, prev: id ? "" : previewOf(c, src), thumb: id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }; });
-      plate.innerHTML = Array.from({length:SLOTS}, (_,i) => { const cv = covers[i];
-        return `<div class="hole${cv ? " has" : ""}" data-i="${i}" style="--a:${i * STEP}deg"><div class="hole__in">${cv
-          ? (cv.prev ? `<video src="${esc(cv.prev)}" ${cv.thumb ? `poster="${esc(cv.thumb)}"` : ""} muted loop playsinline autoplay preload="auto"></video>`
-            : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" onerror="this.remove()">` : "")
-          : ""}${cv && (cv.c.style || cv.c.title) ? `<b class="hole__tag">${esc(cv.c.style || cv.c.title)}</b>` : ""}</div></div>`; }).join("");
-      const holes = [...plate.children], holeVids = $$("video", plate);
-      if(dotsEl) dotsEl.innerHTML = n > 1 ? covers.map(() => "<i></i>").join("") : "";
-      const dots = dotsEl ? [...dotsEl.children] : [];
-
-      // one persistent player for the full clip with sound (created once, so the first tap always plays)
-      const face = center.querySelector(".dial__face");
-      const full = document.createElement("video"); full.className = "dial__full"; full.playsInline = true; full.setAttribute("playsinline", ""); full.preload = "none";
-      center.insertBefore(full, face.nextSibling);
-      let pos = 0, target = 0, active = -1, raf = 0, inView = false, listening = false, pv = null, frame = null, seeking = false;
-      const paint = () => {
-        plate.style.transform = `rotate(${-pos * STEP}deg)`;
-        holes.forEach((h,i) => { h.firstChild.style.transform = `rotate(${pos * STEP - i * STEP}deg)`; }); // pictures stay upright
-      };
-      // VU needle + tape counter while listening
-      let vuRaf = 0, lvl = 0;
-      const vu = () => { if(!needle || !counter){ vuRaf = 0; return; } if(!listening){ needle.style.transform = "rotate(-48deg)"; vuRaf = 0; return; }
-        const t = performance.now() / 1000, want = full.paused ? 0 : .55 + .25 * Math.sin(t * 7.3) * Math.sin(t * 2.1) + Math.random() * .22;
-        lvl += (want - lvl) * .35; needle.style.transform = `rotate(${-48 + Math.min(1, lvl) * 92}deg)`;
-        const s = Math.floor(full.currentTime || 0); counter.textContent = `${String(Math.floor(s / 60)).padStart(2,"0")}:${String(s % 60).padStart(2,"0")}`;
-        vuRaf = requestAnimationFrame(vu); };
-      full.addEventListener("timeupdate", () => { if(listening && full.duration) center.style.setProperty("--p", (full.currentTime / full.duration * 100).toFixed(1)); });
-      full.addEventListener("ended", () => { stopSound(); preview(); });
-      full.addEventListener("waiting", () => center.classList.add("is-loading"));
-      full.addEventListener("playing", () => center.classList.remove("is-loading"));
-      function stopSound(){ if(!listening && !frame) return; listening = false; center.classList.remove("is-live", "is-loading"); dialEl.classList.remove("is-big");
-        center.style.setProperty("--p", 0); if(counter) counter.textContent = "00:00"; full.pause(); if(frame){ frame.remove(); frame = null; } }
-      function preview(){ if(!pv || listening) return; if(inView && !reduce){ pv.muted = true; pv.play().catch(() => {}); } else pv.pause(); }
-      const setActive = i => {
-        if(i === active) return; const first = active < 0; active = i;
-        if(!seeking) stopSound();
-        if(!first){ haptic(); tickSound(); dialEl.classList.remove("click"); void dialEl.offsetWidth; dialEl.classList.add("click"); }
-        holes.forEach((h,j) => h.classList.toggle("is-on", j === i));
-        dots.forEach((d,j) => d.classList.toggle("on", j === i));
-        const cv = covers[i];
-        label.textContent = cv.c.style || cv.c.title || ""; label.classList.remove("pop"); void label.offsetWidth; label.classList.add("pop");
-        hint.textContent = (cv.c.title && cv.c.style ? cv.c.title + " · " : "") + (n > 1 ? "גלגלו את הגלגל · לחצו על סרטון להאזנה" : "לחצו להאזנה");
-        clearTimeout(loadT); loadT = setTimeout(loadCenter, first ? 0 : 160);
-      };
-      let loadT = 0, shown = -1;
-      function loadCenter(){
-        if(moving()){ loadT = setTimeout(loadCenter, 120); return; }
-        if(shown === active) return; shown = active;
-        const cv = covers[active];
-        face.innerHTML = cv.id ? `<img src="${esc(cv.thumb)}" alt="" onerror="this.remove()">`
-          : `<video src="${esc(cv.prev || cv.src)}" ${cv.thumb ? `poster="${esc(cv.thumb)}"` : ""} muted playsinline loop autoplay preload="auto"></video>`;
-        pv = face.querySelector("video");
-        center.classList.remove("swap"); void center.offsetWidth; center.classList.add("swap");
-        preview();
-      }
-      // smooth spring: carries the flick's speed, then settles exactly on a cover
-      let vel = 0, last = 0, dragOn = false;
-      const moving = () => dragOn || raf !== 0;
-      const tick = now => { const dt = Math.min(.034, (now - (last || now)) / 1000 || .016); last = now;
-        const acc = -160 * (pos - target) - 25 * vel; vel += acc * dt; pos += vel * dt;
-        if(Math.abs(pos - target) < .0015 && Math.abs(vel) < .02){ pos = target; vel = 0; }
-        paint(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos))));
-        if(pos !== target || vel !== 0){ raf = requestAnimationFrame(tick); } else { raf = 0; last = 0; seeking = false; } };
-      const go = (t, v0) => { target = Math.max(0, Math.min(n - 1, t)); if(v0 !== undefined) vel = v0; if(!raf){ last = 0; raf = requestAnimationFrame(tick); } };
-
-      // listen: must start right inside the tap (iPhone rule), so the player is ready and we only swap its source
-      function listen(i){
-        const cv = covers[i]; if(!cv) return;
-        stopSound(); pauseAudio(); listening = true; center.classList.add("is-live"); dialEl.classList.add("is-big"); center.style.setProperty("--p", 0);
-        if(!cv.id){
-          if(full.getAttribute("src") !== cv.src){ full.src = cv.src; if(cv.thumb) full.poster = cv.thumb; }
-          full.muted = false; try{ full.currentTime = 0; }catch(_){}
-          center.classList.add("is-loading");
-          const p = full.play(); if(p && p.catch) p.catch(() => { center.classList.remove("is-loading"); listening = false; center.classList.remove("is-live"); dialEl.classList.remove("is-big"); });
-        } else {
-          frame = document.createElement("iframe"); frame.className = "dial__yt"; frame.src = embedUrl(cv.id);
-          frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; frame.title = "YouTube"; face.appendChild(frame);
-        }
-        if(!vuRaf) vuRaf = requestAnimationFrame(vu);
-      }
-
-      // drag the reel any way you like (up/left one way, down/right the other); the page doesn't scroll on it
-      let dragMoved = false, x0 = 0, y0 = 0, p0 = 0, samples = [], dq = 0;
-      const PX = () => dialEl.offsetWidth * .3; // px per cover
-      dialEl.addEventListener("pointerdown", e => { if(n < 2 || listening) return;
-        if(raf){ cancelAnimationFrame(raf); raf = 0; seeking = false; } dragOn = true; dragMoved = false; x0 = e.clientX; y0 = e.clientY; p0 = pos; target = pos; vel = 0; samples = [[performance.now(), pos]]; });
-      dialEl.addEventListener("pointermove", e => { if(!dragOn) return; const dx = e.clientX - x0, dy = e.clientY - y0;
-        if(!dragMoved){ if(Math.hypot(dx, dy) < 6) return; dragMoved = true; try{ dialEl.setPointerCapture(e.pointerId); }catch(_){} x0 = e.clientX; y0 = e.clientY; }
-        const t = p0 - ((e.clientX - x0) + (e.clientY - y0)) / PX();
-        pos = t < 0 ? t * .35 : t > n - 1 ? n - 1 + (t - n + 1) * .35 : t;
-        const now = performance.now(); samples.push([now, pos]); while(samples.length > 2 && now - samples[0][0] > 90) samples.shift();
-        if(!dq) dq = requestAnimationFrame(() => { dq = 0; paint(); setActive(Math.max(0, Math.min(n - 1, Math.round(pos)))); }); });
-      const dragEnd = () => { unlockTick(); if(!dragOn) return; dragOn = false; if(!dragMoved) return;
-        const a = samples[0], b = samples[samples.length - 1], v0 = b && a && b[0] > a[0] ? (b[1] - a[1]) / ((b[0] - a[0]) / 1000) : 0;
-        go(Math.round(pos + Math.max(-3, Math.min(3, v0 * .2))), Math.max(-14, Math.min(14, v0))); setTimeout(() => dragMoved = false, 80); };
-      dialEl.addEventListener("pointerup", dragEnd); dialEl.addEventListener("pointercancel", dragEnd);
-      // tap any circle: it turns to the top and starts playing with sound — one tap
-      plate.addEventListener("click", e => { if(dragMoved) return; const h = e.target.closest(".hole.has"); if(!h) return; const i = +h.dataset.i;
-        if(i !== active){ seeking = true; go(i); } listen(i); });
-      if(dotsEl) dotsEl.addEventListener("click", e => { const d = e.target.closest("i"); if(!d) return; const i = dots.indexOf(d); if(i !== active){ go(i); } });
-      // tap the middle: listen (tap again to stop)
-      center.addEventListener("click", () => { if(dragMoved) return; if(listening){ stopSound(); preview(); return; } listen(active); });
-
-      // small loops play only while the reel is on screen; a first touch anywhere wakes them (battery-saver mode)
-      const wake = () => { if(!inView || reduce) return; holeVids.forEach(x => { x.muted = true; if(x.paused) x.play().catch(() => {}); }); preview(); };
-      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; if(!inView){ if(listening) stopSound(); holeVids.forEach(x => x.pause()); if(pv) pv.pause(); } else wake(); }, {threshold:.15}).observe(dialEl);
-      else inView = true;
+      ring.innerHTML = covers.map((cv,i) => `<div class="c3__card" data-i="${i}" role="button" tabindex="0" aria-label="קאבר ${esc(cv.c.style || "")}">
+          <div class="c3__float" style="animation-delay:${(-i * .7).toFixed(1)}s">
+            <div class="c3__media">${cv.prev ? `<video src="${esc(cv.prev)}" ${cv.thumb ? `poster="${esc(cv.thumb)}"` : ""} muted loop playsinline autoplay preload="auto"></video>`
+              : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy">` : ""}</div>
+            <span class="c3__glare" aria-hidden="true"></span>
+            <span class="c3__tag">${esc(cv.c.style || cv.c.title || "")}</span>
+            <span class="c3__play" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-play"/></svg></span>
+          </div>
+          <span class="c3__shadow" aria-hidden="true"></span>
+        </div>`).join("");
+      const cards = [...ring.children], loops = $$("video", ring);
+      // one player with sound, reused (so the very first tap plays on iPhone)
+      const full = document.createElement("video"); full.className = "c3__full"; full.playsInline = true; full.setAttribute("playsinline", ""); full.preload = "none";
+      const closeBtn = document.createElement("button"); closeBtn.type = "button"; closeBtn.className = "c3__x"; closeBtn.setAttribute("aria-label", "סגירה");
+      closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+      const prog = document.createElement("span"); prog.className = "c3__prog"; prog.innerHTML = "<i></i>";
+      let angle = 0, target = 0, active = -1, raf = 0, inView = false, playing = -1, frame = null, timer = 0, hold = 0;
+      const R = () => { const w = cards[0].offsetWidth; return Math.max(w * .95, (w / 2) / Math.tan(Math.PI / Math.max(n, 3)) + w * .22); };
+      const paint = () => { const r = R();
+        cards.forEach((el,i) => { let rel = ((i * STEP - angle) % 360 + 540) % 360 - 180; const a = rel * Math.PI / 180, cz = Math.cos(a);
+          const lift = i === playing ? 150 : 0; // the playing card floats toward you
+          el.style.transform = `translate3d(${(Math.sin(a) * r).toFixed(1)}px,0,${(cz * r - r + lift).toFixed(1)}px) rotateY(${rel.toFixed(1)}deg)`;
+          el.style.opacity = String(Math.max(.12, .25 + .75 * (cz + 1) / 2 * (cz > 0 ? 1 : .6)).toFixed(3));
+          el.style.zIndex = String(Math.round(100 + cz * 100));
+          el.style.filter = cz > .96 ? "none" : `brightness(${(.55 + .45 * Math.max(0, cz)).toFixed(2)})`; }); };
+      const setActive = i => { if(i === active) return; active = i;
+        cards.forEach((el,j) => el.classList.toggle("is-front", j === i));
+        const c = covers[i].c; label.textContent = c.style || c.title || ""; label.classList.remove("in"); void label.offsetWidth; label.classList.add("in");
+        sub.textContent = c.title && c.style ? c.title : "לחצו על הסרטון להאזנה"; };
+      const nearest = () => ((Math.round(angle / STEP) % n) + n) % n;
+      const tick = () => { angle += (target - angle) * .085; if(Math.abs(target - angle) < .05) angle = target;
+        paint(); setActive(nearest()); raf = angle !== target ? requestAnimationFrame(tick) : 0; };
+      const turnTo = t => { target = t; if(!raf) raf = requestAnimationFrame(tick); };
+      const goIdx = i => { let d = ((i * STEP - target) % 360 + 540) % 360 - 180; turnTo(target + d); };
+      // auto: next style every couple of seconds, with a thin timing line under the name
+      const restartBar = () => { bar.classList.remove("run"); void bar.offsetWidth; if(timer) bar.classList.add("run"); };
+      const startAuto = () => { if(reduce || n < 2 || timer || playing >= 0 || !inView) return; timer = setInterval(() => turnTo(target + STEP), AUTO); restartBar(); };
+      const stopAuto = () => { clearInterval(timer); timer = 0; bar.classList.remove("run"); };
+      const pauseFor = ms => { stopAuto(); clearTimeout(hold); hold = setTimeout(startAuto, ms); };
+      bar.style.setProperty("--t", AUTO + "ms");
+      // listen with sound inside the front card
+      let liftT = 0; const lift = () => { stage.classList.add("lift"); clearTimeout(liftT); liftT = setTimeout(() => stage.classList.remove("lift"), 700); };
+      function stopPlay(){ if(playing < 0) return; const el = cards[playing]; el.classList.remove("is-play"); full.pause(); full.remove(); closeBtn.remove(); prog.remove();
+        if(frame){ frame.remove(); frame = null; } playing = -1; stage.classList.remove("is-playing"); lift(); paint(); pauseFor(1500); }
+      function play(i){ const cv = covers[i]; if(!cv) return; stopPlay(); stopAuto(); clearTimeout(hold); pauseAudio();
+        playing = i; const el = cards[i], media = el.querySelector(".c3__media"); el.classList.add("is-play"); stage.classList.add("is-playing"); lift(); paint();
+        if(!cv.id){ if(full.getAttribute("src") !== cv.src){ full.src = cv.src; if(cv.thumb) full.poster = cv.thumb; }
+          media.appendChild(full); media.appendChild(prog); prog.firstChild.style.width = "0%"; full.muted = false; try{ full.currentTime = 0; }catch(_){}
+          const p = full.play(); if(p && p.catch) p.catch(() => stopPlay()); }
+        else { frame = document.createElement("iframe"); frame.className = "c3__yt"; frame.src = embedUrl(cv.id); frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; frame.title = "YouTube"; media.appendChild(frame); }
+        el.querySelector(".c3__float").appendChild(closeBtn); }
+      full.addEventListener("timeupdate", () => { if(full.duration) prog.firstChild.style.width = (full.currentTime / full.duration * 100).toFixed(1) + "%"; });
+      full.addEventListener("ended", stopPlay);
+      closeBtn.addEventListener("click", e => { e.stopPropagation(); stopPlay(); });
+      // tap: front card plays; a side card turns to the front and plays — one tap
+      let moved = false;
+      ring.addEventListener("click", e => { if(moved) return; const el = e.target.closest(".c3__card"); if(!el) return; const i = +el.dataset.i;
+        if(playing === i) return; if(i !== active) goIdx(i); play(i); });
+      ring.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); const el = e.target.closest(".c3__card"); if(el) el.click(); } });
+      // swipe sideways to turn (up/down still scrolls the page)
+      let sx = 0, sy = 0, a0 = 0, dragging = false;
+      stage.addEventListener("pointerdown", e => { if(playing >= 0) return; sx = e.clientX; sy = e.clientY; a0 = angle; dragging = true; moved = false; });
+      stage.addEventListener("pointermove", e => { if(!dragging) return; const dx = e.clientX - sx;
+        if(!moved){ if(Math.abs(dx) < 8) return; if(Math.abs(e.clientY - sy) > Math.abs(dx)){ dragging = false; return; } moved = true; stopAuto(); clearTimeout(hold); }
+        if(raf){ cancelAnimationFrame(raf); raf = 0; } angle = target = a0 - dx * .45; paint(); setActive(nearest()); });
+      const end = () => { if(!dragging) return; dragging = false; if(moved){ turnTo(Math.round(angle / STEP) * STEP); pauseFor(3500); setTimeout(() => moved = false, 60); } };
+      stage.addEventListener("pointerup", end); stage.addEventListener("pointercancel", end);
+      // only move / play loops while on screen; first touch wakes loops in battery-saver mode
+      const wake = () => { if(!inView || reduce) return; loops.forEach(v => { v.muted = true; if(v.paused) v.play().catch(() => {}); }); };
+      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting;
+        if(inView){ wake(); startAuto(); } else { stopAuto(); stopPlay(); loops.forEach(v => v.pause()); } }, {threshold:.25}).observe(stage);
+      else { inView = true; startAuto(); }
       ["touchstart","pointerdown","scroll"].forEach(ev => addEventListener(ev, wake, {passive:true}));
-      const sec = $("#covers"); sec.addEventListener("scroll", () => { sec.scrollLeft = 0; });
+      // restart the timing line every automatic step
+      let lastT = 0;
+      setInterval(() => { if(timer && target !== lastT){ lastT = target; restartBar(); } }, 120);
+      addEventListener("resize", paint);
       paint(); setActive(0);
-      if(!reduce && "IntersectionObserver" in window){ const io = new IntersectionObserver(([e]) => { if(!e.isIntersecting) return; io.disconnect();
-        plate.classList.add("spin"); setTimeout(() => plate.classList.remove("spin"), 1300); }, {threshold:.4}); io.observe(center); }
     }
 
     // productions

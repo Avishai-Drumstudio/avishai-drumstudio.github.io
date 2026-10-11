@@ -755,6 +755,8 @@ html,body{max-width:100%;overflow-x:hidden}
   .scrollcue i::before{width:12px;height:12px;margin-left:-6px}
 }
 @keyframes cueDot{0%{transform:translateY(-10px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(170px);opacity:0}}
+@media (max-width:760px){.scrollcue i{height:140px !important}}
+@keyframes cueDot{0%{transform:translateY(-10px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(140px);opacity:0}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1444,6 +1446,10 @@ window.mergeContent = function (saved) {
 
     // scroll cue fades out after the first scroll
     (() => { const c = $(".scrollcue"); if(!c) return; const f = () => c.classList.toggle("is-gone", scrollY > 60); addEventListener("scroll", f, {passive:true}); f();
+      // always sit just above the small heading line, whatever the screen height
+      const place = () => { if(innerWidth > 760) { c.style.top = ""; return; } const k = $("#heroEyebrow"), h = $("#hero"); if(!k || !h) return;
+        const top = k.getBoundingClientRect().top - h.getBoundingClientRect().top - c.offsetHeight - 26; c.style.setProperty("top", Math.max(90, top) + "px", "important"); };
+      place(); addEventListener("resize", place); setTimeout(place, 600); setTimeout(place, 2000);
       c.addEventListener("click", () => { const nx = [...$("#main").children].find(x => x.id !== "hero" && !x.hidden && x.offsetHeight); if(nx) nx.scrollIntoView({behavior: reduce ? "auto" : "smooth"}); }); })();
 
     // about: a studio fader — rides up with the scroll, and you can push it with a finger

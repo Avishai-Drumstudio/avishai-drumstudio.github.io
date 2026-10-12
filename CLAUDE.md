@@ -24,6 +24,9 @@ so he asks for a change in chat and expects it live on the site (push to `main` 
   - `mcp` → Google Calendar REST. Calendar access via Google Identity Services token client (`window.GOOGLE_CLIENT_ID`
     in firebase-config.js; origin https://avishai-drumstudio.github.io is authorized on that OAuth client), token ~1h in
     localStorage; the calendar account may differ from the login account (Avishai: login avishy407, calendar yasharulpan).
+    Permanent option ("bridge"): Settings → יומן גוגל → חיבור קבוע — a Google Apps Script web app in the calendar
+    account proxies Calendar REST calls (secret + url stored in `config.gbridge`); when set, the app uses it instead of GIS
+    tokens and never needs to reconnect. Calendar sync is manual only (no auto-sync — Avishai asked).
     Tools emulated: `list_calendars`, `create_event` (first links to an existing event same day within 60 min instead of
     duplicating), `update_event`, `delete_event`.
   - Login once per device: the last user is cached in localStorage and the app opens instantly, auth is verified in the background.

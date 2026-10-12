@@ -102,7 +102,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012093128';
+window.STUDIO_VERSION = '20261012094803';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -217,13 +217,30 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     el.querySelector('#gcal-go').onclick = function () { window.__gcalConnect(); };
   }
   var gcalBusy = null;
+  function rememberedCal() { try { return localStorage.getItem('studio-gcal-email') || ''; } catch (e) { return ''; } }
   window.__gcalAccount = function () { return tokOk() ? (gTok.email || 'מחובר') : ''; };
+  window.__gcalRemembered = rememberedCal;
+  // היומן "נשאר מחובר": הטוקן של גוגל חי שעה, אז מחדשים אותו לבד (בלי לשאול) בלחיצה הבאה באפליקציה.
+  // חייב לרוץ ישר מתוך לחיצה (אחרת הדפדפן חוסם את החלון של גוגל). מתנתק רק בהחלפת משתמש.
+  var renewing = null;
+  window.__gcalEnsure = function () {
+    if (tokOk()) return Promise.resolve(true);
+    if (renewing) return renewing;
+    var g = gisConnect(true); if (!g) return Promise.resolve(false);
+    renewing = g.then(function () { renewing = null; return tokOk(); });
+    return renewing;
+  };
+  document.addEventListener('click', function () {
+    if (rememberedCal() && !tokOk() && !renewing && window.__gcalWant) window.__gcalEnsure();
+  }, true);
   // חיבור ליומן דרך Google Identity Services (חלון של גוגל עצמו — עובד טוב גם באייפון). דורש GOOGLE_CLIENT_ID.
   function saveTok(t, email) {
     gTok = { t: t, exp: Date.now() + 55 * 60000, email: email || '' };
     try { localStorage.setItem('studio-gcal-email', gTok.email); localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {}
-    calPrompt(false); toastMsg('יומן גוגל חובר' + (gTok.email ? ' (' + gTok.email + ')' : '') + ' ✓ — אפשר לסנכרן');
+    calPrompt(false); if (!quietSave) toastMsg('יומן גוגל חובר' + (gTok.email ? ' (' + gTok.email + ')' : '') + ' ✓ — אפשר לסנכרן');
+    try { window.dispatchEvent(new Event('gcal-token')); } catch (e) {}
   }
+  var quietSave = false;
   var gisClient = null;
   function gisInit() {
     if (gisClient || !window.GOOGLE_CLIENT_ID || !(window.google && google.accounts && google.accounts.oauth2)) return gisClient;
@@ -234,17 +251,19 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     if (!window.GOOGLE_CLIENT_ID) return;
     var sc = document.createElement('script'); sc.src = 'https://accounts.google.com/gsi/client'; sc.async = true; sc.onload = gisInit; document.head.appendChild(sc);
   });
-  function gisConnect() {
+  function gisConnect(quiet) {
     var c = gisInit(); if (!c) return null;
-    var hint = (gTok && gTok.email) || (function () { try { return localStorage.getItem('studio-gcal-email') || ''; } catch (e) { return ''; } })();
+    var hint = (gTok && gTok.email) || rememberedCal();
+    if (quiet && !hint) return null;
     return new Promise(function (resolve) {
       c.callback = function (resp) {
-        if (!resp || resp.error || !resp.access_token) { toastMsg('החיבור ליומן לא הצליח' + (resp && resp.error ? ': ' + resp.error : '')); return resolve(); }
+        if (!resp || resp.error || !resp.access_token) { if (!quiet) toastMsg('החיבור ליומן לא הצליח' + (resp && resp.error ? ': ' + resp.error : '')); return resolve(); }
+        if (quiet && hint) { quietSave = true; saveTok(resp.access_token, hint); quietSave = false; return resolve(); }
         fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=owner&maxResults=50', { headers: { Authorization: 'Bearer ' + resp.access_token } })
           .then(function (r) { return r.json(); }).then(function (j) { var pr = (j.items || []).find(function (x) { return x.primary; }); saveTok(resp.access_token, pr ? pr.id : ''); })
           .catch(function () { saveTok(resp.access_token, ''); }).then(resolve);
       };
-      c.error_callback = function (err) { if (!(err && err.type === 'popup_closed')) toastMsg('החיבור ליומן לא הצליח: ' + ((err && err.type) || '')); resolve(); };
+      c.error_callback = function (err) { if (!quiet && !(err && err.type === 'popup_closed')) toastMsg('החיבור ליומן לא הצליח: ' + ((err && err.type) || '')); resolve(); };
       c.requestAccessToken(hint ? { hint: hint, prompt: '' } : { prompt: 'select_account' });
     });
   }
@@ -270,10 +289,10 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   };
   function toastMsg(m) { var t = document.createElement('div'); t.textContent = m; t.style.cssText = 'position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:999px;background:#222;color:#fff;font:600 14px Rubik,system-ui,sans-serif;direction:rtl'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); }
   function gfetch(method, path, body) {
-    if (!tokOk()) { calPrompt(true); return Promise.reject({ code: 'needs_reauth', message: 'no token' }); }
+    if (!tokOk()) { if (!rememberedCal()) calPrompt(true); return Promise.reject({ code: 'needs_reauth', message: 'no token' }); }
     return fetch('https://www.googleapis.com/calendar/v3' + path, { method: method, headers: Object.assign({ Authorization: 'Bearer ' + gTok.t }, body ? { 'Content-Type': 'application/json' } : {}), body: body ? JSON.stringify(body) : undefined })
       .then(function (r) {
-        if (r.status === 401) { gTok = null; try { localStorage.removeItem(GTOK_KEY); } catch (e) {} calPrompt(true); throw { code: 'needs_reauth', message: '401' }; }
+        if (r.status === 401) { gTok = null; try { localStorage.removeItem(GTOK_KEY); } catch (e) {} if (!rememberedCal()) calPrompt(true); throw { code: 'needs_reauth', message: '401' }; }
         if (r.status === 404 || r.status === 410) throw { code: 'tool_error', message: 'not found' };
         if (!r.ok) return r.text().then(function (x) { throw { code: r.status === 403 && /accessNotConfigured|has not been used|disabled/i.test(x) ? 'api_disabled' : 'unavailable', message: x.slice(0, 200) }; });
         return r.status === 204 ? {} : r.json();
@@ -934,7 +953,7 @@ const syncPlan = (data, full) => {
   return tasks;
 };
 const GERR = {
-  needs_reauth: 'צריך לחבר את יומן גוגל — לחץ על "חיבור" בחלונית שלמטה, ואז שוב על סנכרון.', api_disabled: 'צריך להפעיל את Google Calendar API בפרויקט ב-Google Cloud (שלב בהוראות).',
+  needs_reauth: 'החיבור ליומן גוגל צריך רענון — לחץ שוב על סנכרון.', api_disabled: 'צריך להפעיל את Google Calendar API בפרויקט ב-Google Cloud (שלב בהוראות).',
   server_not_connected: 'יומן גוגל לא מחובר לחשבון Claude שלך. הוסף את Google Calendar בהגדרות של Claude, תחת מחברים (Connectors).',
   selection_required: 'יש יותר מחיבור אחד של Google Calendar. בחר אחד בחלון שנפתח ונסה שוב.',
   not_in_manifest: 'לא אושרה גישה ליומן גוגל. בלחיצה הבאה על סנכרון יופיע שוב חלון אישור.',
@@ -2416,7 +2435,7 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
             <${Btn} onClick=${() => window.__gcalConnect && window.__gcalConnect().then(gsync.loadCalendars)}>🔗 חיבור חשבון יומן<//>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            <div className="w-full rounded-2xl glass-soft px-3 py-2 text-sm">${window.__gcalAccount && window.__gcalAccount() ? html`<span className="text-ok font-bold">● מחובר ליומן של </span><b dir="ltr">${window.__gcalAccount()}</b>` : html`<span className="text-warn font-bold">● יומן גוגל עוד לא מחובר במכשיר הזה</span>`}<span className="block text-xs text-muted">בסנכרון הבא: ${gsync.planNew} חדשים · ${gsync.planUpd} עדכונים · ${gsync.planDel} מחיקות${gsync.planNew ? ' — אירוע שכבר נמצא ביומן באותו יום ובשעה קרובה יקושר אליו ולא ישוכפל' : ''}</span></div>
+            <div className="w-full rounded-2xl glass-soft px-3 py-2 text-sm">${(window.__gcalAccount && window.__gcalAccount()) || (window.__gcalRemembered && window.__gcalRemembered()) ? html`<span className="text-ok font-bold">● מחובר ליומן של </span><b dir="ltr">${(window.__gcalAccount && window.__gcalAccount()) || window.__gcalRemembered()}</b>` : html`<span className="text-warn font-bold">● יומן גוגל עוד לא מחובר במכשיר הזה</span>`}<span className="block text-xs text-muted">בסנכרון הבא: ${gsync.planNew} חדשים · ${gsync.planUpd} עדכונים · ${gsync.planDel} מחיקות${gsync.planNew ? ' — אירוע שכבר נמצא ביומן באותו יום ובשעה קרובה יקושר אליו ולא ישוכפל' : ''}</span></div>
             <${Btn} kind="grad" disabled=${gsync.running} onClick=${gsync.run}>${gsync.running ? 'מסנכרן ' + gsync.done + '/' + gsync.total + '…' : '📅 סנכרון עכשיו'}<//>
             <span className="text-xs text-muted">${data.gsync && data.gsync.last ? 'סנכרון אחרון: ' + new Date(data.gsync.last).toLocaleString('he-IL') : 'עוד לא סונכרן'}</span>
           </div>
@@ -2728,6 +2747,8 @@ function App() {
   const setCalendar = id => { const c = gCals.find(x => x.id === id); setGsync({ calendarId: id, calendarName: c ? c.summary : '' }); };
   const runSync = async full => {
     if (gsRun.running) return;
+    const ens = window.__gcalEnsure ? window.__gcalEnsure() : null; // מחדש חיבור ליומן בשקט, ישר מהלחיצה
+    if (ens && !(await ens) && window.__gcalRemembered && window.__gcalRemembered()) { setToast('לא הצלחתי לחדש את החיבור ליומן — נסה שוב'); return; }
     const m = await getMcp(); if (!m) { setToast('סנכרון ליומן גוגל לא זמין בתצוגה הזו'); return; }
     const tasks = syncPlan(dataRef.current, full === true);
     if (!tasks.length) { setGsync({ last: Date.now() }); setToast('יומן גוגל כבר מעודכן ✓'); return; }
@@ -2762,10 +2783,13 @@ function App() {
   };
   const gPending = mcpOk ? syncPlan(data).filter(t => !t.keep).length : 0;
   /* סנכרון אוטומטי ליומן גוגל כשיש שינויים והיומן מחובר במכשיר הזה */
+  const [gTokTick, setGTokTick] = useState(0);
+  useEffect(() => { const f = () => setGTokTick(x => x + 1); window.addEventListener('gcal-token', f); return () => window.removeEventListener('gcal-token', f); }, []);
+  window.__gcalWant = gPending > 0;
   useEffect(() => {
     if (!gPending || gsRun.running || !(window.__gcalAccount && window.__gcalAccount())) return;
     const h = setTimeout(() => runSync(), 4000); return () => clearTimeout(h);
-  }, [gPending, gsRun.running]);
+  }, [gPending, gsRun.running, gTokTick]);
   const fullPending = mcpOk ? syncPlan(data, true).filter(t => !t.keep).length : 0;
   const runFull = () => ask('להעביר ליומן גוגל את כל ההיסטוריה — ' + fullPending + ' אירועים? זה לוקח כמה דקות; השאר את האפליקציה פתוחה עד הסוף. מכאן והלאה הסנכרון הרגיל ימשיך לעדכן רק מהחודש האחרון.', { ok: 'התחל סנכרון מלא' }).then(ok => ok && runSync(true));
   const planNow = mcpOk ? syncPlan(data) : [], planNew = planNow.filter(t => t.op === 'create').length, planUpd = planNow.filter(t => t.op === 'update').length, planDel = planNow.filter(t => t.op === 'delete' && !t.keep).length;

@@ -102,7 +102,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012094803';
+window.STUDIO_VERSION = '20261012095134';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -220,7 +220,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   function rememberedCal() { try { return localStorage.getItem('studio-gcal-email') || ''; } catch (e) { return ''; } }
   window.__gcalAccount = function () { return tokOk() ? (gTok.email || 'מחובר') : ''; };
   window.__gcalRemembered = rememberedCal;
-  // היומן "נשאר מחובר": הטוקן של גוגל חי שעה, אז מחדשים אותו לבד (בלי לשאול) בלחיצה הבאה באפליקציה.
+  // היומן "נשאר מחובר": הטוקן של גוגל חי שעה, אז מחדשים אותו לבד (בלי לשאול) בלחיצה על סנכרון.
   // חייב לרוץ ישר מתוך לחיצה (אחרת הדפדפן חוסם את החלון של גוגל). מתנתק רק בהחלפת משתמש.
   var renewing = null;
   window.__gcalEnsure = function () {
@@ -230,9 +230,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     renewing = g.then(function () { renewing = null; return tokOk(); });
     return renewing;
   };
-  document.addEventListener('click', function () {
-    if (rememberedCal() && !tokOk() && !renewing && window.__gcalWant) window.__gcalEnsure();
-  }, true);
+
   // חיבור ליומן דרך Google Identity Services (חלון של גוגל עצמו — עובד טוב גם באייפון). דורש GOOGLE_CLIENT_ID.
   function saveTok(t, email) {
     gTok = { t: t, exp: Date.now() + 55 * 60000, email: email || '' };
@@ -2782,14 +2780,6 @@ function App() {
     setToast(err ? gErrMsg(err) : 'סונכרנו ' + done + ' שינויים ליומן גוגל ✓');
   };
   const gPending = mcpOk ? syncPlan(data).filter(t => !t.keep).length : 0;
-  /* סנכרון אוטומטי ליומן גוגל כשיש שינויים והיומן מחובר במכשיר הזה */
-  const [gTokTick, setGTokTick] = useState(0);
-  useEffect(() => { const f = () => setGTokTick(x => x + 1); window.addEventListener('gcal-token', f); return () => window.removeEventListener('gcal-token', f); }, []);
-  window.__gcalWant = gPending > 0;
-  useEffect(() => {
-    if (!gPending || gsRun.running || !(window.__gcalAccount && window.__gcalAccount())) return;
-    const h = setTimeout(() => runSync(), 4000); return () => clearTimeout(h);
-  }, [gPending, gsRun.running, gTokTick]);
   const fullPending = mcpOk ? syncPlan(data, true).filter(t => !t.keep).length : 0;
   const runFull = () => ask('להעביר ליומן גוגל את כל ההיסטוריה — ' + fullPending + ' אירועים? זה לוקח כמה דקות; השאר את האפליקציה פתוחה עד הסוף. מכאן והלאה הסנכרון הרגיל ימשיך לעדכן רק מהחודש האחרון.', { ok: 'התחל סנכרון מלא' }).then(ok => ok && runSync(true));
   const planNow = mcpOk ? syncPlan(data) : [], planNew = planNow.filter(t => t.op === 'create').length, planUpd = planNow.filter(t => t.op === 'update').length, planDel = planNow.filter(t => t.op === 'delete' && !t.keep).length;

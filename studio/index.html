@@ -102,7 +102,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012092140';
+window.STUDIO_VERSION = '20261012093128';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -289,12 +289,13 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     list_calendars: function () { return gfetch('GET', '/users/me/calendarList?maxResults=250').then(function (j) { return { calendars: (j.items || []).map(function (c) { return { id: c.id, summary: c.summaryOverride || c.summary, primary: !!c.primary, accessRole: c.accessRole }; }) }; }); },
     // לא ליצור כפולים: אם כבר יש ביומן אירוע באותו יום בשעה קרובה — מקשרים אליו במקום ליצור חדש
     create_event: function (a) {
+      if (a.noAdopt) return gfetch('POST', '/calendars/' + calId(a) + '/events?sendUpdates=none', evBody(a)).then(function (k) { return { id: k.id }; });
       var day = String(a.startTime || '').slice(0, 10), st = Date.parse(a.startTime);
       var tz = String(a.startTime || '').slice(19) || '+03:00';
       var q = '/calendars/' + calId(a) + '/events?singleEvents=true&maxResults=50&timeMin=' + encodeURIComponent(day + 'T00:00:00' + tz) + '&timeMax=' + encodeURIComponent(day + 'T23:59:59' + tz);
       return gfetch('GET', q).then(function (j) {
         var hit = (j.items || []).find(function (e) {
-          if (e.status === 'cancelled' || adopted[e.id]) return false;
+          if (e.status === 'cancelled' || adopted[e.id] || /^🎼/.test(e.summary || '')) return false;
           if (e.start && e.start.dateTime) return Math.abs(Date.parse(e.start.dateTime) - st) <= 60 * 60000;
           return e.start && e.start.date === day;
         });
@@ -905,6 +906,12 @@ const gEvent = (g, subs) => {
   ].filter(Boolean).join('\n');
   return { summary: (sub ? '🔁 ' : '🥁 ') + autoTitle(g) + (sub ? ' · ' + sub.name : ''), startTime: `${g.date}T${st}:00${jlmOffset(g.date, st)}`, endTime: `${endDate}T${en}:00${jlmOffset(endDate, en)}`, timeZone: 'Asia/Jerusalem', colorId: gColorFor(g.type), location: [g.venue, g.address].filter(Boolean).join(', '), description: desc };
 };
+const prepEvent = (g, x, i) => {
+  const st = x.time || '11:00', [hh, mm] = st.split(':').map(Number), e = hh * 60 + mm + 120, en = pad(Math.min(23, Math.floor(e / 60))) + ':' + pad(e >= 1440 ? 59 : e % 60);
+  const n = ((g.prep && g.prep.sessions) || []).length;
+  return { summary: '🎼 ללמוד חומר — ' + prepWho(g), startTime: `${x.date}T${st}:00${jlmOffset(x.date, st)}`, endTime: `${x.date}T${en}:00${jlmOffset(x.date, en)}`, timeZone: 'Asia/Jerusalem', colorId: '5', location: '',
+    description: 'ישיבה ' + (i + 1) + ' מתוך ' + n + ' · לקראת ההופעה ב' + fmtDay(g.date) + (x.done ? '\n✓ בוצע' : '') + '\n— נוצר מ-Studio Manager', noAdopt: true };
+};
 const syncPlan = (data, full) => {
   const gs = data.gsync || {}, map = gs.map || {}, cal = gs.calendarId || '';
   const from = full ? '0000-01-01' : addDays(todayISO(), -30), tasks = [];
@@ -914,7 +921,16 @@ const syncPlan = (data, full) => {
     else if ((cur.cal || '') !== cal) { tasks.push({ op: 'delete', gid: g.id, eid: cur.id, cal: cur.cal || '', keep: true }); tasks.push({ op: 'create', gid: g.id, ev, h }); }
     else if (cur.h !== h) tasks.push({ op: 'update', gid: g.id, eid: cur.id, ev, h });
   });
-  Object.keys(map).forEach(id => { if (!data.gigs.some(g => g.id === id)) tasks.push({ op: 'delete', gid: id, eid: map[id].id, cal: map[id].cal || '' }); });
+  /* ימי הכנת חומר נכנסים ליומן גוגל כאירועים נפרדים: "🎼 ללמוד חומר — אמן" */
+  const prepIds = {};
+  data.gigs.forEach(g => prepOf(g).forEach((x, i) => {
+    const pid = g.id + '#p' + i; prepIds[pid] = 1; if (x.date < from) return;
+    const ev = prepEvent(g, x, i), h = hashStr(JSON.stringify(ev)), cur = map[pid];
+    if (!cur) tasks.push({ op: 'create', gid: pid, ev, h });
+    else if ((cur.cal || '') !== cal) { tasks.push({ op: 'delete', gid: pid, eid: cur.id, cal: cur.cal || '', keep: true }); tasks.push({ op: 'create', gid: pid, ev, h }); }
+    else if (cur.h !== h) tasks.push({ op: 'update', gid: pid, eid: cur.id, ev, h });
+  }));
+  Object.keys(map).forEach(id => { if (id.includes('#p') ? !prepIds[id] : !data.gigs.some(g => g.id === id)) tasks.push({ op: 'delete', gid: id, eid: map[id].id, cal: map[id].cal || '' }); });
   return tasks;
 };
 const GERR = {
@@ -2745,6 +2761,11 @@ function App() {
     setToast(err ? gErrMsg(err) : 'סונכרנו ' + done + ' שינויים ליומן גוגל ✓');
   };
   const gPending = mcpOk ? syncPlan(data).filter(t => !t.keep).length : 0;
+  /* סנכרון אוטומטי ליומן גוגל כשיש שינויים והיומן מחובר במכשיר הזה */
+  useEffect(() => {
+    if (!gPending || gsRun.running || !(window.__gcalAccount && window.__gcalAccount())) return;
+    const h = setTimeout(() => runSync(), 4000); return () => clearTimeout(h);
+  }, [gPending, gsRun.running]);
   const fullPending = mcpOk ? syncPlan(data, true).filter(t => !t.keep).length : 0;
   const runFull = () => ask('להעביר ליומן גוגל את כל ההיסטוריה — ' + fullPending + ' אירועים? זה לוקח כמה דקות; השאר את האפליקציה פתוחה עד הסוף. מכאן והלאה הסנכרון הרגיל ימשיך לעדכן רק מהחודש האחרון.', { ok: 'התחל סנכרון מלא' }).then(ok => ok && runSync(true));
   const planNow = mcpOk ? syncPlan(data) : [], planNew = planNow.filter(t => t.op === 'create').length, planUpd = planNow.filter(t => t.op === 'update').length, planDel = planNow.filter(t => t.op === 'delete' && !t.keep).length;

@@ -102,7 +102,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012091704';
+window.STUDIO_VERSION = '20261012092140';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1597,9 +1597,8 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
   const [slide, setSlide] = useState(0);
   const move = n => { setSlide(n); setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + n, 1)); };
   const curYM = t.slice(0, 7), viewYM = toISO(cursor).slice(0, 7), away = viewYM !== curYM;
-  const [todayPop, setTodayPop] = useState(false);
   useEffect(() => { if (onAway) onAway(away); }, [away]);
-  useEffect(() => { if (!todayTick) return; goToday(); setTodayPop(true); const h = setTimeout(() => setTodayPop(false), 3200); return () => clearTimeout(h); }, [todayTick]);
+  useEffect(() => { if (todayTick) goToday(); }, [todayTick]);
   const goToday = () => { setSlide(viewYM > curYM ? -1 : 1); const d = D(t); setCursor(new Date(d.getFullYear(), d.getMonth(), 1)); setSelected(t); setPing(true); setTimeout(() => setPing(false), 3200); };
   /* החלקה ימינה/שמאלה על היומן מעבירה חודש (כמו ביומן גוגל). בעברית: גרירה ימינה = החודש הבא */
   const swipe = useRef(null), gridRef = useRef(null);
@@ -1709,12 +1708,6 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
             ${admin && Number(g.fee) > 0 ? html`<${Status} s=${payStatus(g)} />` : html`<${TypeChip} type=${g.type} small />`}
           </button></li>`)}</ul>`)}
       <//>`}
-      ${todayPop && html`<div onClick=${() => setTodayPop(false)} className="today-fab fixed inset-x-0 z-30 mx-auto flex w-fit items-center gap-3 rounded-3xl glass px-4 py-3 shadow-2xl" style=${{ top: 'calc(env(safe-area-inset-top, 0px) + 5.2rem)', background: 'color-mix(in srgb, var(--bg) 94%, #7c3aed 6%)', border: '1px solid var(--glass-line)' }}>
-        <${DayTile} iso=${t} size=${52} />
-        <span className="leading-tight"><b className="block text-lg">${D(t).toLocaleDateString('he-IL', { weekday: 'long' })}</b>
-          <span className="block text-sm">${D(t).toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-          <span className="block text-xs text-muted">${hebDate(t).day} ${hebDate(t).month}</span></span>
-      </div>`}
     </div>`;
 }
 

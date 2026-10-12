@@ -95,12 +95,15 @@ select.field option { color: #1d1238; background: #fff; }
 html, body { max-width: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
 @supports (overflow: clip) { html, body { overflow-x: clip; } }
 body { -webkit-tap-highlight-color: transparent; }
-main { touch-action: pan-y pinch-zoom; }
 .cal-clip { overflow: hidden; overflow: clip; overflow-clip-margin: 6px; }
 #root button:not(:disabled):not(.transition) { transition: transform .16s cubic-bezier(.2,.8,.2,1); }
-#root button:not(:disabled):active { transform: scale(.95); }
-.tabin { animation: tabIn .34s cubic-bezier(.2,.8,.2,1); }
-@keyframes tabIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+#root button:not(:disabled):active { transform: scale(.97); }
+.scroll-x { overscroll-behavior-x: contain; scroll-behavior: smooth; touch-action: pan-x pan-y; }
+[role="dialog"] { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+button, a, [role="button"] { touch-action: manipulation; }
+@media (max-width: 639px) { .glass { backdrop-filter: blur(10px) saturate(130%); -webkit-backdrop-filter: blur(10px) saturate(130%); } }
+.tabin { animation: tabIn .28s cubic-bezier(.2,.8,.2,1); }
+@keyframes tabIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes calIn { from { transform: translateX(var(--from, 0)); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (max-width: 639px) {
   [role="dialog"].pop { animation: sheetUp .42s cubic-bezier(.16,1,.3,1); }
@@ -126,7 +129,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012125732';
+window.STUDIO_VERSION = '20261012130137';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -3153,7 +3156,7 @@ function App() {
         </div>
       </header>
 
-      <main key=${tab} className="tabin mx-auto max-w-6xl px-1.5 sm:px-4 pt-2 sm:pt-4" style=${{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}>
+      <main key=${ADMIN_IDS.includes(tab) ? 'admin' : tab} className="tabin mx-auto max-w-6xl px-1.5 sm:px-4 pt-2 sm:pt-4" style=${{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}>
         ${showEmpty ? html`
           <${Panel} className="mx-auto max-w-lg p-8 text-center mt-6">
             <div className="text-5xl">🥁</div>
@@ -3199,10 +3202,11 @@ function App() {
                 ${n > 0 && html`<span className="rounded-full bg-rose-500 px-1.5 text-[11px] leading-4 text-white">${n}</span>`}</button>`;
             })}
           </div></div>`}
+          <div key=${'pg-' + tab} className="tabin">
           ${tab === 'admin' && html`<${AdminDashboard} gigs=${gigs} onOpen=${setOpenId} onPay=${setPayId} onLock=${lock} onFaceId=${enableFaceId} faceIdOn=${!!(data.admin && (data.admin.passkeys || []).length)} onChangePw=${() => setLogin('change')} go=${setTab} />`}
           ${tab === 'payments' && html`<${Payments} gigs=${gigs} onOpen=${setOpenId} onPay=${setPayId} onInvoice=${setInvId} update=${update} />`}
           ${tab === 'tax' && html`<${Tax} gigs=${gigs} update=${update} onUnpay=${undoPaid} onOpen=${setOpenId} onDoc=${(id, kind) => setDocReq({ id, kind })} onPay=${(id, kind) => { setPayPreset(kind); setPayId(id); }} exportCsv=${exportCsv} />`}
-          ${tab === 'settings' && html`<${Settings} data=${data} book=${book} setBook=${setBook} gsync=${gsyncApi} freshData=${freshData} setConfig=${setConfig} renameType=${renameType} setData=${replaceData} mode=${mode} lastSync=${lastSync} theme=${theme} setTheme=${setTheme} backup=${backup} toast=${setToast} />`}`}`}
+          ${tab === 'settings' && html`<${Settings} data=${data} book=${book} setBook=${setBook} gsync=${gsyncApi} freshData=${freshData} setConfig=${setConfig} renameType=${renameType} setData=${replaceData} mode=${mode} lastSync=${lastSync} theme=${theme} setTheme=${setTheme} backup=${backup} toast=${setToast} />`}</div>`}`}
       </main>
 
       <nav aria-label="ניווט" className="fixed inset-x-0 bottom-0 z-40 px-2 sm:px-3" style=${{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}>

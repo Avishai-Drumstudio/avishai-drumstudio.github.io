@@ -126,7 +126,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012121426';
+window.STUDIO_VERSION = '20261012122423';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -242,13 +242,27 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   }
   var gcalBusy = null;
   function rememberedCal() { try { return localStorage.getItem('studio-gcal-email') || ''; } catch (e) { return ''; } }
-  window.__gcalAccount = function () { return tokOk() ? (gTok.email || 'מחובר') : ''; };
+  function bridge() { var b = window.__gcalBridge; return b && b.url && b.secret ? b : null; }
+  window.__gcalAccount = function () { var b = bridge(); if (b) return b.email || 'מחובר'; return tokOk() ? (gTok.email || 'מחובר') : ''; };
+  // "גשר" קבוע ליומן: Google Apps Script שרץ בחשבון היומן — לא פג אף פעם, בלי חלונות התחברות
+  function bridgeFetch(b, method, path, body) {
+    return fetch(b.url, { method: 'POST', body: JSON.stringify({ secret: b.secret, method: method, path: path, body: body || null }) })
+      .then(function (r) { return r.json(); }, function () { throw { code: 'unavailable', message: 'bridge unreachable' }; })
+      .then(function (j) {
+        var st = j && j.status;
+        if (st === 403 && j.error === 'forbidden') throw { code: 'bridge_auth', message: 'bridge secret' };
+        if (st === 404 || st === 410) throw { code: 'tool_error', message: 'not found' };
+        if (!st || st >= 300) throw { code: 'unavailable', message: JSON.stringify(j).slice(0, 200) };
+        return j.data || {};
+      });
+  }
+  window.__gcalBridgeTest = function (url, secret) { return bridgeFetch({ url: url, secret: secret }, 'GET', '/users/me/calendarList?minAccessRole=owner&maxResults=50').then(function (j) { var pr = (j.items || []).find(function (x) { return x.primary; }); return pr ? pr.id : 'מחובר'; }); };
   window.__gcalRemembered = rememberedCal;
   // היומן "נשאר מחובר": הטוקן של גוגל חי שעה, אז מחדשים אותו לבד (בלי לשאול) בלחיצה על סנכרון.
   // חייב לרוץ ישר מתוך לחיצה (אחרת הדפדפן חוסם את החלון של גוגל). מתנתק רק בהחלפת משתמש.
   var renewing = null;
   window.__gcalEnsure = function () {
-    if (tokOk()) return Promise.resolve(true);
+    if (bridge() || tokOk()) return Promise.resolve(true);
     if (renewing) return renewing;
     var g = gisConnect(true); if (!g) { calPrompt(true); return Promise.resolve(false); }
     var tmo = new Promise(function (r) { setTimeout(r, 25000); });
@@ -312,6 +326,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   };
   function toastMsg(m) { var t = document.createElement('div'); t.textContent = m; t.style.cssText = 'position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:999px;background:#222;color:#fff;font:600 14px Rubik,system-ui,sans-serif;direction:rtl'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); }
   function gfetch(method, path, body) {
+    var b = bridge(); if (b) return bridgeFetch(b, method, path, body);
     if (!tokOk()) { if (!rememberedCal()) calPrompt(true); return Promise.reject({ code: 'needs_reauth', message: 'no token' }); }
     return fetch('https://www.googleapis.com/calendar/v3' + path, { method: method, headers: Object.assign({ Authorization: 'Bearer ' + gTok.t }, body ? { 'Content-Type': 'application/json' } : {}), body: body ? JSON.stringify(body) : undefined })
       .then(function (r) {
@@ -996,7 +1011,7 @@ const syncPlan = (data, full) => {
   return tasks;
 };
 const GERR = {
-  needs_reauth: 'החיבור ליומן גוגל צריך רענון — לחץ שוב על סנכרון.', api_disabled: 'צריך להפעיל את Google Calendar API בפרויקט ב-Google Cloud (שלב בהוראות).',
+  needs_reauth: 'החיבור ליומן גוגל צריך רענון — לחץ שוב על סנכרון.', bridge_auth: 'הגשר ליומן לא מזהה את האפליקציה — הגדר אותו מחדש בהגדרות → יומן גוגל.', api_disabled: 'צריך להפעיל את Google Calendar API בפרויקט ב-Google Cloud (שלב בהוראות).',
   server_not_connected: 'יומן גוגל לא מחובר לחשבון Claude שלך. הוסף את Google Calendar בהגדרות של Claude, תחת מחברים (Connectors).',
   selection_required: 'יש יותר מחיבור אחד של Google Calendar. בחר אחד בחלון שנפתח ונסה שוב.',
   not_in_manifest: 'לא אושרה גישה ליומן גוגל. בלחיצה הבאה על סנכרון יופיע שוב חלון אישור.',
@@ -2354,6 +2369,60 @@ function AccountMenu() {
       </div>`}
   </div>`;
 }
+/* ===== חיבור קבוע ליומן (Google Apps Script) ===== */
+const bridgeCode = secret => `// Studio Manager — גשר קבוע ליומן גוגל. אל תשתף את הקוד הזה.
+const SECRET = '${secret}';
+function doPost(e) {
+  var r = JSON.parse(e.postData.contents || '{}');
+  if (r.secret !== SECRET) return out({ status: 403, error: 'forbidden' });
+  if (!/^\\/(calendars\\/|users\\/me\\/calendarList)/.test(r.path || '')) return out({ status: 400, error: 'bad path' });
+  var opt = { method: String(r.method || 'GET').toLowerCase(), headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }, muteHttpExceptions: true };
+  if (r.body) { opt.contentType = 'application/json'; opt.payload = JSON.stringify(r.body); }
+  var res = UrlFetchApp.fetch('https://www.googleapis.com/calendar/v3' + r.path, opt), t = res.getContentText(), d = {};
+  try { d = t ? JSON.parse(t) : {}; } catch (x) { d = { raw: t }; }
+  return out({ status: res.getResponseCode(), data: d });
+}
+function out(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+function setup() { CalendarApp.getDefaultCalendar(); }
+`;
+const newSecret = () => { const a = new Uint8Array(18); crypto.getRandomValues(a); return Array.from(a, x => x.toString(16).padStart(2, '0')).join(''); };
+function BridgeSetup({ data, setConfig, toast }) {
+  const gb = (data.config || {}).gbridge || null;
+  const [open, setOpen] = useState(false), [secret, setSecret] = useState(''), [url, setUrl] = useState(''), [busy, setBusy] = useState(false), [err, setErr] = useState('');
+  const start = () => { setSecret(gb && gb.secret || newSecret()); setUrl(''); setErr(''); setOpen(true); };
+  const copy = () => { const t = bridgeCode(secret); (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('הקוד הועתק ✓'), () => toast('לא הצלחתי להעתיק — סמן והעתק ידנית')); };
+  const save = () => { const u = url.trim(); if (!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(u)) { setErr('הקישור צריך להיראות כך: https://script.google.com/macros/s/…/exec'); return; }
+    setBusy(true); setErr('');
+    window.__gcalBridgeTest(u, secret).then(email => { setConfig({ gbridge: { url: u, secret, email, at: Date.now() } }); setOpen(false); toast('📅 היומן מחובר קבוע ✓ (' + email + ')'); })
+      .catch(e => setErr(e && e.code === 'bridge_auth' ? 'הקוד בגשר לא תואם — העתק שוב את הקוד, הדבק ופרסם גרסה חדשה' : 'לא הצלחתי להתחבר לגשר. בדוק שבפרסום בחרת "Anyone" ושהקישור נגמר ב-exec'))
+      .finally(() => setBusy(false)); };
+  if (gb && !open) return html`<div className="mt-3 rounded-2xl glass-soft p-3 text-sm">
+    <span className="text-ok font-bold">🔒 חיבור קבוע פעיל</span> <span className="text-muted">— היומן לא יתנתק יותר, בלי חלונות התחברות.</span>
+    <div className="mt-2 flex gap-2"><${Btn} onClick=${start}>הגדרה מחדש<//><${Btn} onClick=${() => setConfig({ gbridge: null })}>ביטול החיבור הקבוע<//></div></div>`;
+  if (!open) return html`<div className="mt-3 rounded-2xl glass-soft p-3 text-sm">
+    <b className="block">🔒 חיבור קבוע ליומן (מומלץ)</b>
+    <span className="block text-xs text-muted">גוגל מנתקת את החיבור הרגיל כל שעה. חיבור קבוע עובד דרך סקריפט קטן בחשבון היומן שלך — מגדירים פעם אחת (5 דקות) והוא לא מתנתק לעולם.</span>
+    <${Btn} kind="grad" className="mt-2" onClick=${start}>הגדרת חיבור קבוע<//></div>`;
+  return html`<div className="mt-3 rounded-2xl glass-soft p-3 text-sm space-y-3">
+    <b className="block">🔒 הגדרת חיבור קבוע — 4 צעדים</b>
+    <div><b>1.</b> העתק את הקוד: <${Btn} kind="grad" onClick=${copy}>📋 העתק קוד<//></div>
+    <div><b>2.</b> פתח את <a className="underline font-bold" href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com</a> בחשבון של היומן (yasharulpan). מחק את מה שכתוב שם, הדבק את הקוד ולחץ 💾 שמירה.
+      <span className="block text-xs text-muted">באייפון: אם זה לא נפתח טוב — בספארי לחץ על <b>aA</b> ← <b>בקשת אתר שולחני</b>.</span></div>
+    <div><b>3.</b> פרסום:
+      <ul className="mt-1 list-disc pr-5 space-y-0.5" dir="rtl">
+        <li>למעלה לחץ <b dir="ltr">Deploy</b> ← <b dir="ltr">New deployment</b></li>
+        <li>ליד <b dir="ltr">Select type</b> לחץ ⚙️ ובחר <b dir="ltr">Web app</b></li>
+        <li><b dir="ltr">Execute as</b>: <b dir="ltr">Me</b> · <b dir="ltr">Who has access</b>: <b dir="ltr">Anyone</b></li>
+        <li>לחץ <b dir="ltr">Deploy</b> ואשר הרשאות: <b dir="ltr">Authorize</b> ← בחר את החשבון ← <b dir="ltr">Advanced</b> ← <b dir="ltr">Go to…</b> ← <b dir="ltr">Allow</b></li>
+      </ul></div>
+    <div><b>4.</b> העתק את ה-<b dir="ltr">Web app URL</b> והדבק כאן:
+      <input className="field mt-1" dir="ltr" placeholder="https://script.google.com/macros/s/.../exec" value=${url} onInput=${e => setUrl(e.target.value)} /></div>
+    ${err && html`<p role="alert" className="text-bad">${err}</p>`}
+    <div className="flex gap-2"><${Btn} kind="grad" disabled=${busy} onClick=${save}>${busy ? 'בודק…' : 'שמירה ובדיקה'}<//><${Btn} onClick=${() => setOpen(false)}>ביטול<//></div>
+    <details className="text-xs text-muted"><summary>הצג את הקוד</summary><pre dir="ltr" className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap rounded-xl bg-black/30 p-2 text-[10px] select-all">${bridgeCode(secret)}</pre></details>
+  </div>`;
+}
+
 function Settings({ data, book = [], setBook, gsync, freshData, setData, setConfig, renameType, mode, lastSync, theme, setTheme, backup, toast }) {
   const fileRef = useRef(null);
   const [open, setOpen] = useState('look');
@@ -2503,8 +2572,9 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
                 ${data.gsync && data.gsync.calendarId && !gsync.calendars.some(c => c.id === data.gsync.calendarId) && html`<option value=${data.gsync.calendarId}>${data.gsync.calendarName || data.gsync.calendarId}</option>`}
               </select><//>
             <${Btn} onClick=${gsync.loadCalendars}>רענון רשימה<//>
-            <${Btn} onClick=${() => window.__gcalConnect && window.__gcalConnect().then(gsync.loadCalendars)}>🔗 חיבור חשבון יומן<//>
+            ${!(data.config || {}).gbridge && html`<${Btn} onClick=${() => window.__gcalConnect && window.__gcalConnect().then(gsync.loadCalendars)}>🔗 חיבור חשבון יומן<//>`}
           </div>
+          <${BridgeSetup} data=${data} setConfig=${setConfig} toast=${toast} />
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <div className="w-full rounded-2xl glass-soft px-3 py-2 text-sm">${(window.__gcalAccount && window.__gcalAccount()) || (window.__gcalRemembered && window.__gcalRemembered()) ? html`<span className="text-ok font-bold">● מחובר ליומן של </span><b dir="ltr">${(window.__gcalAccount && window.__gcalAccount()) || window.__gcalRemembered()}</b>` : html`<span className="text-warn font-bold">● יומן גוגל עוד לא מחובר במכשיר הזה</span>`}<span className="block text-xs text-muted">בסנכרון הבא: ${gsync.planNew} חדשים · ${gsync.planUpd} עדכונים · ${gsync.planDel} מחיקות${gsync.planNew ? ' — אירוע שכבר נמצא ביומן באותו יום ובשעה קרובה יקושר אליו ולא ישוכפל' : ''}</span></div>
             <${Btn} kind="grad" disabled=${gsync.running} onClick=${gsync.run}>${gsync.running ? 'מסנכרן ' + gsync.done + '/' + gsync.total + '…' : '📅 סנכרון עכשיו'}<//>
@@ -2767,6 +2837,7 @@ function App() {
   const { data, setData, mode, saveState, lastSync } = useStore();
   const { book, setBook } = usePhonebook();
   applyCfg(data.config);
+  window.__gcalBridge = (data.config || {}).gbridge || null;
   const { gigs, subs, clients } = data;
   const storedColors = (data.config || {}).clientColors;
   useMemo(() => buildRanks(gigs, storedColors), [gigs, storedColors]);

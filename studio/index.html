@@ -86,12 +86,36 @@ select.field option { color: #1d1238; background: #fff; }
 .today-fab { animation: todayIn .35s cubic-bezier(.2,.9,.3,1.3); }
 .today-fab .tile { transition: transform .2s; }
 .today-fab:active .tile { transform: rotate(-8deg) scale(.95); }
-@keyframes calIn { from { transform: translateX(var(--from, 0)); opacity: .3; } to { transform: none; opacity: 1; } }
 @keyframes pop { from { transform: translateY(14px) scale(.98); opacity: 0; } to { transform: none; opacity: 1; } }
 .shine { position: relative; overflow: hidden; }
 .shine::after { content: ''; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.28) 50%, transparent 70%); transform: translateX(120%); animation: shine 3.2s ease-in-out 1s 1; pointer-events: none; }
 @keyframes shine { to { transform: translateX(-120%); } }
 @media (prefers-reduced-motion: reduce) { .pop, .shine::after { animation: none; } }
+/* ===== תנועה חלקה + המסך לא זז לצדדים ===== */
+html, body { max-width: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
+@supports (overflow: clip) { html, body { overflow-x: clip; } }
+body { -webkit-tap-highlight-color: transparent; }
+main { touch-action: pan-y pinch-zoom; }
+.cal-clip { overflow: hidden; overflow: clip; overflow-clip-margin: 6px; }
+#root button:not(:disabled):not(.transition) { transition: transform .16s cubic-bezier(.2,.8,.2,1); }
+#root button:not(:disabled):active { transform: scale(.95); }
+.tabin { animation: tabIn .34s cubic-bezier(.2,.8,.2,1); }
+@keyframes tabIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes calIn { from { transform: translateX(var(--from, 0)); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (max-width: 639px) {
+  [role="dialog"].pop { animation: sheetUp .42s cubic-bezier(.16,1,.3,1); }
+}
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+.fx-burst { position: fixed; inset: 0; z-index: 10000; pointer-events: none; overflow: hidden; }
+.fx-burst span { position: absolute; top: 0; left: 0; will-change: transform, opacity; line-height: 1; }
+.fx-badge { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); padding: 14px 24px; border-radius: 999px; background: var(--grad); color: #fff;
+  font: 800 20px Rubik, system-ui, sans-serif; white-space: nowrap; box-shadow: 0 18px 50px color-mix(in srgb, var(--accent3) 55%, transparent); animation: fxBadge 1.9s cubic-bezier(.2,.9,.3,1.3) forwards; }
+@keyframes fxBadge { 0% { transform: translate(-50%, -50%) scale(.3) rotate(-8deg); opacity: 0; } 18% { transform: translate(-50%, -50%) scale(1.08) rotate(2deg); opacity: 1; }
+  28% { transform: translate(-50%, -50%) scale(1) rotate(0); } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -62%) scale(.9); opacity: 0; } }
+.justadded { animation: justAdded 1.1s cubic-bezier(.2,.9,.3,1.3) 2; position: relative; z-index: 2; }
+@keyframes justAdded { 0% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent2) 80%, transparent); }
+  25% { transform: scale(1.14); } 50% { transform: scale(1); } 100% { box-shadow: 0 0 0 10px transparent; } }
+@media (prefers-reduced-motion: reduce) { .tabin, .justadded, .fx-badge, [role="dialog"].pop { animation: none !important; } }
 .ltr { direction: ltr; unicode-bidi: isolate; }
 a[href^="https://wa.me"] { background: #1fa855 !important; color: #fff !important; border-color: transparent !important; }
 a[href^="https://wa.me"]:hover { background: #18914a !important; }
@@ -102,7 +126,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012095819';
+window.STUDIO_VERSION = '20261012100743';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1043,6 +1067,33 @@ const Btn = ({ kind = 'glass', className = '', ...p }) => {
 const LinkBtn = ({ href, children }) => html`<a href=${href} target="_blank" rel="noopener" className="inline-flex items-center gap-1.5 rounded-full glass-soft px-4 py-2 text-sm font-semibold hover:bg-[var(--glass-2)]">${children}</a>`;
 const Panel = ({ className = '', children }) => html`<div className=${'glass rounded-3xl ' + className}>${children}</div>`;
 
+/* ===== אפקטים כיפיים: פיצוץ קונפטי + תגית, וזוהר על אירוע שנוסף ===== */
+const JUST = { id: null, at: 0 };
+const justCls = id => JUST.id === id && Date.now() - JUST.at < 6000 ? ' justadded' : '';
+const celebrate = kind => {
+  try { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
+  const box = document.createElement('div'); box.className = 'fx-burst'; box.setAttribute('aria-hidden', 'true'); document.body.appendChild(box);
+  const emo = kind === 'paid' ? ['💰', '💸', '🪙', '✨', '💵'] : ['🥁', '🎶', '✨', '🎉', '🥳', '🎵'];
+  const cols = ['#f59e0b', '#ec4899', '#8b5cf6', '#22d3ee', '#f43f5e', '#facc15', '#34d399'];
+  const W = window.innerWidth, H = window.innerHeight, ox = W / 2, oy = H * 0.6;
+  for (let i = 0; i < 38; i++) {
+    const e = document.createElement('span'); const isE = i < 13;
+    if (isE) { e.textContent = emo[i % emo.length]; e.style.fontSize = (22 + Math.random() * 18) + 'px'; }
+    else { e.style.width = (6 + Math.random() * 6) + 'px'; e.style.height = (9 + Math.random() * 9) + 'px'; e.style.background = cols[i % cols.length]; e.style.borderRadius = i % 3 ? '2px' : '50%'; }
+    box.appendChild(e);
+    const ang = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.15, v = H * (0.3 + Math.random() * 0.32);
+    const dx = Math.cos(ang) * v * 0.85, dy = Math.sin(ang) * v, r = (Math.random() - 0.5) * 720;
+    e.animate([
+      { transform: 'translate(' + ox + 'px,' + oy + 'px) scale(.2) rotate(0deg)', opacity: 1 },
+      { transform: 'translate(' + (ox + dx) + 'px,' + (oy + dy) + 'px) scale(1) rotate(' + r * 0.5 + 'deg)', opacity: 1, offset: 0.42 },
+      { transform: 'translate(' + (ox + dx * 1.2) + 'px,' + (oy + dy + H * 0.5) + 'px) scale(.85) rotate(' + r + 'deg)', opacity: 0 }
+    ], { duration: 1500 + Math.random() * 800, easing: 'cubic-bezier(.12,.75,.3,1)', fill: 'forwards' });
+  }
+  const b = document.createElement('div'); b.className = 'fx-badge'; b.textContent = kind === 'paid' ? '💰 שולם! יאללה' : '🥁 נכנס ליומן!'; box.appendChild(b);
+  try { navigator.vibrate && navigator.vibrate([14, 50, 22]); } catch (e) {}
+  setTimeout(() => box.remove(), 2600);
+};
+
 function Modal({ title, onClose, children, wide, z }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -1660,8 +1711,9 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
     if (s0.lock === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) s0.lock = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
     if (s0.lock === 'x') { s0.dx = dx; if (gridRef.current) { gridRef.current.style.transition = 'none'; gridRef.current.style.transform = 'translateX(' + dx * 0.6 + 'px)'; gridRef.current.style.opacity = String(1 - Math.min(Math.abs(dx) / 600, .4)); } } };
   const onTE = () => { const s0 = swipe.current; swipe.current = null; const el = gridRef.current;
-    if (el) { el.style.transition = 'transform .18s ease, opacity .18s ease'; el.style.transform = ''; el.style.opacity = ''; }
-    if (s0 && s0.lock === 'x' && Math.abs(s0.dx) > 50) move(s0.dx > 0 ? 1 : -1); };
+    const go = s0 && s0.lock === 'x' && Math.abs(s0.dx) > 50;
+    if (el && go) { el.style.transition = 'transform .15s cubic-bezier(.4,0,1,1), opacity .15s'; el.style.transform = 'translateX(' + (s0.dx > 0 ? 70 : -70) + '%)'; el.style.opacity = '0'; setTimeout(() => move(s0.dx > 0 ? 1 : -1), 130); return; }
+    if (el) { el.style.transition = 'transform .3s cubic-bezier(.2,.9,.3,1.2), opacity .2s ease'; el.style.transform = ''; el.style.opacity = ''; } };
   const [pick, setPick] = useState(null);
   const years = Array.from(new Set(gigs.map(g => +g.date.slice(0, 4)).concat([new Date().getFullYear()]))).sort();
 
@@ -1686,7 +1738,7 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
         <div className="grid grid-cols-7 text-center text-xs font-medium text-muted mb-1">
           ${["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"].slice(ws).concat(["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"].slice(0, ws)).map(d => html`<div key=${d} className="py-1">${d}</div>`)}
         </div>
-        <div ref=${gridRef} key=${toISO(cursor)} onTouchStart=${onTS} onTouchMove=${onTM} onTouchEnd=${onTE} onTouchCancel=${onTE} className="grid grid-cols-7 gap-1 sm:gap-2" style=${{ touchAction: 'pan-y', animation: slide ? 'calIn .25s ease-out' : 'none', '--from': (slide > 0 ? '-40%' : '40%') }}>
+        <div className="cal-clip"><div ref=${gridRef} key=${toISO(cursor)} onTouchStart=${onTS} onTouchMove=${onTM} onTouchEnd=${onTE} onTouchCancel=${onTE} className="grid grid-cols-7 gap-1 sm:gap-2" style=${{ touchAction: 'pan-y', animation: slide ? 'calIn .34s cubic-bezier(.2,.8,.2,1)' : 'none', '--from': (slide > 0 ? '-55%' : '55%') }}>
           ${cells.map((iso, i) => {
             if (!iso) return html`<div key=${'e' + i}></div>`;
             const evs = byDate[iso] || [];
@@ -1701,13 +1753,13 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
                 <span className=${'text-sm sm:text-base ' + (isToday ? 'self-start inline-flex h-7 w-7 items-center justify-center rounded-full grad font-bold' : evs.length || CFG.cellBoxes ? 'font-bold' : 'font-medium text-muted')}>${Number(iso.slice(8))}</span>
                 <span className=${'-mt-0.5 block truncate text-[9px] sm:text-[10px] leading-tight ' + (hebDate(iso).first ? 'font-bold text-[var(--ink)]' : 'text-muted')}>${hebDate(iso).day}</span>
                 <span className="flex flex-col gap-0.5 sm:gap-1 mt-0.5 sm:mt-1 min-w-0">
-                  ${evs.slice().sort(mineFirst).slice(0, 2).map(g => html`<span key=${g.id} className=${'block truncate rounded-md sm:rounded-full px-1 sm:px-2 py-px sm:py-0.5 text-[9px] sm:text-[11px] leading-tight font-semibold text-white ' + (g.subId ? 'opacity-80' : '')} style=${{ background: g.subId ? subChipBg(g) : colorOf(g).g }}>${g.subId ? SUB_ICON + ' ' : ''}${g.title}</span>`)}
+                  ${evs.slice().sort(mineFirst).slice(0, 2).map(g => html`<span key=${g.id} className=${'block truncate' + justCls(g.id) + ' rounded-md sm:rounded-full px-1 sm:px-2 py-px sm:py-0.5 text-[9px] sm:text-[11px] leading-tight font-semibold text-white ' + (g.subId ? 'opacity-80' : '')} style=${{ background: g.subId ? subChipBg(g) : colorOf(g).g }}>${g.subId ? SUB_ICON + ' ' : ''}${g.title}</span>`)}
                   ${evs.length > 2 && html`<span className="text-[9px] sm:text-[11px] leading-tight text-muted">+${evs.length - 2}</span>`}
                   ${(prepByDate[iso] || []).slice(0, 1).map(({ g, x }) => html`<span key=${'p' + g.id} title=${'ללמוד חומר: ' + prepWho(g)} className=${'block truncate rounded-md sm:rounded-full border border-dashed border-[var(--accent2)] px-1 sm:px-2 py-px text-[9px] sm:text-[11px] leading-tight font-semibold ' + (x.done ? 'opacity-50 line-through' : '')}>🎼 ללמוד · ${prepWho(g)}</span>`)}
                 </span>
               </button>`;
           })}
-        </div>
+        </div></div>
         <div className="mt-2 px-1">
           <button onClick=${() => setShowLegend(v => !v)} aria-expanded=${showLegend} className="text-xs font-medium text-muted hover:text-[var(--ink)]">
             ${showLegend ? 'הסתר סוגים ▴' : 'סוגי אירועים' + (Object.values(hidden).some(Boolean) ? ' · חלק מוסתרים' : '') + ' ▾'}</button>
@@ -2995,7 +3047,10 @@ function App() {
       clients: upsertClient(d.clients, g),
       subs: newSubRec ? d.subs.concat([newSubRec]) : d.subs
     }));
+    const isNew = !gigs.some(x => x.id === g.id);
+    JUST.id = g.id; JUST.at = Date.now();
     setEditing(null); setToast(newClient ? 'האירוע נשמר · ' + g.client.trim() + ' נוסף למאגר הלקוחות' : 'האירוע נשמר');
+    if (isNew) setTimeout(() => celebrate('gig'), 120);
   };
 
   const syncText = mode === 'account' ? ({ saving: 'שומר…', error: 'השמירה נכשלה — הנתונים שמורים במכשיר', full: 'האחסון מלא' }[saveState] || 'מסונכרן לחשבון שלך') : 'שמור במכשיר הזה';
@@ -3020,7 +3075,7 @@ function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-1.5 sm:px-4 pt-2 sm:pt-4" style=${{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}>
+      <main key=${tab} className="tabin mx-auto max-w-6xl px-1.5 sm:px-4 pt-2 sm:pt-4" style=${{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)' }}>
         ${showEmpty ? html`
           <${Panel} className="mx-auto max-w-lg p-8 text-center mt-6">
             <div className="text-5xl">🥁</div>
@@ -3102,6 +3157,7 @@ function App() {
           setToast({ msg: '📄 חשבונית מס סומנה כהופקה' + (num ? ' · #' + num : ''), undo: () => { update(id, prev); setToast('הסימון בוטל'); } }); }}
         onConfirm=${(method, date, receipt, newMode) => { const prev = { paidDate: paying.paidDate || '', method: paying.method || '', docNumber: paying.docNumber || '', docIssued: !!paying.docIssued, docMode: modeOf(paying) }, id = paying.id;
           update(id, Object.assign({ paidDate: date, method }, newMode ? { docMode: newMode, docNeeded: newMode !== 'none' } : {}, receipt ? { docNumber: receipt, docIssued: true } : {})); setPayId(null); setPayPreset(null);
+          if (!prev.paidDate) setTimeout(() => celebrate('paid'), 120);
           setToast({ msg: money(amt(paying)) + ' התקבלו ב' + method + (receipt ? ' · קבלה ' + receipt : ''), undo: () => { update(id, prev); setToast('הרישום בוטל'); } }); }} />`}
       ${docGig && html`<${DocSheet} gig=${docGig} kind=${docReq.kind} onClose=${() => setDocReq(null)}
         onUnset=${() => { update(docGig.id, docReq.kind === 'inv' ? { invIssued: false } : { docIssued: false }); setDocReq(null); setToast('ההפקה בוטלה'); }}

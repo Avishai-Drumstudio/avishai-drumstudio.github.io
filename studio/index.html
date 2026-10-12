@@ -102,7 +102,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012095134';
+window.STUDIO_VERSION = '20261012095819';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -469,8 +469,28 @@ const SHADE_SETS = {
   'הופעה': [['#1c1917', '#7c4a2d'], ['#0c0a09', '#57534e'], ['#44403c', '#a8a29e'], ['#422006', '#b45309'], ['#27272a', '#71717a'], ['#3b2416', '#c2884f'], ['#1f2937', '#6b7280'], ['#451a03', '#92400e'], ['#292524', '#d6d3d1'], ['#57534e', '#a16207']]
 };
 let CLIENT_RANK = {};
-const buildRanks = gigs => { const r = {}; Object.keys(SHADE_SETS).forEach(t => { const cnt = {}; gigs.forEach(g => { if (g.type === t && cleanName(g.client)) { const k = cleanName(g.client).toLowerCase(); cnt[k] = (cnt[k] || 0) + 1; } });
-  r[t] = {}; Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a] || a.localeCompare(b, 'he')).forEach((k, i) => { r[t][k] = i; }); }); CLIENT_RANK = r; for (const k in _colorCache) delete _colorCache[k]; };
+/* צבע קבוע לכל להקה/לקוח: נקבע פעם אחת ונשמר (config.clientColors), כך שהוספת אירוע לא מזיזה צבעים של אחרים */
+const assignClientColors = (gigs, stored) => {
+  const out = {}; let changed = false;
+  Object.keys(SHADE_SETS).forEach(t => {
+    const n = SHADE_SETS[t].length, cur = Object.assign({}, (stored || {})[t]);
+    const cnt = {}, first = {};
+    gigs.forEach(g => { if (g.type === t && cleanName(g.client)) { const k = cleanName(g.client).toLowerCase(); cnt[k] = (cnt[k] || 0) + 1; if (!first[k] || (g.date || '9') < first[k]) first[k] = g.date || '9'; } });
+    const fresh = !Object.keys(cur).length;
+    const order = Object.keys(cnt).filter(k => cur[k] === undefined)
+      .sort(fresh ? (a, b) => cnt[b] - cnt[a] || a.localeCompare(b, 'he') : (a, b) => (first[a] < first[b] ? -1 : first[a] > first[b] ? 1 : a.localeCompare(b, 'he')));
+    order.forEach(k => {
+      const use = new Array(n).fill(0); Object.keys(cur).forEach(x => { if (cnt[x]) use[cur[x] % n]++; });
+      let best = 0; for (let i = 1; i < n; i++) if (use[i] < use[best]) best = i;
+      cur[k] = best; changed = true;
+    });
+    out[t] = cur;
+  });
+  return changed ? out : null;
+};
+const buildRanks = (gigs, stored) => { if (stored) { CLIENT_RANK = stored; for (const k in _colorCache) delete _colorCache[k]; return; }
+  { const r = {}; Object.keys(SHADE_SETS).forEach(t => { const cnt = {}; gigs.forEach(g => { if (g.type === t && cleanName(g.client)) { const k = cleanName(g.client).toLowerCase(); cnt[k] = (cnt[k] || 0) + 1; } });
+  r[t] = {}; Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a] || a.localeCompare(b, 'he')).forEach((k, i) => { r[t][k] = i; }); }); CLIENT_RANK = r; for (const k in _colorCache) delete _colorCache[k]; } };
 const nameHash = s => { let h = 0; for (const c of cleanName(s).toLowerCase()) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
 const _colorCache = {};
 const colorOf = g => {
@@ -2695,7 +2715,8 @@ function App() {
   const { book, setBook } = usePhonebook();
   applyCfg(data.config);
   const { gigs, subs, clients } = data;
-  useMemo(() => buildRanks(gigs), [gigs]);
+  const storedColors = (data.config || {}).clientColors;
+  useMemo(() => buildRanks(gigs, storedColors), [gigs, storedColors]);
   const [history, setHistory] = useState([]);
   const [histOpen, setHistOpen] = useState(false);
   const [lastAt, setLastAt] = useState(0);
@@ -2713,6 +2734,13 @@ function App() {
     });
     setLastAt(Date.now());
   }, [data]);
+  /* צבעים קבועים ללהקות — רץ אחרי רישום ההיסטוריה כדי לא להיכנס ל"בטל" */
+  useEffect(() => {
+    if (mode === 'local' && !gigs.length) return;
+    const nc = assignClientColors(gigs, storedColors); if (!nc) return;
+    HIST.skip = true;
+    setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { clientColors: nc }) }));
+  }, [gigs, storedColors]);
   const restoreTo = idx => {
     const e = history[idx]; if (!e) return;
     HIST.skip = true;

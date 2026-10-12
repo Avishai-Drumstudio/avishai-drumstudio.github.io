@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link rel="preconnect" href="https://www.gstatic.com"><link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=7959d052">
+<link rel="stylesheet" href="app.css?v=d156d822">
 <style>
 :root {
   --bg: #140d2b; --glow-pct: 100%;
@@ -81,6 +81,8 @@ select.field option { color: #1d1238; background: #fff; }
 @keyframes todayRing { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent2) 70%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
 .today-ping { animation: todayRing 1s ease-out 3; }
 @keyframes todayIn { from { transform: translateY(30px) scale(.8); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes liveGlow { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent2) 60%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
+.today-live { animation: liveGlow 1.6s ease-in-out infinite; }
 .today-fab { animation: todayIn .35s cubic-bezier(.2,.9,.3,1.3); }
 .today-fab .tile { transition: transform .2s; }
 .today-fab:active .tile { transform: rotate(-8deg) scale(.95); }
@@ -100,7 +102,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012024022';
+window.STUDIO_VERSION = '20261012091704';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1138,6 +1140,10 @@ const planPrep = (date, lead, n, time, busy) => {
   }
   return out.sort().map(d => ({ date: d, time: time || '11:00', done: false }));
 };
+const DayTile = ({ iso, size = 24, live }) => { const d = D(iso || todayISO()); const m = d.toLocaleDateString('he-IL', { month: 'short' }).replace('.', '');
+  return html`<span className=${'inline-flex flex-col overflow-hidden rounded-[22%] bg-white text-center shadow-md ' + (live ? 'today-live' : '')} style=${{ width: size, height: size }}>
+    <span className="grad block font-bold leading-none" style=${{ fontSize: size * 0.22, padding: (size * 0.05) + 'px 0' }}>${m}</span>
+    <span className="flex flex-1 items-center justify-center font-extrabold leading-none text-[#1c1917]" style=${{ fontSize: size * 0.5 }}>${d.getDate()}</span></span>`; };
 const prepWho = g => cleanName(g.client) || cleanName(g.title) || autoTitle(g);
 const prepOf = g => g.prep && g.prep.on && PREP_TYPES.includes(g.type) ? (g.prep.sessions || []) : [];
 const SpeechRec = (() => { try { return window.SpeechRecognition || window.webkitSpeechRecognition || null; } catch (e) { return null; } })();
@@ -1570,7 +1576,7 @@ function GigDetails({ gig, sub, admin, book = [], update, hasSync, onEdit, onPay
 }
 
 /* ===== יומן ===== */
-function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDone }) {
+function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDone, todayTick, onAway }) {
   const [sheet, setSheet] = useState(null), [prepView, setPrepView] = useState(null);
   const [showLegend, setShowLegend] = useState(false);
   const t = todayISO();
@@ -1591,6 +1597,9 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
   const [slide, setSlide] = useState(0);
   const move = n => { setSlide(n); setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + n, 1)); };
   const curYM = t.slice(0, 7), viewYM = toISO(cursor).slice(0, 7), away = viewYM !== curYM;
+  const [todayPop, setTodayPop] = useState(false);
+  useEffect(() => { if (onAway) onAway(away); }, [away]);
+  useEffect(() => { if (!todayTick) return; goToday(); setTodayPop(true); const h = setTimeout(() => setTodayPop(false), 3200); return () => clearTimeout(h); }, [todayTick]);
   const goToday = () => { setSlide(viewYM > curYM ? -1 : 1); const d = D(t); setCursor(new Date(d.getFullYear(), d.getMonth(), 1)); setSelected(t); setPing(true); setTimeout(() => setPing(false), 3200); };
   /* החלקה ימינה/שמאלה על היומן מעבירה חודש (כמו ביומן גוגל). בעברית: גרירה ימינה = החודש הבא */
   const swipe = useRef(null), gridRef = useRef(null);
@@ -1700,13 +1709,12 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
             ${admin && Number(g.fee) > 0 ? html`<${Status} s=${payStatus(g)} />` : html`<${TypeChip} type=${g.type} small />`}
           </button></li>`)}</ul>`)}
       <//>`}
-      ${away && html`<button onClick=${goToday} aria-label="חזרה להיום" className="today-fab fixed z-30 flex items-center gap-2.5 rounded-full glass py-1.5 pe-4 ps-1.5 shadow-2xl" style=${{ left: '14px', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 6.4rem)', backdropFilter: 'blur(16px)' }}>
-        <span className="tile flex h-11 w-11 flex-col overflow-hidden rounded-xl bg-white text-center shadow-md">
-          <span className="grad block py-px text-[9px] font-bold leading-[13px]">${D(t).toLocaleDateString('he-IL', { month: 'short' })}</span>
-          <span className="block flex-1 text-xl font-extrabold leading-[28px] text-[#1c1917]">${Number(t.slice(8))}</span>
-        </span>
-        <span className="text-right leading-tight"><b className="block text-sm">היום</b><span className="block text-[11px] text-muted">${viewYM > curYM ? 'חזרה' : 'קדימה'} ${Math.abs((+viewYM.slice(0, 4) - +curYM.slice(0, 4)) * 12 + (+viewYM.slice(5) - +curYM.slice(5)))} חו׳</span></span>
-      </button>`}
+      ${todayPop && html`<div onClick=${() => setTodayPop(false)} className="today-fab fixed inset-x-0 z-30 mx-auto flex w-fit items-center gap-3 rounded-3xl glass px-4 py-3 shadow-2xl" style=${{ top: 'calc(env(safe-area-inset-top, 0px) + 5.2rem)', background: 'color-mix(in srgb, var(--bg) 94%, #7c3aed 6%)', border: '1px solid var(--glass-line)' }}>
+        <${DayTile} iso=${t} size=${52} />
+        <span className="leading-tight"><b className="block text-lg">${D(t).toLocaleDateString('he-IL', { weekday: 'long' })}</b>
+          <span className="block text-sm">${D(t).toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+          <span className="block text-xs text-muted">${hebDate(t).day} ${hebDate(t).month}</span></span>
+      </div>`}
     </div>`;
 }
 
@@ -2771,6 +2779,8 @@ function App() {
     CFG.glow.forEach((c, i) => r.setProperty('--glow-' + 'abc'[i], c));
     document.title = CFG.title || 'Studio Manager';
   }, [JSON.stringify(data.config || {})]);
+  const [todayTick, setTodayTick] = useState(0), [calAway, setCalAway] = useState(false), [, setNowTick] = useState(0);
+  useEffect(() => { const h = setInterval(() => setNowTick(x => x + 1), 60000); return () => clearInterval(h); }, []);
   const MAIN_TABS = ['calendar', 'list', 'clients', 'subs', 'admin'].map(id => TABS.find(t => t.id === id));
   const [login, setLogin] = useState(null); // 'setup' | 'login' | 'change'
   const replaceData = useCallback(v => setData(d => Object.assign({}, normalize(v), { admin: d.admin, config: (v && v.config) || d.config, gsync: d.gsync })), [setData]);
@@ -2985,7 +2995,7 @@ function App() {
                 <button onClick=${() => doneSession(g, i)} className="rounded-full grad px-3 py-1 text-xs font-bold">✓ בוצע</button></li>`)}
               ${due.map(x => html`<li key=${x.id} className="flex items-center gap-2 text-sm"><span className="min-w-0 flex-1">${x.text}<span className="block text-xs text-muted">${x.date < t0 ? fmtDay(x.date) : 'היום'}${x.time ? ' · ' + x.time : ''}</span></span>
               <button onClick=${() => onTodo(x.id, 'done')} className="rounded-full grad px-3 py-1 text-xs font-bold">✓ בוצע</button></li>`)}</ul></div>`; })()}
-          ${tab === 'calendar' && html`<${CalendarView} gigs=${gigs} subs=${subs} admin=${unlocked} gsyncUI=${gsyncUI} onOpen=${setOpenId} onAdd=${d => setEditing(blankGig(d))} onPrepDone=${(g, i, done) => update(g.id, { prep: Object.assign({}, g.prep, { sessions: g.prep.sessions.map((s, j) => j === i ? Object.assign({}, s, { done }) : s) }) })} />
+          ${tab === 'calendar' && html`<${CalendarView} gigs=${gigs} subs=${subs} admin=${unlocked} gsyncUI=${gsyncUI} onOpen=${setOpenId} onAdd=${d => setEditing(blankGig(d))} todayTick=${todayTick} onAway=${setCalAway} onPrepDone=${(g, i, done) => update(g.id, { prep: Object.assign({}, g.prep, { sessions: g.prep.sessions.map((s, j) => j === i ? Object.assign({}, s, { done }) : s) }) })} />
             ${unlocked && html`<${QuickStats} gigs=${gigs} go=${setTab} />`}`}
           ${tab === 'list' && html`<${GigList} gigs=${gigs} subs=${subs} onOpen=${setOpenId} admin=${unlocked} />`}
           ${tab === 'clients' && html`<${Clients} book=${book} admin=${false} gigs=${gigs} clients=${clients} setClients=${setClients} onRename=${(o, n) => setGigs(l => l.map(g => sameName(g.client, o) ? Object.assign({}, g, { client: n }) : g))} onOpen=${setOpenId} />`}
@@ -3013,9 +3023,9 @@ function App() {
             const badge = t.id === 'admin' && unlocked && (overdueCount + docCount) > 0;
             return html`
             <button key=${t.id} aria-current=${active ? 'page' : undefined}
-              onClick=${() => { if (t.id === 'admin' && !unlocked) return openAdmin(); setTab(t.id); window.scrollTo(0, 0); }}
+              onClick=${() => { if (t.id === 'admin' && !unlocked) return openAdmin(); if (t.id === 'calendar') setTodayTick(x => x + 1); setTab(t.id); window.scrollTo(0, 0); }}
               className=${'relative flex flex-1 min-w-0 flex-col items-center gap-0.5 rounded-[1.4rem] px-1 py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold transition ' + (active ? 'grad' : 'text-muted hover:text-[var(--ink)]')}>
-              <span className="text-base sm:text-lg leading-none" aria-hidden="true">${t.id === 'admin' ? (unlocked ? '🔓' : '🔒') : t.icon}</span>${t.label}
+              ${t.id === 'calendar' ? html`<span aria-hidden="true" className="leading-none"><${DayTile} size=${22} live=${calAway && tab === 'calendar'} /></span>` : html`<span className="text-base sm:text-lg leading-none" aria-hidden="true">${t.id === 'admin' ? (unlocked ? '🔓' : '🔒') : t.icon}</span>`}${t.id === 'calendar' && calAway && tab === 'calendar' ? 'להיום' : t.label}
               ${badge && html`<span className="absolute top-1.5 left-1/2 ms-3 h-2 w-2 rounded-full bg-rose-500"></span>`}
             </button>`;
           })}

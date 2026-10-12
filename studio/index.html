@@ -126,7 +126,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261012122423';
+window.STUDIO_VERSION = '20261012125732';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -264,8 +264,8 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   window.__gcalEnsure = function () {
     if (bridge() || tokOk()) return Promise.resolve(true);
     if (renewing) return renewing;
-    var g = gisConnect(true); if (!g) { calPrompt(true); return Promise.resolve(false); }
-    var tmo = new Promise(function (r) { setTimeout(r, 25000); });
+    var g = window.__gcalConnect(); if (!g) { calPrompt(true); return Promise.resolve(false); }
+    var tmo = new Promise(function (r) { setTimeout(r, 120000); });
     renewing = Promise.race([g, tmo]).then(function () { renewing = null; var ok = tokOk(); if (!ok) calPrompt(true); return ok; });
     return renewing;
   };
@@ -301,7 +301,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
           .catch(function () { saveTok(resp.access_token, ''); }).then(resolve);
       };
       c.error_callback = function (err) { window.__gcalLastErr = (err && err.type) || 'error'; if (!quiet && !(err && err.type === 'popup_closed')) toastMsg('החיבור ליומן לא הצליח: ' + ((err && err.type) || '')); resolve(); };
-      c.requestAccessToken(hint ? { login_hint: hint, hint: hint, prompt: '' } : { prompt: 'select_account' });
+      c.requestAccessToken(hint ? { hint: hint, prompt: '' } : { prompt: 'select_account' });
     });
   }
   window.__gcalConnect = function () {

@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link rel="preconnect" href="https://www.gstatic.com"><link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=3bc2c77c">
+<link rel="stylesheet" href="app.css?v=1f9143e5">
 <style>
 :root {
   --bg: #140d2b; --glow-pct: 100%;
@@ -144,7 +144,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261013122913';
+window.STUDIO_VERSION = '20261013123356';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1026,7 +1026,7 @@ const gEvent = (g, subs) => {
     g.equipment && 'ציוד: ' + g.equipment,
     g.notes, '— נוצר מ-Studio Manager'
   ].filter(Boolean).join('\n');
-  return { summary: (sub ? '🔁 ' : g.needSub ? '🚨 צריך מחליף · ' : '🥁 ') + autoTitle(g) + (sub ? ' · ' + sub.name : ''), startTime: `${g.date}T${st}:00${jlmOffset(g.date, st)}`, endTime: `${endDate}T${en}:00${jlmOffset(endDate, en)}`, timeZone: 'Asia/Jerusalem', colorId: gColorFor(g.type), location: [g.venue, g.address].filter(Boolean).join(', '), description: desc };
+  return { summary: (sub ? '🔁 ' : g.needSub ? '🚨 ' : '🥁 ') + (g.needSub && !sub ? autoTitle(g).replace(/\s*[—–]\s*/g, ' ') : autoTitle(g)) + (sub ? ' · ' + sub.name : g.needSub ? ' - למצוא מחליף' : ''), startTime: `${g.date}T${st}:00${jlmOffset(g.date, st)}`, endTime: `${endDate}T${en}:00${jlmOffset(endDate, en)}`, timeZone: 'Asia/Jerusalem', colorId: gColorFor(g.type), location: [g.venue, g.address].filter(Boolean).join(', '), description: desc };
 };
 const prepEvent = (g, x, i) => {
   const st = x.time || '11:00', [hh, mm] = st.split(':').map(Number), e = hh * 60 + mm + 120, en = pad(Math.min(23, Math.floor(e / 60))) + ':' + pad(e >= 1440 ? 59 : e % 60);
@@ -1826,7 +1826,7 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
                 <span className=${'text-sm sm:text-base ' + (isToday ? 'self-start inline-flex h-7 w-7 items-center justify-center rounded-full grad font-bold' : evs.length || CFG.cellBoxes ? 'font-bold' : 'font-medium text-muted')}>${Number(iso.slice(8))}</span>
                 <span className=${'-mt-0.5 block truncate text-[9px] sm:text-[10px] leading-tight ' + (hebDate(iso).first ? 'font-bold text-[var(--ink)]' : 'text-muted')}>${hebDate(iso).day}</span>
                 <span className="flex flex-col gap-0.5 sm:gap-1 mt-0.5 sm:mt-1 min-w-0">
-                  ${evs.slice().sort(mineFirst).slice(0, 2).map(g => html`<span key=${g.id} className=${'block truncate' + justCls(g.id) + (needsSub(g) ? ' needsub' : '') + ' rounded-md sm:rounded-full px-1 sm:px-2 py-px sm:py-0.5 text-[9px] sm:text-[11px] leading-tight font-semibold ' + (needsSub(g) ? '' : 'text-white ') + (g.subId ? 'opacity-80' : '')} style=${{ background: g.subId ? subChipBg(g) : needsSub(g) ? NEED_BG : colorOf(g).g, color: needsSub(g) ? '#111' : undefined, fontWeight: needsSub(g) ? 800 : undefined }}>${g.subId ? SUB_ICON + ' ' : needsSub(g) ? '🚨 ' : ''}${g.title}</span>`)}
+                  ${evs.slice().sort(mineFirst).slice(0, 2).map(g => html`<span key=${g.id} className=${'block ' + (needsSub(g) ? 'whitespace-normal break-words' : 'truncate') + justCls(g.id) + (needsSub(g) ? ' needsub' : '') + ' rounded-md sm:rounded-full px-1 sm:px-2 py-px sm:py-0.5 text-[9px] sm:text-[11px] leading-tight font-semibold ' + (needsSub(g) ? '' : 'text-white ') + (g.subId ? 'opacity-80' : '')} style=${needsSub(g) ? { background: NEED_BG, color: '#111', fontWeight: 800, display: '-webkit-box', WebkitLineClamp: 6, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.15 } : { background: g.subId ? subChipBg(g) : colorOf(g).g }}>${g.subId ? SUB_ICON + ' ' : needsSub(g) ? '🚨 ' : ''}${needsSub(g) ? String(g.title).replace(/\s*[—–]\s*/g, ' ') + ' - למצוא מחליף' : g.title}</span>`)}
                   ${evs.length > 2 && html`<span className="text-[9px] sm:text-[11px] leading-tight text-muted">+${evs.length - 2}</span>`}
                   ${(prepByDate[iso] || []).slice(0, 1).map(({ g, x }) => html`<span key=${'p' + g.id} title=${'ללמוד חומר: ' + prepWho(g)} className=${'block truncate rounded-md sm:rounded-full border border-dashed border-[var(--accent2)] px-1 sm:px-2 py-px text-[9px] sm:text-[11px] leading-tight font-semibold ' + (x.done ? 'opacity-50 line-through' : '')}>🎼 ללמוד · ${prepWho(g)}</span>`)}
                 </span>
@@ -2258,7 +2258,7 @@ function Subs({ admin, subs, gigs, setSubs, onOpen, onEdit, book = [] }) {
         <div className="flex items-center gap-2"><span className="text-2xl">🚨</span><b className="flex-1 text-lg">צריך למצוא מתופף · ${need.length}</b></div>
         <ul className="mt-2 space-y-1.5">${need.map(g => { const d = Math.round((D(g.date) - D(t)) / 864e5);
           return html`<li key=${g.id}><button onClick=${() => onEdit ? onEdit(g) : onOpen(g.id)} className="flex w-full items-center gap-2 rounded-2xl bg-black/10 px-3 py-2 text-right text-sm">
-            <span className="flex-1 min-w-0 truncate"><b>${fmtDate(g.date)}</b> · ${g.title}${g.venue ? ' · ' + g.venue : ''}</span>
+            <span className="flex-1 min-w-0 truncate"><b>${fmtDate(g.date)}</b> · ${String(g.title).replace(/\s*[—–]\s*/g, ' ')} - למצוא מחליף${g.venue ? ' · ' + g.venue : ''}</span>
             <span className="shrink-0 rounded-full bg-black px-2 py-0.5 text-xs font-bold text-[#e6ff00]">${d === 0 ? 'היום!' : d === 1 ? 'מחר!' : 'עוד ' + d + ' ימים'}</span>
             <span className="shrink-0 text-xs font-semibold underline">שיבוץ ‹</span></button></li>`; })}</ul>
       </div>`}

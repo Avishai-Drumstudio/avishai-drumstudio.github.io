@@ -82,7 +82,7 @@ select.field option { color: #1d1238; background: #fff; }
 .today-ping { animation: todayRing 1s ease-out 3; }
 @keyframes todayIn { from { transform: translateY(30px) scale(.8); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes liveGlow { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent2) 60%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
-.today-live { animation: liveGlow 1.6s ease-in-out infinite; }
+.today-live { animation: liveGlow 1.6s ease-in-out 4; }
 .today-fab { animation: todayIn .35s cubic-bezier(.2,.9,.3,1.3); }
 .today-fab .tile { transition: transform .2s; }
 .today-fab:active .tile { transform: rotate(-8deg) scale(.95); }
@@ -105,7 +105,11 @@ body { -webkit-tap-highlight-color: transparent; }
 input[type="time"].field, input[type="date"].field, input[type="datetime-local"].field { -webkit-appearance: none; appearance: none; display: block; min-width: 0; width: 100%; min-height: 2.75rem; }
 .grid > * { min-width: 0; }
 button, a, [role="button"] { touch-action: manipulation; }
-@media (max-width: 639px) { .glass { backdrop-filter: blur(10px) saturate(130%); -webkit-backdrop-filter: blur(10px) saturate(130%); } }
+@media (pointer: coarse) {
+  .glass { backdrop-filter: none; -webkit-backdrop-filter: none; background: color-mix(in srgb, var(--bg) 78%, rgba(255,255,255,.18)); }
+  header .glass, nav .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: color-mix(in srgb, var(--bg) 70%, transparent); }
+  .backdrop-blur-sm { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+}
 .tabin { animation: tabIn .28s cubic-bezier(.2,.8,.2,1); }
 @keyframes tabIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes calIn { from { transform: translateX(var(--from, 0)); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -138,7 +142,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261013113848';
+window.STUDIO_VERSION = '20261013121041';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -192,6 +196,9 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
 :root[data-theme="light"] .amb b{opacity:.35}
 @media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .amb i{filter:invert(1) sepia(1) saturate(3) hue-rotate(-15deg);opacity:.07}:root:not([data-theme="dark"]) .amb b{opacity:.35}}
 @media (prefers-reduced-motion: reduce){.amb i,.amb b{animation:none}}
+/* מהירות: הרקע החי + טשטוש זכוכית גרמו לציור מחדש של כל המסך בכל פריים (איטי מאוד באייפד) — הרקע נשאר אותו מראה אבל סטטי */
+.amb i,.amb b{animation:none!important;will-change:auto}
+@media (pointer: coarse){.amb b{filter:none;opacity:.4}}
 </style>
 <script>
 /* ===== גרסת גוגל: התחברות עם Google + שמירה ב-Firestore. מחליף את window.claude של Claude ===== */
@@ -2992,10 +2999,11 @@ function App() {
     setToast(err ? gErrMsg(err) : 'סונכרנו ' + done + ' שינויים ליומן גוגל ✓');
   };
   runSyncRef.current = runSync;
-  const gPending = mcpOk ? syncPlan(data).filter(t => !t.keep).length : 0;
-  const fullPending = mcpOk ? syncPlan(data, true).filter(t => !t.keep).length : 0;
+  const planNow = useMemo(() => mcpOk ? syncPlan(data) : [], [data, mcpOk]);
+  const gPending = planNow.filter(t => !t.keep).length;
+  const fullPending = useMemo(() => mcpOk ? syncPlan(data, true).filter(t => !t.keep).length : 0, [data, mcpOk]);
   const runFull = () => ask('להעביר ליומן גוגל את כל ההיסטוריה — ' + fullPending + ' אירועים? זה לוקח כמה דקות; השאר את האפליקציה פתוחה עד הסוף. מכאן והלאה הסנכרון הרגיל ימשיך לעדכן רק מהחודש האחרון.', { ok: 'התחל סנכרון מלא' }).then(ok => ok && runSync(true));
-  const planNow = mcpOk ? syncPlan(data) : [], planNew = planNow.filter(t => t.op === 'create').length, planUpd = planNow.filter(t => t.op === 'update').length, planDel = planNow.filter(t => t.op === 'delete' && !t.keep).length;
+  const planNew = planNow.filter(t => t.op === 'create').length, planUpd = planNow.filter(t => t.op === 'update').length, planDel = planNow.filter(t => t.op === 'delete' && !t.keep).length;
   const gsyncApi = { planNew, planUpd, planDel, fullPending, runFull, ok: mcpOk, pending: gPending, running: gsRun.running, done: gsRun.done, total: gsRun.total, error: gsRun.error, run: runSync, calendars: gCals, loadCalendars, setCalendar };
   const gsyncUI = mcpOk && gigs.length > 0 ? html`
     <div className="mt-3 flex items-center gap-2 px-1">

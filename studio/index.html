@@ -106,6 +106,8 @@ input[type="time"].field, input[type="date"].field, input[type="datetime-local"]
 .grid > * { min-width: 0; }
 button, a, [role="button"] { touch-action: manipulation; }
 @media (pointer: coarse) {
+  body::after { display: none; }
+  main li.glass, main li.glass-soft { content-visibility: auto; contain-intrinsic-size: auto 96px; }
   .glass { backdrop-filter: none; -webkit-backdrop-filter: none; background: color-mix(in srgb, var(--bg) 78%, rgba(255,255,255,.18)); }
   header .glass, nav .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: color-mix(in srgb, var(--bg) 70%, transparent); }
   .backdrop-blur-sm { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
@@ -142,7 +144,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261013121041';
+window.STUDIO_VERSION = '20261013122016';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -451,7 +453,7 @@ const toISO = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate(
 const todayISO = () => toISO(new Date());
 const D = iso => new Date(iso + 'T12:00:00');
 const addDays = (iso, n) => { const d = D(iso); d.setDate(d.getDate() + n); return toISO(d); };
-const fmtDate = iso => iso ? D(iso).toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric', year: 'numeric' }) : '—';
+const fmtDate = iso => { if (!iso) return '—'; const p = String(iso).slice(0, 10).split('-'); return p.length === 3 ? (+p[2]) + '.' + (+p[1]) + '.' + p[0] : '—'; };
 /* תאריך עברי קטן */
 const HEB_FMT = (() => { try { return new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long' }); } catch (e) { return null; } })();
 const gematria = n => { if (n === 15) return 'ט״ו'; if (n === 16) return 'ט״ז'; const t = ['', 'י', 'כ', 'ל'][Math.floor(n / 10)] || '', u = ['', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט'][n % 10]; const s = t + u; return s.length > 1 ? s.slice(0, -1) + '״' + s.slice(-1) : s + '׳'; };
@@ -469,7 +471,8 @@ const hebDate = iso => {
 };
 const fmtDay = iso => D(iso).toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
 const monthShort = iso => D(iso).toLocaleDateString('he-IL', { month: 'short' });
-const money = n => '₪' + Math.round(Number(n) || 0).toLocaleString('he-IL');
+const NF0 = new Intl.NumberFormat('he-IL', { maximumFractionDigits: 0 }), NF2 = new Intl.NumberFormat('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const money = n => '₪' + NF0.format(Math.round(Number(n) || 0));
 const uid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'g' + Date.now() + Math.random().toString(16).slice(2);
 const daysBetween = (a, b) => Math.round((D(b) - D(a)) / 86400000);
 const intlPhone = p => { const d = (p || '').replace(/\D/g, ''); return d.startsWith('0') ? '972' + d.slice(1) : d; };
@@ -598,7 +601,7 @@ const greetName = n => { const full = cleanName(n); if (!full || CFG.firstNameOn
 const remindPhone = g => g.contactPhone || g.phone || '';
 /* פירוט הסכום להודעות: בסיס, אובר טיים, תוספת מרחק, מע״מ, סה״כ */
 const hhmm = h => { const m = Math.round((Number(h) || 0) * 60); return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); };
-const money2 = n => { const v = Math.round((Number(n) || 0) * 100) / 100; return '₪' + v.toLocaleString('he-IL', { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 }); };
+const money2 = n => { const v = Math.round((Number(n) || 0) * 100) / 100; return '₪' + (v % 1 ? NF2 : NF0).format(v); };
 const hasExtras = g => !!(otAmt(g) || Number(g.travelFee) || (g.vat && g.vat !== 'none' && vatPart(g)));
 const breakdownLines = g => {
   const L = [], r = vatRateOf(g), ex = g.vat === 'incl' ? 1 + r / 100 : 1;
@@ -1991,7 +1994,8 @@ function GigList({ gigs, subs, onOpen, admin }) {
 /* ===== תשלומים ===== */
 function Payments({ gigs, onOpen, onPay, onInvoice, update }) {
   const undoPaid = g => ask('לבטל את רישום התשלום של ' + (g.client || g.title) + '? הוא יחזור להיות "ממתין".', { ok: 'ביטול תשלום' }).then(ok => ok && update(g.id, { paidDate: '', method: '' }));
-  const [filter, setFilter] = useState('פתוחים');
+  const [filter, setFilter0] = useState('פתוחים'), [limit, setLimit] = useState(20);
+  const setFilter = f => { setFilter0(f); setLimit(20); };
   const billable = gigs.filter(g => Number(g.fee) > 0);
   const counts = { 'פתוחים': 0, 'באיחור': 0, 'ממתין': 0, 'עתידי': 0, 'שולם': 0, 'הכל': billable.length };
   billable.forEach(g => { const s = payStatus(g); counts[s] = (counts[s] || 0) + 1; if (s === 'ממתין' || s === 'באיחור') counts['פתוחים']++; });
@@ -2038,7 +2042,7 @@ function Payments({ gigs, onOpen, onPay, onInvoice, update }) {
           </li>`)}</ul>`) : html`
       <${Chips} items=${['פתוחים', 'באיחור', 'ממתין', 'עתידי', 'שולם', 'הכל']} value=${filter} onChange=${setFilter} counts=${counts} />
       ${list.length === 0 ? html`<${Empty}>אין תשלומים בסינון הזה.<//>` : html`
-      <ul className="space-y-2">${list.map(g => {
+      <ul className="space-y-2">${list.slice(0, limit).map(g => {
         const s = payStatus(g), late = s === 'באיחור' ? daysBetween(g.dueDate, t) : 0;
         return html`<li key=${g.id} className=${'glass rounded-3xl p-4 ' + (s === 'באיחור' ? 'ring-1 ring-rose-400/60' : '')}>
           <div className="flex items-start gap-3">
@@ -2065,7 +2069,8 @@ function Payments({ gigs, onOpen, onPay, onInvoice, update }) {
           </div>
           ${!g.paidDate && html`<${RemindNote} gigs=${[g]} className="mt-1.5 text-center" />`}
         </li>`;
-      })}</ul>`}`}
+      })}</ul>
+      ${list.length > limit && html`<button onClick=${() => setLimit(x => x + 30)} className="w-full rounded-2xl glass-soft py-3 text-sm font-semibold">הצג עוד (${list.length - limit})</button>`}`}`}
     </div>`;
 }
 

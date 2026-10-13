@@ -99,7 +99,11 @@ body { -webkit-tap-highlight-color: transparent; }
 #root button:not(:disabled):not(.transition) { transition: transform .16s cubic-bezier(.2,.8,.2,1); }
 #root button:not(:disabled):active { transform: scale(.97); }
 .scroll-x { overscroll-behavior-x: contain; scroll-behavior: smooth; touch-action: pan-x pan-y; }
-[role="dialog"] { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+[role="dialog"] { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; overflow-x: hidden; overflow-x: clip; touch-action: pan-y pinch-zoom; }
+/* שדות תאריך/שעה באייפון רחבים מהעמודה ודחפו את החלון לצדדים */
+.field { min-width: 0; max-width: 100%; }
+input[type="time"].field, input[type="date"].field, input[type="datetime-local"].field { -webkit-appearance: none; appearance: none; display: block; min-width: 0; width: 100%; min-height: 2.75rem; }
+.grid > * { min-width: 0; }
 button, a, [role="button"] { touch-action: manipulation; }
 @media (max-width: 639px) { .glass { backdrop-filter: blur(10px) saturate(130%); -webkit-backdrop-filter: blur(10px) saturate(130%); } }
 .tabin { animation: tabIn .28s cubic-bezier(.2,.8,.2,1); }
@@ -129,7 +133,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261013085020';
+window.STUDIO_VERSION = '20261013085244';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {

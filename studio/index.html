@@ -129,7 +129,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261013003357';
+window.STUDIO_VERSION = '20261013085020';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -578,11 +578,28 @@ const TITLES = ['הרב', 'ר׳', "ר'", 'רבי', 'ד"ר', 'ד״ר', 'דר', '�
 const greetName = n => { const full = cleanName(n); if (!full || CFG.firstNameOnly === false) return full; const w = full.split(' ');
   let i = 0; while (i < w.length - 1 && TITLES.includes(w[i])) i++; return i > 0 ? w.slice(0, i + 1).join(' ') : w[0]; };
 const remindPhone = g => g.contactPhone || g.phone || '';
-const reminderMsg = (list, name) => (CFG.reminderText || DEFAULT_CONFIG.reminderText)
+/* פירוט הסכום להודעות: בסיס, אובר טיים, תוספת מרחק, מע״מ, סה״כ */
+const hhmm = h => { const m = Math.round((Number(h) || 0) * 60); return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); };
+const money2 = n => { const v = Math.round((Number(n) || 0) * 100) / 100; return '₪' + v.toLocaleString('he-IL', { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 }); };
+const hasExtras = g => !!(otAmt(g) || Number(g.travelFee) || (g.vat && g.vat !== 'none' && vatPart(g)));
+const breakdownLines = g => {
+  const L = [], r = vatRateOf(g), ex = g.vat === 'incl' ? 1 + r / 100 : 1;
+  L.push('• בסיס: ' + money2((Number(g.fee) || 0) / ex));
+  if (otAmt(g)) L.push('• אובר טיים (' + hhmm(g.otHours) + ' ש׳ × ' + money2(g.otRate) + ' לשעה): ' + money2(otAmt(g) / ex));
+  if (Number(g.travelFee)) L.push('• תוספת מרחק: ' + money2(Number(g.travelFee) / ex));
+  if (g.vat === 'plus' || g.vat === 'incl') L.push('• מע״מ ' + r + '%: ' + money2(vatPart(g)));
+  L.push('סה״כ: ' + money2(amt(g)));
+  return L.join('\n');
+};
+const breakdownOf = list => { const xs = list.filter(hasExtras); if (!xs.length) return '';
+  return list.length === 1 ? 'פירוט:\n' + breakdownLines(list[0]) : list.map(g => (g.title || autoTitle(g)) + ' (' + fmtDate(g.date) + '):\n' + breakdownLines(g)).join('\n\n') + '\n\nסה״כ לתשלום: ' + money2(list.reduce((a, g) => a + amt(g), 0)); };
+const reminderMsg = (list, name) => { const tpl = CFG.reminderText || DEFAULT_CONFIG.reminderText, bd = breakdownOf(list);
+  const out = tpl
   .split('{שם}').join(greetName(name || (list[0] && (list[0].contactName || list[0].client)) || ''))
   .split('{אירוע}').join(list.map(g => g.title).join(', '))
   .split('{תאריך}').join(list.map(g => fmtDate(g.date)).join(', '))
-  .split('{סכום}').join(money(list.reduce((a, g) => a + amt(g), 0)));
+  .split('{סכום}').join(money2(list.reduce((a, g) => a + amt(g), 0)));
+  return tpl.includes('{פירוט}') ? out.split('{פירוט}').join(bd) : (bd ? out + '\n\n' + bd : out); };
 const remindUrl = g => waUrl(remindPhone(g), reminderMsg([g]));
 const hasBank = () => { const b = CFG.bank || {}; return !!(b.account || b.bit); };
 const bankMsg = (gigs, name) => { const b = CFG.bank || {}, tot = gigs.reduce((a, g) => a + amt(g), 0);
@@ -2539,8 +2556,8 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
         <div className="mb-5"></div>
         <span className="mb-1 block text-sm font-bold">תזכורת תשלום ללקוח</span>
         <${Label} text="נוסח ההודעה"><textarea rows="4" className="field" value=${cfg.reminderText} onChange=${e => setConfig({ reminderText: e.target.value })}></textarea><//>
-        <p className="mt-1 text-xs text-muted">אפשר להשתמש ב: {שם} · {אירוע} · {תאריך} · {סכום} — הם יוחלפו בפרטים האמיתיים.</p>
-        <div className="mt-2 rounded-2xl glass-soft px-3 py-2 text-sm"><span className="text-xs text-muted">תצוגה מקדימה: </span>${reminderMsg([{ title: 'חתונה בהאנגר 11', date: todayISO(), fee: 2800, vat: 'none', contactName: 'אבישי ישר מתופף' }])}</div>
+        <p className="mt-1 text-xs text-muted">אפשר להשתמש ב: {שם} · {אירוע} · {תאריך} · {סכום} · {פירוט} — הם יוחלפו בפרטים האמיתיים. כשיש אובר טיים, תוספת מרחק או מע״מ — הפירוט נוסף אוטומטית בסוף ההודעה.</p>
+        <div className="mt-2 rounded-2xl glass-soft px-3 py-2 text-sm"><span className="text-xs text-muted">תצוגה מקדימה: </span><span className="whitespace-pre-line">${reminderMsg([{ title: 'חתונה בהאנגר 11', date: todayISO(), fee: 1200, otHours: 1.75, otRate: 300, vat: 'plus', contactName: 'אבישי ישר מתופף' }])}</span></div>
       <//>
 
       <${Section} icon="⏱️" title="ברירות מחדל\" sub="שעות, ימי תשלום, מע״מ, תחילת שבוע" open=${open === 'defaults'} onToggle=${() => tog('defaults')}>

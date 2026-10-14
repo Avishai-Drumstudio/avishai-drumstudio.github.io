@@ -144,7 +144,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261014102506';
+window.STUDIO_VERSION = '20261014103736';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -964,7 +964,42 @@ function useStore() {
     }, 700);
   }, [data]);
 
+  /* גיבוי אוטומטי בענן: פעם ביום עותק מלא, 14 ימים אחורה (כל יום תופס "מגירה" אחת מתוך 14) */
+  useEffect(() => {
+    if (mode !== 'account' || !ready.current || !colRef.current || !data.gigs.length) return;
+    const day = todayISO(); let last = ''; try { last = localStorage.getItem('studio-cloud-backup') || ''; } catch (e) {}
+    if (last === day) return;
+    const h = setTimeout(async () => {
+      try {
+        const json = JSON.stringify({ gigs: data.gigs, subs: data.subs, clients: data.clients, config: data.config, admin: data.admin, gsync: data.gsync });
+        if (json.length > 950000) return;
+        const slot = Math.floor(Date.now() / 864e5) % 14;
+        await colRef.current.doc('backup-' + slot).set({ day, at: Date.now(), count: data.gigs.length, json });
+        try { localStorage.setItem('studio-cloud-backup', day); } catch (e) {}
+      } catch (e) {}
+    }, 5000);
+    return () => clearTimeout(h);
+  }, [data, mode]);
+  window.__studioBackups = {
+    list: async () => { if (!colRef.current) return []; const r = await Promise.all(Array.from({ length: 14 }, (_, i) => colRef.current.doc('backup-' + i).get().catch(() => null)));
+      return r.map((x, i) => x && x.exists ? Object.assign({ slot: i }, x.data()) : null).filter(Boolean).sort((a, b) => b.at - a.at); },
+    restore: b => { const v = JSON.parse(b.json); setData(d => normalize(Object.assign({}, v, { gsync: d.gsync }))); }
+  };
   return { data, setData, mode, saveState, lastSync };
+}
+
+function CloudBackups({ toast }) {
+  const [list, setList] = useState(null);
+  const load = () => { setList('loading'); window.__studioBackups.list().then(setList).catch(() => setList([])); };
+  if (!window.__studioBackups) return null;
+  return html`<div className="mt-4 rounded-2xl glass-soft p-3 text-sm">
+    <b className="block">☁️ גיבוי אוטומטי בענן</b>
+    <span className="block text-xs text-muted">כל יום נשמר לבד עותק מלא של כל הנתונים, 14 ימים אחורה. אם משהו נמחק או השתבש — אפשר לחזור ליום קודם.</span>
+    ${list === null ? html`<${Btn} className="mt-2" onClick=${load}>הצג גיבויים<//>` : list === 'loading' ? html`<p className="mt-2 text-muted">טוען…</p>` : list.length === 0 ? html`<p className="mt-2 text-muted">עוד אין גיבויים — הראשון יישמר היום.</p>` : html`
+      <ul className="mt-2 divide-y divide-[var(--glass-line)]">${list.map(b => html`<li key=${b.slot} className="flex items-center gap-2 py-1.5">
+        <span className="flex-1">${fmtDate(b.day)} · ${b.count} אירועים</span>
+        <${Btn} onClick=${() => ask('לחזור לגיבוי מ־' + fmtDate(b.day) + '? כל הנתונים יחזרו למצב של אותו יום.', { danger: true, ok: 'שחזור' }).then(ok => { if (ok) { window.__studioBackups.restore(b); toast('שוחזר הגיבוי מ־' + fmtDate(b.day)); } })}>שחזור<//></li>`)}</ul>`}
+  </div>`;
 }
 
 /* ===== ספר טלפונים מיובא (מסמך נפרד, כדי לא להכביד על הנתונים) ===== */
@@ -2654,13 +2689,14 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
       <//>
 
       ${window.__studioIsOwner && window.__studioFriends && html`<${Section} icon="👥" title="חברים מורשים" sub="מי יכול להיכנס לאפליקציה" open=${open === 'friends'} onToggle=${() => tog('friends')}><${FriendsSection} toast=${toast} /><//>`}
-      <${Section} icon="💾" title="גיבוי" sub="הורדה ושחזור של כל הנתונים" open=${open === 'backup'} onToggle=${() => tog('backup')}>
+      <${Section} icon="💾" title="גיבוי" sub="גיבוי יומי אוטומטי בענן · הורדה ושחזור" open=${open === 'backup'} onToggle=${() => tog('backup')}>
         <p className="text-sm text-muted">הקובץ כולל אירועים, לקוחות, מחליפים, אנשי קשר, הסיסמה וההגדרות. שמור אותו בתיקייה בגוגל דרייב.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <${Btn} kind="grad" onClick=${backup}>הורדת גיבוי<//>
           <${Btn} onClick=${() => fileRef.current && fileRef.current.click()}>שחזור מגיבוי<//>
           <input ref=${fileRef} type="file" accept=".json,application/json" className="hidden" onChange=${restore} />
         </div>
+        <${CloudBackups} toast=${toast} />
       <//>
 
       <${Section} icon="📅" title="יומן גוגל" sub=${gsync.ok ? (gsync.pending ? gsync.pending + ' שינויים ממתינים לסנכרון' : 'מסונכרן') : 'הוספת אירועים ליומן'} open=${open === 'gcal'} onToggle=${() => tog('gcal')}>

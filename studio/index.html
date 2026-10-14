@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261015012139';
+window.STUDIO_VERSION = '20261015012627';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -226,7 +226,11 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
 @media (prefers-reduced-motion: reduce){.amb i,.amb b{animation:none}}
 /* מהירות: הרקע החי + טשטוש זכוכית גרמו לציור מחדש של כל המסך בכל פריים (איטי מאוד באייפד) — הרקע נשאר אותו מראה אבל סטטי */
 .amb i,.amb b{animation:none!important;will-change:auto}
-@media (pointer: coarse){.amb b{filter:none;opacity:.4}}
+@media (pointer: coarse){.amb b{filter:none}}
+/* ערפל עדין יותר — שלא יסתיר את היומן */
+.amb i{opacity:.035!important}
+.amb i:nth-child(2){opacity:.025!important}
+.amb b{opacity:.16!important}
 </style>
 <script>
 /* ===== גרסת גוגל: התחברות עם Google + שמירה ב-Firestore. מחליף את window.claude של Claude ===== */
@@ -1916,7 +1920,7 @@ function CalendarView({ gigs, subs = [], onOpen, onAdd, gsyncUI, admin, onPrepDo
               <button key=${iso} onClick=${() => { setSelected(iso); (byDate[iso] || []).length ? setSheet(iso) : prepByDate[iso] ? setPrepView(prepByDate[iso][0]) : onAdd(iso); }} aria-label=${fmtDay(iso) + (evs.length ? ', ' + evs.length + ' אירועים' : '')}
                 className=${'relative flex flex-col items-stretch min-w-0 min-h-[3.9rem] sm:min-h-[6.5rem] rounded-xl sm:rounded-2xl p-1 sm:p-2 text-right transition border ' + (isToday && ping ? 'today-ping ' : '') + (evs.some(needsSub) ? 'needsub-cell ' : '')
                   + (isSel ? 'border-[var(--accent2)] ' : CFG.cellBoxes ? 'border-[var(--glass-line)] hover:border-[var(--accent2)] ' : 'border-transparent hover:border-[var(--glass-line)] ')
-                  + (iso < t ? 'opacity-50 ' : '')}
+                  + (iso < t ? 'opacity-70 ' : '')}
                 style=${{ background: tint ? `linear-gradient(160deg, ${tint}50, ${tint}14 75%)` : (CFG.cellBoxes ? 'var(--glass)' : 'transparent') }}>
                 <span className=${'text-sm sm:text-base ' + (isToday ? 'self-start inline-flex h-7 w-7 items-center justify-center rounded-full grad font-bold' : evs.length || CFG.cellBoxes ? 'font-bold' : 'font-medium text-muted')}>${Number(iso.slice(8))}</span>
                 <span className=${'-mt-0.5 block truncate text-[9px] sm:text-[10px] leading-tight ' + (hebDate(iso).first ? 'font-bold text-[var(--ink)]' : 'text-muted')}>${hebDate(iso).day}</span>

@@ -134,6 +134,32 @@ button, a, [role="button"] { touch-action: manipulation; }
 .needsub-card { animation: needPulse 2.2s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .needsub, .needsub-badge, .needsub-card { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .tabin, .justadded, .fx-badge, [role="dialog"].pop { animation: none !important; } }
+/* ===== מסך קוד כניסה ===== */
+.pinlock{position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;padding:24px;color:#fff;font-family:Rubik,system-ui,sans-serif;
+  background:radial-gradient(60% 45% at 75% 12%,rgba(245,158,60,.28),transparent 70%),radial-gradient(55% 40% at 15% 90%,rgba(239,68,68,.16),transparent 70%),#0d0b09}
+.pin-wrap{width:100%;max-width:330px;text-align:center}
+.pin-logo{display:block;margin:0 auto 14px;border-radius:18px;box-shadow:0 12px 40px #000a,0 0 0 1px #ffffff14}
+.pin-title{font-size:19px;font-weight:600;letter-spacing:.2px;opacity:.95;min-height:28px}
+.pin-dots{display:flex;justify-content:center;gap:22px;margin:22px 0 8px}
+.pin-dots span{width:15px;height:15px;border-radius:50%;border:1.5px solid #ffffff70;transition:background .15s,box-shadow .15s,transform .15s}
+.pin-dots span.on{border-color:transparent;transform:scale(1.12)}
+.pin-shake{animation:pinShake .38s cubic-bezier(.36,.07,.19,.97)}
+@keyframes pinShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
+.pin-err{min-height:20px;font-size:13px;color:#fca5a5;margin-bottom:10px}
+.pin-pad{display:grid;grid-template-columns:repeat(3,78px);justify-content:center;gap:16px 24px}
+.pin-pad button{width:78px;height:78px;border-radius:50%;border:0;background:rgba(255,255,255,.09);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:background .12s,transform .12s,box-shadow .2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
+.pin-pad button b{font-size:32px;font-weight:400;line-height:1}
+.pin-pad button small{font-size:9.5px;letter-spacing:2px;font-weight:600;opacity:.7;margin-top:2px;min-height:12px}
+.pin-pad button:active{background:rgba(245,158,60,.55);transform:scale(.94);box-shadow:0 0 24px rgba(245,158,60,.55)}
+.pin-pad button.pin-txt{background:transparent;box-shadow:none;font-size:15px;font-weight:600}
+.pin-pad button.pin-txt:active{background:rgba(255,255,255,.08);box-shadow:none}
+.pin-forgot{margin-top:18px}
+.pin-forgot p{font-size:14px;opacity:.8;margin:0 0 12px}
+.pin-forgot input{width:100%;padding:13px 14px;border-radius:14px;border:1px solid #ffffff30;background:#ffffff14;color:#fff;font:500 17px Rubik,sans-serif;text-align:center;direction:ltr}
+.pin-go{margin-top:12px;width:100%;padding:13px;border:0;border-radius:999px;background:linear-gradient(90deg,#c2410c,#f59e0b);color:#fff;font:700 16px Rubik,sans-serif}
+.pin-link{margin-top:10px;background:none;border:0;color:#fff;opacity:.7;text-decoration:underline;font:500 14px Rubik,sans-serif}
+@media (max-height:640px){.pin-pad{grid-template-columns:repeat(3,68px);gap:12px 22px}.pin-pad button{width:68px;height:68px}.pin-logo{display:none}}
 .ltr { direction: ltr; unicode-bidi: isolate; }
 a[href^="https://wa.me"] { background: #1fa855 !important; color: #fff !important; border-color: transparent !important; }
 a[href^="https://wa.me"]:hover { background: #18914a !important; }
@@ -144,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261015011528';
+window.STUDIO_VERSION = '20261015012139';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -2690,7 +2716,7 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
 
       ${window.__studioIsOwner && window.__studioFriends && html`<${Section} icon="👥" title="חברים מורשים" sub="מי יכול להיכנס לאפליקציה" open=${open === 'friends'} onToggle=${() => tog('friends')}><${FriendsSection} toast=${toast} /><//>`}
       <label className="flex items-center gap-3 rounded-3xl glass p-4 text-sm"><input type="checkbox" className="h-5 w-5" style=${{ accentColor: 'var(--accent2)' }} checked=${(data.config || {}).appLock !== false} onChange=${e => setConfig({ appLock: e.target.checked })} />
-        <span><b>🔒 סיסמה בכניסה לאפליקציה</b><span className="block text-xs text-muted">בכל פתיחה, ואחרי 10 דקות שהאפליקציה ברקע. אותה סיסמה של הניהול.</span></span></label>
+        <span className="flex-1"><b>🔒 קוד כניסה לאפליקציה</b><span className="block text-xs text-muted">קוד בן 4 ספרות בכל פתיחה, ואחרי 10 דקות שהאפליקציה ברקע.</span></span>${(data.config || {}).pin && html`<button type="button" onClick=${e => { e.preventDefault(); setConfig({ pin: null }); toast('בפתיחה הבאה תתבקש לבחור קוד חדש'); }} className="rounded-full glass-soft px-3 py-1.5 text-xs font-semibold">שינוי קוד</button>`}</label>
       <${Section} icon="💾" title="גיבוי" sub="גיבוי יומי אוטומטי בענן · הורדה ושחזור" open=${open === 'backup'} onToggle=${() => tog('backup')}>
         <p className="text-sm text-muted">הקובץ כולל אירועים, לקוחות, מחליפים, אנשי קשר, הסיסמה וההגדרות. שמור אותו בתיקייה בגוגל דרייב.</p>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -2745,20 +2771,49 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
 /* ===== כניסת ניהול ===== */
 /* ===== נעילת האפליקציה בסיסמה (אותה סיסמה של הניהול) ===== */
 const LOCK_KEY = 'studio-app-active';
-function AppLock({ admin, onOk }) {
-  const [pw, setPw] = useState(''), [err, setErr] = useState(''), [busy, setBusy] = useState(false);
-  const go = async e => { e.preventDefault(); if (!pw) return; setBusy(true); setErr('');
-    try { const h = await hashPw(pw, admin.salt); if (h === admin.hash) { onOk(h); return; } setErr('סיסמה שגויה'); setPw(''); } catch (x) { setErr('משהו השתבש, נסה שוב'); }
-    setBusy(false); };
-  return ReactDOM.createPortal(html`<div role="dialog" aria-label="כניסה לאפליקציה" className="fixed inset-0 flex items-center justify-center p-6" style=${{ zIndex: 9990, background: 'var(--bg)' }}>
-    <form onSubmit=${go} className="w-full space-y-4 text-center" style=${{ maxWidth: '20rem' }}>
-      <img src="icon-192.png?v=4" alt="" width="80" height="80" className="mx-auto rounded-3xl shadow-xl" />
-      <h1 className="text-2xl font-extrabold grad-text">Studio Manager</h1>
-      <p className="text-sm text-muted">🔒 הקלד סיסמה כדי להיכנס</p>
-      <input type="password" autoFocus aria-label="סיסמה" className="field ltr text-center text-lg" value=${pw} onChange=${e => setPw(e.target.value)} autoComplete="current-password" />
-      ${err && html`<p role="alert" className="text-sm text-bad">${err}</p>`}
-      <button type="submit" disabled=${busy || !pw} className="w-full rounded-full grad px-5 py-3 font-bold disabled:opacity-50">${busy ? 'בודק…' : 'כניסה'}</button>
-    </form></div>`, document.body);
+function AppLock({ admin, pin, onOk, onSetPin }) {
+  // stage: enter (יש קוד) | new / confirm (קביעת קוד) | forgot (כניסה עם סיסמת הניהול כדי לקבוע קוד חדש)
+  const [stage, setStage] = useState(pin && pin.hash ? 'enter' : 'new');
+  const [code, setCode] = useState(''), [first, setFirst] = useState(''), [err, setErr] = useState(''), [shake, setShake] = useState(0), [pw, setPw] = useState('');
+  const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+  const hold = useRef(false);
+  const fail = m => { hold.current = true; setErr(m); setShake(x => x + 1); buzz([40, 40, 40]); setTimeout(() => { setCode(''); hold.current = false; }, 380); };
+  const done = async c => {
+    if (stage === 'enter') { const h = await hashPw(c, pin.salt); if (h === pin.hash) { buzz(15); onOk(); } else fail('קוד שגוי'); }
+    else if (stage === 'new') { setFirst(c); setCode(''); setErr(''); setStage('confirm'); }
+    else if (stage === 'confirm') { if (c !== first) { setStage('new'); setFirst(''); fail('הקודים לא תואמים — נסה שוב'); return; }
+      const salt = uid(); onSetPin({ salt, hash: await hashPw(c, salt), set: Date.now() }); buzz(15); onOk(); }
+  };
+  const press = k => { if (hold.current) return; setErr(''); if (k === 'del') { setCode(c => c.slice(0, -1)); return; }
+    setCode(c => { if (c.length >= 4) return c; const n = c + k; if (n.length === 4) { hold.current = true; setTimeout(() => { hold.current = false; done(n); }, 120); } return n; }); };
+  useEffect(() => { const f = e => { if (stage === 'forgot') return; if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('del'); };
+    window.addEventListener('keydown', f); return () => window.removeEventListener('keydown', f); }, [stage, first, pin]);
+  const forgot = async e => { e.preventDefault(); try { const h = await hashPw(pw, admin.salt); if (h === admin.hash) { setPw(''); setErr(''); setStage('new'); } else setErr('סיסמה שגויה'); } catch (x) { setErr('משהו השתבש'); } };
+  const title = stage === 'enter' ? 'הקלד קוד' : stage === 'new' ? 'בחר קוד בן 4 ספרות' : stage === 'confirm' ? 'הקלד שוב לאישור' : 'שכחת קוד?';
+  const LED = ['#facc15', '#f59e0b', '#f97316', '#ef4444'];
+  const KEYS = [['1', ''], ['2', 'ABC'], ['3', 'DEF'], ['4', 'GHI'], ['5', 'JKL'], ['6', 'MNO'], ['7', 'PQRS'], ['8', 'TUV'], ['9', 'WXYZ']];
+  return ReactDOM.createPortal(html`<div role="dialog" aria-label="כניסה לאפליקציה" className="pinlock">
+    <div className="pin-wrap">
+      <img src="icon-192.png?v=4" alt="" width="64" height="64" className="pin-logo" />
+      <div className="pin-title">${title}</div>
+      ${stage === 'forgot' ? html`<form onSubmit=${forgot} className="pin-forgot">
+          <p>הקלד את סיסמת הניהול כדי לקבוע קוד חדש</p>
+          <input type="password" autoFocus aria-label="סיסמת ניהול" value=${pw} onChange=${e => setPw(e.target.value)} autoComplete="current-password" />
+          ${err && html`<p className="pin-err" role="alert">${err}</p>`}
+          <button type="submit" className="pin-go">אישור</button>
+          <button type="button" className="pin-link" onClick=${() => { setErr(''); setStage(pin && pin.hash ? 'enter' : 'new'); }}>חזרה</button>
+        </form>` : html`
+        <div key=${shake} className=${'pin-dots' + (shake ? ' pin-shake' : '')} aria-label=${code.length + ' מתוך 4'}>
+          ${[0, 1, 2, 3].map(i => html`<span key=${i} className=${i < code.length ? 'on' : ''} style=${i < code.length ? { background: LED[i], boxShadow: '0 0 14px ' + LED[i] + ', 0 0 4px ' + LED[i] } : null}></span>`)}
+        </div>
+        <div className="pin-err" role="alert">${err}</div>
+        <div className="pin-pad" dir="ltr">
+          ${KEYS.map(([n, l]) => html`<button key=${n} type="button" onClick=${() => press(n)}><b>${n}</b><small>${l}</small></button>`)}
+          <button type="button" className="pin-txt" onClick=${() => { setErr(''); setCode(''); setStage('forgot'); }}>${stage === 'enter' ? 'שכחתי' : ''}</button>
+          <button type="button" onClick=${() => press('0')}><b>0</b><small>+</small></button>
+          <button type="button" className="pin-txt" aria-label="מחיקה" onClick=${() => press('del')}>${code ? '⌫' : ''}</button>
+        </div>`}
+    </div></div>`, document.body);
 }
 
 function AdminLogin({ adminData, mode, onSuccess, onSetPassword, onClose }) {
@@ -3419,7 +3474,7 @@ function App() {
             : { docIssued: true, docNumber: num, docDate: date, docMode: 'combined', invIssued: false };
           update(g.id, patch); setDocReq(null); setToast(DOCS[k].name + ' סומנה כהופקה' + (num ? ' · #' + num : ''));
         }} />`}
-      ${lockOn && appLocked && html`<${AppLock} admin=${data.admin} onOk=${appUnlocked} />`}
+      ${lockOn && appLocked && html`<${AppLock} admin=${data.admin} pin=${(data.config || {}).pin} onOk=${() => appUnlocked(data.admin.hash)} onSetPin=${pin => setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { pin }) }))} />`}
       ${login && html`<${AdminLogin} adminData=${data.admin} mode=${login} onSuccess=${onLoggedIn} onSetPassword=${onSetPassword} onClose=${() => setLogin(null)} />`}
       ${histOpen && html`<${Modal} title="מכונת הזמן — חזרה אחורה" onClose=${() => setHistOpen(false)}>
         <p className="text-sm text-muted">כל מה ששינית מאז שפתחת את האפליקציה. אפשר לבטל את הפעולה האחרונה, או לחזור לכל נקודה קודמת.</p>

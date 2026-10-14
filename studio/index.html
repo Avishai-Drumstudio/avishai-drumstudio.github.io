@@ -135,7 +135,7 @@ button, a, [role="button"] { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) { .needsub, .needsub-badge, .needsub-card { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .tabin, .justadded, .fx-badge, [role="dialog"].pop { animation: none !important; } }
 /* ===== מסך קוד כניסה ===== */
-.pinlock{position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;padding:24px;color:#fff;font-family:Rubik,system-ui,sans-serif;
+.pinlock{touch-action:none;position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;padding:24px;color:#fff;font-family:Rubik,system-ui,sans-serif;
   background:radial-gradient(60% 45% at 75% 12%,rgba(245,158,60,.28),transparent 70%),radial-gradient(55% 40% at 15% 90%,rgba(239,68,68,.16),transparent 70%),#0d0b09}
 .pin-wrap{width:100%;max-width:330px;text-align:center}
 .pin-logo{display:block;margin:0 auto 14px;border-radius:18px;box-shadow:0 12px 40px #000a,0 0 0 1px #ffffff14}
@@ -147,11 +147,11 @@ button, a, [role="button"] { touch-action: manipulation; }
 @keyframes pinShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
 .pin-err{min-height:20px;font-size:13px;color:#fca5a5;margin-bottom:10px}
 .pin-pad{display:grid;grid-template-columns:repeat(3,78px);justify-content:center;gap:16px 24px}
-.pin-pad button{width:78px;height:78px;border-radius:50%;border:0;background:rgba(255,255,255,.09);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:background .12s,transform .12s,box-shadow .2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
+.pin-pad button{width:78px;height:78px;border-radius:50%;border:0;background:rgba(255,255,255,.09);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:background .25s,transform .08s,box-shadow .25s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
 .pin-pad button b{font-size:32px;font-weight:400;line-height:1}
 .pin-pad button small{font-size:9.5px;letter-spacing:2px;font-weight:600;opacity:.7;margin-top:2px;min-height:12px}
-.pin-pad button:active{background:rgba(245,158,60,.55);transform:scale(.94);box-shadow:0 0 24px rgba(245,158,60,.55)}
+.pin-pad button:active{background:rgba(245,158,60,.55);transform:scale(.94);box-shadow:0 0 24px rgba(245,158,60,.55);transition:none}
 .pin-pad button.pin-txt{background:transparent;box-shadow:none;font-size:15px;font-weight:600}
 .pin-pad button.pin-txt:active{background:rgba(255,255,255,.08);box-shadow:none}
 .pin-forgot{margin-top:18px}
@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261015012627';
+window.STUDIO_VERSION = '20261015012728';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -2789,7 +2789,7 @@ function AppLock({ admin, pin, onOk, onSetPin }) {
       const salt = uid(); onSetPin({ salt, hash: await hashPw(c, salt), set: Date.now() }); buzz(15); onOk(); }
   };
   const press = k => { if (hold.current) return; setErr(''); if (k === 'del') { setCode(c => c.slice(0, -1)); return; }
-    setCode(c => { if (c.length >= 4) return c; const n = c + k; if (n.length === 4) { hold.current = true; setTimeout(() => { hold.current = false; done(n); }, 120); } return n; }); };
+    setCode(c => { if (c.length >= 4) return c; const n = c + k; if (n.length === 4) { hold.current = true; setTimeout(() => { hold.current = false; done(n); }, 60); } return n; }); };
   useEffect(() => { const f = e => { if (stage === 'forgot') return; if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('del'); };
     window.addEventListener('keydown', f); return () => window.removeEventListener('keydown', f); }, [stage, first, pin]);
   const forgot = async e => { e.preventDefault(); try { const h = await hashPw(pw, admin.salt); if (h === admin.hash) { setPw(''); setErr(''); setStage('new'); } else setErr('סיסמה שגויה'); } catch (x) { setErr('משהו השתבש'); } };
@@ -2812,10 +2812,10 @@ function AppLock({ admin, pin, onOk, onSetPin }) {
         </div>
         <div className="pin-err" role="alert">${err}</div>
         <div className="pin-pad" dir="ltr">
-          ${KEYS.map(([n, l]) => html`<button key=${n} type="button" onClick=${() => press(n)}><b>${n}</b><small>${l}</small></button>`)}
+          ${KEYS.map(([n, l]) => html`<button key=${n} type="button" onPointerDown=${e => { e.preventDefault(); press(n); }}><b>${n}</b><small>${l}</small></button>`)}
           <button type="button" className="pin-txt" onClick=${() => { setErr(''); setCode(''); setStage('forgot'); }}>${stage === 'enter' ? 'שכחתי' : ''}</button>
-          <button type="button" onClick=${() => press('0')}><b>0</b><small>+</small></button>
-          <button type="button" className="pin-txt" aria-label="מחיקה" onClick=${() => press('del')}>${code ? '⌫' : ''}</button>
+          <button type="button" onPointerDown=${e => { e.preventDefault(); press('0'); }}><b>0</b><small>+</small></button>
+          <button type="button" className="pin-txt" aria-label="מחיקה" onPointerDown=${e => { e.preventDefault(); press('del'); }}>${code ? '⌫' : ''}</button>
         </div>`}
     </div></div>`, document.body);
 }

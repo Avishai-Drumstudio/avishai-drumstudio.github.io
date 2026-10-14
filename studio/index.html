@@ -144,7 +144,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261013123356';
+window.STUDIO_VERSION = '20261014101840';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -284,6 +284,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   var renewing = null;
   window.__gcalEnsure = function () {
     if (bridge() || tokOk()) return Promise.resolve(true);
+    if (window.GCAL_REDIRECT) { try { localStorage.setItem('studio-gcal-resume', '1'); } catch (e) {} return gcalRedirect(!!rememberedCal()); }
     if (renewing) return renewing;
     var g = window.__gcalConnect(); if (!g) { calPrompt(true); return Promise.resolve(false); }
     var tmo = new Promise(function (r) { setTimeout(r, 120000); });
@@ -325,7 +326,20 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
       c.requestAccessToken(hint ? { hint: hint, prompt: '' } : { prompt: 'select_account' });
     });
   }
+  /* חיבור בהפניה (בלי חלונות קופצים — עובד גם באפליקציה מהמסך הראשי). דורש שהכתובת תהיה ב-Authorized redirect URIs */
+  var REDIR = location.origin + '/studio/';
+  function gcalRedirect(silent) {
+    var hint = (gTok && gTok.email) || rememberedCal(), st = Math.random().toString(36).slice(2);
+    try { localStorage.setItem('studio-gcal-st', st); } catch (e) {}
+    var q = { client_id: window.GOOGLE_CLIENT_ID, redirect_uri: REDIR, response_type: 'token', scope: 'https://www.googleapis.com/auth/calendar', include_granted_scopes: 'true', state: st + (silent ? '.s' : '.i') };
+    if (hint) q.login_hint = hint;
+    if (silent) q.prompt = 'none'; else if (!hint) q.prompt = 'select_account';
+    location.assign('https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams(q).toString());
+    return new Promise(function () {});
+  }
+  window.__gcalRedirectOn = function () { return !!window.GCAL_REDIRECT; };
   window.__gcalConnect = function () {
+    if (window.GCAL_REDIRECT) return gcalRedirect(false);
     if (gcalBusy) return gcalBusy;
     var g = gisConnect(); if (g) return g;
     var app2 = firebase.apps.find(function (a) { return a.name === 'gcal'; }) || firebase.initializeApp(window.FIREBASE_CONFIG, 'gcal');
@@ -345,6 +359,26 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     }).then(function () { gcalBusy = null; });
     return gcalBusy;
   };
+  (function gcalReturn() {
+    var h = location.hash || ''; if (h.indexOf('state=') < 0) return;
+    var p = new URLSearchParams(h.slice(1)), st = p.get('state') || '', mine = null;
+    try { mine = localStorage.getItem('studio-gcal-st'); } catch (e) {}
+    if (!mine || st.split('.')[0] !== mine) return;
+    try { localStorage.removeItem('studio-gcal-st'); } catch (e) {}
+    history.replaceState(null, '', location.pathname + location.search);
+    var tok = p.get('access_token');
+    if (tok) {
+      var exp = (Number(p.get('expires_in')) || 3600) * 1000, email = rememberedCal();
+      gTok = { t: tok, exp: Date.now() + exp - 5 * 60000, email: email };
+      try { localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {}
+      if (!email) fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=owner&maxResults=50', { headers: { Authorization: 'Bearer ' + tok } })
+        .then(function (r) { return r.json(); }).then(function (j) { var pr = (j.items || []).find(function (x) { return x.primary; }); if (pr) { gTok.email = pr.id; try { localStorage.setItem('studio-gcal-email', pr.id); localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {} } }).catch(function () {});
+      var resume = false; try { resume = localStorage.getItem('studio-gcal-resume') === '1'; localStorage.removeItem('studio-gcal-resume'); } catch (e) {}
+      window.__gcalResume = resume;
+      setTimeout(function () { toastMsg('📅 יומן גוגל מחובר' + (resume ? ' — ממשיך לסנכרן…' : ' ✓')); }, 600);
+    } else if (/\.s$/.test(st)) { gcalRedirect(false); }
+    else { try { localStorage.removeItem('studio-gcal-resume'); } catch (e) {} setTimeout(function () { toastMsg('החיבור ליומן לא הושלם: ' + (p.get('error') || '')); }, 600); }
+  })();
   function toastMsg(m) { var t = document.createElement('div'); t.textContent = m; t.style.cssText = 'position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:999px;background:#222;color:#fff;font:600 14px Rubik,system-ui,sans-serif;direction:rtl'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); }
   function gfetch(method, path, body) {
     var b = bridge(); if (b) return bridgeFetch(b, method, path, body);
@@ -3005,6 +3039,7 @@ function App() {
     setToast(err ? gErrMsg(err) : 'סונכרנו ' + done + ' שינויים ליומן גוגל ✓');
   };
   runSyncRef.current = runSync;
+  useEffect(() => { if (window.__gcalResume && mcpOk && mode === 'account') { window.__gcalResume = false; setTimeout(() => runSyncRef.current && runSyncRef.current(), 400); } }, [mcpOk, mode]);
   const planNow = useMemo(() => mcpOk ? syncPlan(data) : [], [data, mcpOk]);
   const gPending = planNow.filter(t => !t.keep).length;
   const fullPending = useMemo(() => mcpOk ? syncPlan(data, true).filter(t => !t.keep).length : 0, [data, mcpOk]);

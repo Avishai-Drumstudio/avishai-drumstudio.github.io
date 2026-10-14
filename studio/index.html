@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link rel="preconnect" href="https://www.gstatic.com"><link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=1f9143e5">
+<link rel="stylesheet" href="app.css?v=111757e5">
 <style>
 :root {
   --bg: #140d2b; --glow-pct: 100%;
@@ -144,7 +144,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261014103736';
+window.STUDIO_VERSION = '20261015011528';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -2689,6 +2689,8 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
       <//>
 
       ${window.__studioIsOwner && window.__studioFriends && html`<${Section} icon="👥" title="חברים מורשים" sub="מי יכול להיכנס לאפליקציה" open=${open === 'friends'} onToggle=${() => tog('friends')}><${FriendsSection} toast=${toast} /><//>`}
+      <label className="flex items-center gap-3 rounded-3xl glass p-4 text-sm"><input type="checkbox" className="h-5 w-5" style=${{ accentColor: 'var(--accent2)' }} checked=${(data.config || {}).appLock !== false} onChange=${e => setConfig({ appLock: e.target.checked })} />
+        <span><b>🔒 סיסמה בכניסה לאפליקציה</b><span className="block text-xs text-muted">בכל פתיחה, ואחרי 10 דקות שהאפליקציה ברקע. אותה סיסמה של הניהול.</span></span></label>
       <${Section} icon="💾" title="גיבוי" sub="גיבוי יומי אוטומטי בענן · הורדה ושחזור" open=${open === 'backup'} onToggle=${() => tog('backup')}>
         <p className="text-sm text-muted">הקובץ כולל אירועים, לקוחות, מחליפים, אנשי קשר, הסיסמה וההגדרות. שמור אותו בתיקייה בגוגל דרייב.</p>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -2741,6 +2743,24 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
 }
 
 /* ===== כניסת ניהול ===== */
+/* ===== נעילת האפליקציה בסיסמה (אותה סיסמה של הניהול) ===== */
+const LOCK_KEY = 'studio-app-active';
+function AppLock({ admin, onOk }) {
+  const [pw, setPw] = useState(''), [err, setErr] = useState(''), [busy, setBusy] = useState(false);
+  const go = async e => { e.preventDefault(); if (!pw) return; setBusy(true); setErr('');
+    try { const h = await hashPw(pw, admin.salt); if (h === admin.hash) { onOk(h); return; } setErr('סיסמה שגויה'); setPw(''); } catch (x) { setErr('משהו השתבש, נסה שוב'); }
+    setBusy(false); };
+  return ReactDOM.createPortal(html`<div role="dialog" aria-label="כניסה לאפליקציה" className="fixed inset-0 flex items-center justify-center p-6" style=${{ zIndex: 9990, background: 'var(--bg)' }}>
+    <form onSubmit=${go} className="w-full space-y-4 text-center" style=${{ maxWidth: '20rem' }}>
+      <img src="icon-192.png?v=4" alt="" width="80" height="80" className="mx-auto rounded-3xl shadow-xl" />
+      <h1 className="text-2xl font-extrabold grad-text">Studio Manager</h1>
+      <p className="text-sm text-muted">🔒 הקלד סיסמה כדי להיכנס</p>
+      <input type="password" autoFocus aria-label="סיסמה" className="field ltr text-center text-lg" value=${pw} onChange=${e => setPw(e.target.value)} autoComplete="current-password" />
+      ${err && html`<p role="alert" className="text-sm text-bad">${err}</p>`}
+      <button type="submit" disabled=${busy || !pw} className="w-full rounded-full grad px-5 py-3 font-bold disabled:opacity-50">${busy ? 'בודק…' : 'כניסה'}</button>
+    </form></div>`, document.body);
+}
+
 function AdminLogin({ adminData, mode, onSuccess, onSetPassword, onClose }) {
   // mode: 'setup' | 'login' | 'change'
   const [cur, setCur] = useState(''), [pw, setPw] = useState(''), [pw2, setPw2] = useState('');
@@ -3120,6 +3140,16 @@ function App() {
   }, [data.admin && data.admin.hash, data.admin && data.admin.rememberUntil]);
   useEffect(() => { if (!unlocked && !(TABS.find(x => x.id === tab) || {}).pub) setTab('calendar'); }, [unlocked, tab]);
   const openAdmin = () => unlocked ? setTab('admin') : setLogin(data.admin ? 'login' : 'setup');
+  const lockOn = !!(data.admin && data.admin.hash) && (data.config || {}).appLock !== false;
+  const [appLocked, setAppLocked] = useState(() => { try { return Date.now() - (Number(sessionStorage.getItem(LOCK_KEY)) || 0) > 10 * 60000; } catch (e) { return true; } });
+  useEffect(() => { const f = () => { try {
+      if (document.visibilityState === 'hidden') sessionStorage.setItem(LOCK_KEY, String(Date.now()));
+      else if (Date.now() - (Number(sessionStorage.getItem(LOCK_KEY)) || 0) > 10 * 60000) setAppLocked(true);
+    } catch (e) {} };
+    document.addEventListener('visibilitychange', f); window.addEventListener('pagehide', f);
+    return () => { document.removeEventListener('visibilitychange', f); window.removeEventListener('pagehide', f); }; }, []);
+  useEffect(() => { if (appLocked) return; const h = setInterval(() => { try { if (document.visibilityState === 'visible') sessionStorage.setItem(LOCK_KEY, String(Date.now())); } catch (e) {} }, 30000); return () => clearInterval(h); }, [appLocked]);
+  const appUnlocked = h => { try { sessionStorage.setItem(LOCK_KEY, String(Date.now())); } catch (e) {} if (!IS_DESKTOP) writeSession(h); setUnlocked(true); setAppLocked(false); };
   const enableFaceId = async () => {
     if (!canPasskey()) { setToast('זיהוי פנים לא נתמך במכשיר הזה'); return; }
     try { const id = await passkeyCreate();
@@ -3389,6 +3419,7 @@ function App() {
             : { docIssued: true, docNumber: num, docDate: date, docMode: 'combined', invIssued: false };
           update(g.id, patch); setDocReq(null); setToast(DOCS[k].name + ' סומנה כהופקה' + (num ? ' · #' + num : ''));
         }} />`}
+      ${lockOn && appLocked && html`<${AppLock} admin=${data.admin} onOk=${appUnlocked} />`}
       ${login && html`<${AdminLogin} adminData=${data.admin} mode=${login} onSuccess=${onLoggedIn} onSetPassword=${onSetPassword} onClose=${() => setLogin(null)} />`}
       ${histOpen && html`<${Modal} title="מכונת הזמן — חזרה אחורה" onClose=${() => setHistOpen(false)}>
         <p className="text-sm text-muted">כל מה ששינית מאז שפתחת את האפליקציה. אפשר לבטל את הפעולה האחרונה, או לחזור לכל נקודה קודמת.</p>

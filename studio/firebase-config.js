@@ -11,3 +11,5 @@ window.FIREBASE_CONFIG = {
 window.STUDIO_OWNERS = ['avishy407@gmail.com', 'yasharulpan@gmail.com'];
 // OAuth client (Google Cloud → Credentials → Web client) — לחיבור ליומן גוגל דרך חלון ההתחברות של גוגל
 window.GOOGLE_CLIENT_ID = '196522008239-2ncgd0fmjbmla2j6lteranivnso2q139.apps.googleusercontent.com';
+// חיבור ליומן בהפניה (בלי חלונות קופצים). הכתובת https://avishai-drumstudio.github.io/studio/ רשומה ב-Authorized redirect URIs
+window.GCAL_REDIRECT = true;

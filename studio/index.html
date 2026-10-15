@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261015121624';
+window.STUDIO_VERSION = '20261015121811';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1633,6 +1633,9 @@ function TravelBox({ g, set, client, gigs, onClientTravel }) {
   return html`<div className="rounded-2xl glass-soft p-3 space-y-2">
     <${Label} text="🚗 תוספת מרחק (₪)"><div className="relative"><span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted">₪</span>
       <input type="number" min="0" inputMode="decimal" className="field pr-8" value=${g.travelFee || ''} onChange=${e => { touched.current = true; setAuto(false); set('travelFee', e.target.value); }} placeholder="0" /></div><//>
+    ${hasRules && html`<div className="flex flex-wrap gap-1.5">${client.travel.filter(ruleOk).map((r, i) => { const on = (Number(g.travelFee) || 0) === Number(r.fee) && (Number(r.fee) > 0 || touched.current || auto); const sug1 = sug && sug.area === ruleLabel(r);
+      return html`<button type="button" key=${i} onClick=${() => { touched.current = true; setAuto(false); set('travelFee', Number(r.fee) ? String(r.fee) : ''); }}
+        className=${'rounded-full px-3 py-1.5 text-xs font-semibold transition ' + (on ? 'grad' : 'glass-soft') + (sug1 && !on ? ' ring-2 ring-[var(--accent2)]' : '')}>${ruleLabel(r)} · ${Number(r.fee) ? '₪' + r.fee : 'כלול'}</button>`; })}</div>`}
     ${busy && html`<p className="text-xs text-muted">🔎 בודק מרחק…</p>`}
     ${!busy && sug && sug.fee === 0 && (sug.why !== 'geo' || sug.near) && html`<p className="text-sm">🚗 ${where} ← <b className="text-ok">כלול במחיר ✓</b></p>`}
     ${!busy && sug && sug.far && html`<p className="text-xs text-muted">📍 ${sug.place || 'המקום'} מחוץ לאזורים שהוגדרו ל${cleanName(g.client)} — תקבע תוספת ידנית.</p>`}

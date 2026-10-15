@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261015121811';
+window.STUDIO_VERSION = '20261015132251';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -3333,14 +3333,15 @@ function App() {
   const openAdmin = () => unlocked ? setTab('admin') : setLogin(data.admin ? 'login' : 'setup');
   /* חד־פעמי: ההסכם עם סעדה (הצעת מחיר 08.10.2026) */
   useEffect(() => {
-    if (mode !== 'account' || (data.config || {}).seedSaeda2) return;
+    if (mode !== 'account' || !lastSync || (data.config || {}).seedSaeda2) return; // רק אחרי שהנתונים מהענן נטענו (אחרת הטעינה דורסת)
     const isS = x => ['סעדה', 'אביחי סעדה'].includes(cleanName(x.name));
     if (!(data.clients || []).some(isS)) return;
     setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { seedSaeda1: 1, seedSaeda2: 1 }), clients: d.clients.map(x => !isS(x) ? x : Object.assign({}, x, { vat: 'plus',
       travel: (x.travel || []).length ? x.travel : [{ area: 'קריית גת', to: 'נתניה', toIncl: true, fee: 0 }, { area: 'נתניה', to: 'חדרה', fee: 300 }, { area: 'חדרה', to: 'חיפה', fee: 400 }, { area: 'חיפה', fee: 600 }],
       rates: (x.rates || []).length ? x.rates : [{ from: '', fee: 1200 }, { from: '2027-01-01', fee: 1400 }],
       baseHours: x.baseHours || 5, otRate: x.otRate || 300 })) }));
-  }, [mode, data.clients && data.clients.length]);
+    setTimeout(() => setToast('✓ ההסכם עם סעדה נשמר: בסיס, מע״מ ותוספות מרחק'), 800);
+  }, [mode, lastSync, data.clients && data.clients.length]);
   const lockOn = !!(data.admin && data.admin.hash) && (data.config || {}).appLock !== false;
   const [appLocked, setAppLocked] = useState(() => { try { return Date.now() - (Number(sessionStorage.getItem(LOCK_KEY)) || 0) > 10 * 60000; } catch (e) { return true; } });
   useEffect(() => { const f = () => { try {

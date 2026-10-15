@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261015100358';
+window.STUDIO_VERSION = '20261015121624';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1679,7 +1679,7 @@ function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, i
   useEffect(() => {
     if (!isNew || !known) return;
     const r = clientRate(known, g.date);
-    setG(p => Object.assign({}, p, r && (feeAuto.current || !Number(p.fee)) ? { fee: String(r) } : {}, Number(known.otRate) && !Number(p.otRate) ? { otRate: String(known.otRate) } : {}));
+    setG(p => Object.assign({}, p, r && (feeAuto.current || !Number(p.fee)) ? { fee: String(r) } : {}, Number(known.otRate) && !Number(p.otRate) ? { otRate: String(known.otRate) } : {}, known.vat && known.vat !== 'none' && (!p.vat || p.vat === 'none') ? { vat: known.vat, vatRate: p.vatRate !== undefined && p.vatRate !== '' ? p.vatRate : CFG.vatRate } : {}));
     if (r) feeAuto.current = true;
   }, [known && known.id, g.date]);
   const otGuess = (() => { const bh = Number(known && known.baseHours); const st = g.loadIn || g.start; if (!bh || !st || !g.end) return null;
@@ -2390,7 +2390,7 @@ function Clients({ book = [], setBook, admin, gigs, clients, setClients, onRenam
     }
     const old = clients.find(x => x.id === c.id);
     if (old && old.name !== name) onRename(old.name, name);
-    const rec = Object.assign({}, c, { name, contacts: (c.contacts || []).filter(k => (k.name || '').trim() || (k.phone || '').trim()), travel: (c.travel || []).filter(r => cleanName(r.area)).map(r => Object.assign({ area: cleanName(r.area), fee: Number(r.fee) || 0 }, cleanName(r.to) ? { to: cleanName(r.to), toIncl: !!r.toIncl } : {})), rates: (c.rates || []).filter(r => Number(r.fee) > 0).map(r => ({ from: r.from || '', fee: Number(r.fee) })), baseHours: Number(c.baseHours) || 0, otRate: Number(c.otRate) || 0 });
+    const rec = Object.assign({}, c, { name, contacts: (c.contacts || []).filter(k => (k.name || '').trim() || (k.phone || '').trim()), travel: (c.travel || []).filter(r => cleanName(r.area)).map(r => Object.assign({ area: cleanName(r.area), fee: Number(r.fee) || 0 }, cleanName(r.to) ? { to: cleanName(r.to), toIncl: !!r.toIncl } : {})), rates: (c.rates || []).filter(r => Number(r.fee) > 0).map(r => ({ from: r.from || '', fee: Number(r.fee) })), baseHours: Number(c.baseHours) || 0, otRate: Number(c.otRate) || 0, vat: c.vat || '' });
     setClients(l => old ? l.map(x => x.id === c.id ? rec : x) : l.concat([rec]));
     setEdit(null);
   };
@@ -2413,14 +2413,15 @@ function Clients({ book = [], setBook, admin, gigs, clients, setClients, onRenam
             ${admin && c.s.owed > 0 && html`<span className="mt-2 inline-block rounded-full glass-soft px-2.5 py-0.5 text-xs font-bold text-warn">חייב ${money(c.s.owed)}</span>`}
             ${(c.contacts || []).length > 0 && html`<p className="mt-2 text-sm text-muted">אנשי קשר: ${c.contacts.map(k => personLabel(k.name, k.phone, book)).join(' | ')}</p>`}
             ${c.notes && html`<p className="mt-1 text-sm text-muted">${c.notes}</p>`}
-            ${admin && (c.travel || []).length > 0 && html`<p className="mt-1 text-xs text-muted">🚗 ${c.travel.map(r => r.area + ' ₪' + r.fee).join(' · ')}</p>`}
+            ${admin && (c.travel || []).length > 0 && html`<p className="mt-1 text-xs text-muted">🚗 ${c.travel.map(r => ruleLabel(r) + ' ' + (Number(r.fee) ? '₪' + r.fee : 'כלול')).join(' · ')}</p>`}
+            ${admin && (clientRate(c, todayISO()) || (c.vat && c.vat !== 'none')) && html`<p className="mt-1 text-xs text-muted">${clientRate(c, todayISO()) ? '💰 בסיס ₪' + clientRate(c, todayISO()) : ''}${c.vat === 'plus' ? ' · + מע״מ' : c.vat === 'incl' ? ' · כולל מע״מ' : ''}${Number(c.otRate) ? ' · ⏱️ ₪' + c.otRate + ' לשעה נוספת' : ''}</p>`}
           </button>
           ${openC === c.id && html`
             <div className="mt-3 flex flex-wrap gap-2">
               ${c.phone && html`<${LinkBtn} href=${waUrl(c.phone)}><${MsgIcon} /> הודעה<//>`}
               ${c.phone && html`<${LinkBtn} href=${'tel:' + c.phone.replace(/[^\d+]/g, '')}>📞 חיוג<//>`}
               ${c.email && html`<${LinkBtn} href=${'mailto:' + c.email}>✉️ מייל<//>`}
-              <${Btn} onClick=${() => setEdit({ id: c.id, name: c.name, phone: c.phone || '', email: c.email || '', notes: c.notes || '', contacts: (c.contacts || []).slice(), travel: (c.travel || []).map(r => Object.assign({}, r)), rates: (c.rates || []).map(r => Object.assign({}, r)), baseHours: c.baseHours || '', otRate: c.otRate || '' })}>עריכה<//>
+              <${Btn} onClick=${() => setEdit({ id: c.id, name: c.name, phone: c.phone || '', email: c.email || '', notes: c.notes || '', contacts: (c.contacts || []).slice(), travel: (c.travel || []).map(r => Object.assign({}, r)), rates: (c.rates || []).map(r => Object.assign({}, r)), baseHours: c.baseHours || '', otRate: c.otRate || '', vat: c.vat || '' })}>עריכה<//>
             </div>
             ${(c.contacts || []).length > 0 && html`<ul className="mt-3 space-y-1.5">${c.contacts.map(k => html`<li key=${k.name + k.phone} className="flex items-center gap-2 rounded-2xl glass-soft px-3 py-2 text-sm">
               <span className="flex-1 truncate"><b>${k.name || nameForPhone(book, k.phone) || 'ללא שם'}</b> <span className="ltr text-muted">${k.phone}</span></span>
@@ -2459,6 +2460,9 @@ function Clients({ book = [], setBook, admin, gigs, clients, setClients, onRenam
             <${Label} text="⏱️ שעות בסיס"><input type="number" min="0" step="0.5" inputMode="decimal" className="field" value=${edit.baseHours || ''} onChange=${e => setEdit(Object.assign({}, edit, { baseHours: e.target.value }))} placeholder="למשל 5" /><//>
             <${Label} text="אובר טיים לשעה (₪)"><input type="number" min="0" inputMode="decimal" className="field" value=${edit.otRate || ''} onChange=${e => setEdit(Object.assign({}, edit, { otRate: e.target.value }))} placeholder="למשל 300" /><//>
           </div>
+          <div><span className="mb-1 block text-sm font-medium">🧾 מע״מ קבוע ללקוח</span>
+            <div className="flex gap-1.5">${[{ id: '', label: 'לפי האירוע' }].concat(VAT_MODES).map(m => html`<button type="button" key=${m.id || 'x'} onClick=${() => setEdit(Object.assign({}, edit, { vat: m.id }))}
+              className=${'flex-1 rounded-full px-2 py-1.5 text-xs font-semibold ' + ((edit.vat || '') === m.id ? 'grad' : 'glass-soft text-muted')}>${m.label}</button>`)}</div></div>
           <div className="flex gap-2 pt-2">
             <${Btn} kind="grad" disabled=${!edit.name.trim()} onClick=${() => save(edit)}>שמירה<//>
             <${Btn} onClick=${() => setEdit(null)}>ביטול<//>
@@ -3326,10 +3330,10 @@ function App() {
   const openAdmin = () => unlocked ? setTab('admin') : setLogin(data.admin ? 'login' : 'setup');
   /* חד־פעמי: ההסכם עם סעדה (הצעת מחיר 08.10.2026) */
   useEffect(() => {
-    if (mode !== 'account' || (data.config || {}).seedSaeda1) return;
+    if (mode !== 'account' || (data.config || {}).seedSaeda2) return;
     const isS = x => ['סעדה', 'אביחי סעדה'].includes(cleanName(x.name));
     if (!(data.clients || []).some(isS)) return;
-    setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { seedSaeda1: 1 }), clients: d.clients.map(x => !isS(x) ? x : Object.assign({}, x, {
+    setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { seedSaeda1: 1, seedSaeda2: 1 }), clients: d.clients.map(x => !isS(x) ? x : Object.assign({}, x, { vat: 'plus',
       travel: (x.travel || []).length ? x.travel : [{ area: 'קריית גת', to: 'נתניה', toIncl: true, fee: 0 }, { area: 'נתניה', to: 'חדרה', fee: 300 }, { area: 'חדרה', to: 'חיפה', fee: 400 }, { area: 'חיפה', fee: 600 }],
       rates: (x.rates || []).length ? x.rates : [{ from: '', fee: 1200 }, { from: '2027-01-01', fee: 1400 }],
       baseHours: x.baseHours || 5, otRate: x.otRate || 300 })) }));

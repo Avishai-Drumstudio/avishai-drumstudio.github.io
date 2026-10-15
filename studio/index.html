@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261015132251';
+window.STUDIO_VERSION = '20261015142842';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1309,19 +1309,19 @@ function ClientPicker({ value, clients, book = [], onType, onPick }) {
     <div className="relative">
       <input className="field" value=${value} placeholder=${clients.length ? 'הקלד שם או בחר מהמאגר' : 'שם הלקוח'} autoComplete="off"
         role="combobox" aria-expanded=${open && matches.length > 0} aria-autocomplete="list"
-        onFocus=${() => setOpen(true)} onBlur=${() => setTimeout(() => setOpen(false), 150)}
+        onFocus=${() => setOpen(true)} onBlur=${() => setTimeout(() => setOpen(false), 300)}
         onChange=${e => { onType(e.target.value); setOpen(true); }} />
       ${open && (matches.length > 0 || bookHits.length > 0) && !(exact && matches.length === 1) && html`
         <ul role="listbox" className="absolute inset-x-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-2xl border border-[var(--glass-line)] p-1 shadow-2xl"
           style=${{ background: 'color-mix(in srgb, var(--bg) 92%, #7c3aed 8%)' }}>
           ${matches.map(c => html`<li key=${c.id} role="option" aria-selected=${exact === c}>
-            <button type="button" onMouseDown=${e => { e.preventDefault(); onPick(c); setOpen(false); }} onTouchStart=${e => { e.preventDefault(); onPick(c); setOpen(false); }}
+            <button type="button" onMouseDown=${e => e.preventDefault()} onClick=${() => { onPick(c); setOpen(false); }}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-right hover:bg-[var(--glass-2)]">
               <span className="grad h-8 w-8 shrink-0 rounded-full flex items-center justify-center text-sm font-bold">${c.name.slice(0, 1)}</span>
               <span className="min-w-0 flex-1"><span className="block truncate font-semibold">${c.name}</span><span className="block truncate text-xs text-muted ltr text-right">${c.phone}</span></span>
             </button></li>`)}
           ${bookHits.map(k => html`<li key=${'b' + k.name + k.phone} role="option" aria-selected="false">
-            <button type="button" onMouseDown=${e => { e.preventDefault(); onPick({ name: k.name, phone: k.phone, email: '', fromBook: true }); setOpen(false); }} onTouchStart=${e => { e.preventDefault(); onPick({ name: k.name, phone: k.phone, email: '', fromBook: true }); setOpen(false); }}
+            <button type="button" onMouseDown=${e => e.preventDefault()} onClick=${() => { onPick({ name: k.name, phone: k.phone, email: '', fromBook: true }); setOpen(false); }}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-right hover:bg-[var(--glass-2)]">
               <span className="h-8 w-8 shrink-0 rounded-full glass-soft flex items-center justify-center text-lg font-bold" aria-hidden="true">•</span>
               <span className="min-w-0 flex-1"><span className="block truncate font-semibold">${k.name}</span><span className="block truncate text-xs text-muted"><span className="ltr">${k.phone}</span> · מהטלפון</span></span>
@@ -1340,14 +1340,14 @@ function ContactPicker({ name, phone, contacts, book = [], onName, onPhone, onPi
   return html`
     <div className="relative grid grid-cols-2 gap-2">
       <input className="field" aria-label="שם איש הקשר" placeholder="שם" value=${name} autoComplete="off" role="combobox" aria-expanded=${open && matches.length > 0}
-        onFocus=${() => setOpen(true)} onBlur=${() => setTimeout(() => setOpen(false), 150)}
+        onFocus=${() => setOpen(true)} onBlur=${() => setTimeout(() => setOpen(false), 300)}
         onChange=${e => { onName(e.target.value); setOpen(true); }} />
       <input type="tel" className="field ltr text-right" aria-label="טלפון איש הקשר" placeholder="טלפון" value=${phone} onChange=${e => onPhone(e.target.value)} />
       ${open && matches.length > 0 && html`
         <ul role="listbox" className="absolute inset-x-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-2xl border border-[var(--glass-line)] p-1 shadow-2xl"
           style=${{ background: 'color-mix(in srgb, var(--bg) 92%, #7c3aed 8%)' }}>
           ${matches.map(k => html`<li key=${k.name + '|' + k.phone} role="option" aria-selected="false">
-            <button type="button" onMouseDown=${e => { e.preventDefault(); onPick(k); setOpen(false); }} onTouchStart=${e => { e.preventDefault(); onPick(k); setOpen(false); }}
+            <button type="button" onMouseDown=${e => e.preventDefault()} onClick=${() => { onPick(k); setOpen(false); }}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-right hover:bg-[var(--glass-2)]">
               <span className="h-8 w-8 shrink-0 rounded-full glass-soft flex items-center justify-center text-sm font-bold">${(k.name || '?').slice(0, 1)}</span>
               <span className="min-w-0 flex-1"><span className="block truncate font-semibold">${k.name}</span>
@@ -1527,9 +1527,9 @@ function BookName({ value, book = [], onType, onPick, placeholder, label }) {
   const hits = open ? bookSearch(book, value).filter(k => !(sameName(k.name, value))) : [];
   return html`<div className="relative">
     <input className="field" aria-label=${label || 'שם'} placeholder=${placeholder || 'שם'} value=${value} autoComplete="off"
-      onFocus=${() => setOpen(true)} onBlur=${() => setTimeout(() => setOpen(false), 150)} onChange=${e => { onType(e.target.value); setOpen(true); }} />
+      onFocus=${() => setOpen(true)} onBlur=${() => setTimeout(() => setOpen(false), 300)} onChange=${e => { onType(e.target.value); setOpen(true); }} />
     ${hits.length > 0 && html`<ul role="listbox" className="absolute right-0 top-full z-30 mt-1 max-h-64 w-[min(20rem,85vw)] overflow-y-auto rounded-2xl border border-[var(--glass-line)] p-1 shadow-2xl" style=${{ background: 'color-mix(in srgb, var(--bg) 94%, #7c3aed 6%)' }}>
-      ${hits.map(k => html`<li key=${k.name + k.phone} role="option" aria-selected="false"><button type="button" onMouseDown=${e => { e.preventDefault(); onPick(k); setOpen(false); }} onTouchStart=${e => { e.preventDefault(); onPick(k); setOpen(false); }}
+      ${hits.map(k => html`<li key=${k.name + k.phone} role="option" aria-selected="false"><button type="button" onMouseDown=${e => e.preventDefault()} onClick=${() => { onPick(k); setOpen(false); }}
         className="flex w-full items-start gap-2 rounded-xl px-3 py-2 text-right hover:bg-[var(--glass-2)]"><span className="mt-0.5 font-bold" aria-hidden="true">•</span><span className="min-w-0 flex-1"><span className="block font-semibold leading-tight">${k.name}</span><span className="ltr block text-right text-xs text-muted">${k.phone}</span></span></button></li>`)}
     </ul>`}
   </div>`;
@@ -1541,9 +1541,9 @@ function VenuePicker({ value, venues, onType, onPick }) {
   const hits = open ? venues.filter(v => (!q || v.name.toLowerCase().includes(q) || (v.address || '').toLowerCase().includes(q)) && !(q && v.name.toLowerCase() === q)).slice(0, 7) : [];
   return html`<div className="relative">
     <input className="field" value=${value} autoComplete="off" placeholder="אולם, מועדון, אולפן…" aria-label="מקום"
-      onFocus=${() => setOpen(true)} onBlur=${() => setTimeout(() => setOpen(false), 150)} onChange=${e => { onType(e.target.value); setOpen(true); }} />
+      onFocus=${() => setOpen(true)} onBlur=${() => setTimeout(() => setOpen(false), 300)} onChange=${e => { onType(e.target.value); setOpen(true); }} />
     ${hits.length > 0 && html`<ul role="listbox" className="absolute inset-x-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-2xl border border-[var(--glass-line)] p-1 shadow-2xl" style=${{ background: 'color-mix(in srgb, var(--bg) 94%, #7c3aed 6%)' }}>
-      ${hits.map(v => html`<li key=${v.name} role="option" aria-selected="false"><button type="button" onMouseDown=${e => { e.preventDefault(); onPick(v); setOpen(false); }} onTouchStart=${e => { e.preventDefault(); onPick(v); setOpen(false); }}
+      ${hits.map(v => html`<li key=${v.name} role="option" aria-selected="false"><button type="button" onMouseDown=${e => e.preventDefault()} onClick=${() => { onPick(v); setOpen(false); }}
         className="flex w-full items-start gap-2 rounded-xl px-3 py-2 text-right hover:bg-[var(--glass-2)]"><span className="mt-0.5 font-bold" aria-hidden="true">•</span>
         <span className="min-w-0 flex-1"><span className="block font-semibold leading-tight">${v.name}</span>${v.address && html`<span className="block truncate text-xs text-muted">${v.address}</span>`}</span>
         <span className="text-[10px] text-muted">${v.count}×</span></button></li>`)}

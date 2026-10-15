@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link rel="preconnect" href="https://www.gstatic.com"><link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=111757e5">
+<link rel="stylesheet" href="app.css?v=3b688abb">
 <style>
 :root {
   --bg: #140d2b; --glow-pct: 100%;
@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261015012728';
+window.STUDIO_VERSION = '20261015095436';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1552,7 +1552,86 @@ function VenuePicker({ value, venues, onType, onPick }) {
 }
 
 /* ===== טופס אירוע ===== */
-function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, isNew, onSave, onCancel, onAddType }) {
+/* ===== תוספות מרחק: איתור מקום (OpenStreetMap) + התאמה להסכם עם הלקוח ===== */
+const GEO_KEY = 'studio-geo-cache';
+let GEO = (() => { try { return JSON.parse(localStorage.getItem(GEO_KEY) || '{}'); } catch (e) { return {}; } })();
+let geoChain = Promise.resolve();
+const geocode = q0 => {
+  const q = cleanName(q0); if (!q || q.length < 2) return Promise.resolve(null);
+  const k = q.toLowerCase(); if (k in GEO) return Promise.resolve(GEO[k]);
+  const run = () => k in GEO ? GEO[k] : fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=il&accept-language=he&q=' + encodeURIComponent(q))
+    .then(r => r.json()).then(j => { const x = j && j[0]; GEO[k] = x ? { lat: +x.lat, lon: +x.lon, name: String(x.display_name || '').split(',')[0] } : null;
+      try { localStorage.setItem(GEO_KEY, JSON.stringify(GEO)); } catch (e) {} return GEO[k]; }).catch(() => null);
+  const p = geoChain.then(run); geoChain = p.then(() => new Promise(r => setTimeout(r, 1100))); return p;
+};
+const kmBetween = (a, b) => { const R = 6371, t = x => x * Math.PI / 180, dLa = t(b.lat - a.lat), dLo = t(b.lon - a.lon);
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(t(a.lat)) * Math.cos(t(b.lat)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); };
+const NEAR_KM = 15;
+/* מחזיר הצעה: { fee, area, km, why } */
+async function travelSuggest(g, client, gigs) {
+  const rules = ((client && client.travel) || []).filter(r => cleanName(r.area) && Number(r.fee) > 0);
+  const place = cleanName([g.venue, g.address].filter(Boolean).join(' '));
+  if (!place) return null;
+  const low = place.toLowerCase();
+  const direct = rules.find(r => low.includes(cleanName(r.area).toLowerCase()));
+  if (direct) return { fee: Number(direct.fee), area: direct.area, km: 0, why: 'rule' };
+  const prev = gigs.filter(x => x.id !== g.id && sameName(x.client, g.client) && Number(x.travelFee) > 0 && cleanName(x.venue) && sameName(x.venue, g.venue)).sort((a, b) => b.date.localeCompare(a.date))[0];
+  if (prev) return { fee: Number(prev.travelFee), area: cleanName(prev.venue), km: 0, why: 'history', date: prev.date };
+  if (!rules.length) return null;
+  const here = (g.address && await geocode(g.address)) || (g.venue && await geocode(g.venue));
+  if (!here) return { none: true };
+  let best = null;
+  for (const r of rules) { const c = await geocode(r.area); if (!c) continue; const km = kmBetween(here, c); if (!best || km < best.km) best = { fee: Number(r.fee), area: r.area, km, place: here.name }; }
+  if (!best) return null;
+  return Object.assign(best, { why: 'geo', near: best.km <= NEAR_KM });
+}
+function TravelRulesEditor({ rules, onChange }) {
+  const list = rules || [];
+  const upd = (i, k, v) => onChange(list.map((r, j) => j === i ? Object.assign({}, r, { [k]: v }) : r));
+  return html`<div className="space-y-2">
+    ${list.map((r, i) => html`<div key=${i} className="grid grid-cols-[1fr_6.5rem_auto] gap-2">
+      <input className="field" aria-label="אזור / עיר" placeholder="עיר, למשל חדרה" value=${r.area} onChange=${e => upd(i, 'area', e.target.value)} />
+      <div className="relative"><span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted">₪</span><input type="number" min="0" inputMode="decimal" aria-label="סכום התוספת" className="field pr-7" value=${r.fee} onChange=${e => upd(i, 'fee', e.target.value)} /></div>
+      <button type="button" aria-label="הסר" onClick=${() => onChange(list.filter((_, j) => j !== i))} className="h-10 w-10 rounded-full glass-soft">✕</button></div>`)}
+    <button type="button" onClick=${() => onChange(list.concat([{ area: '', fee: '' }]))} className="text-sm font-semibold grad-text">+ אזור</button>
+  </div>`;
+}
+function TravelBox({ g, set, client, gigs, onClientTravel }) {
+  const [sug, setSug] = useState(null), [busy, setBusy] = useState(false), [auto, setAuto] = useState(false), [edit, setEdit] = useState(null);
+  const touched = useRef(!!Number(g.travelFee));
+  const rulesKey = JSON.stringify((client && client.travel) || []);
+  useEffect(() => {
+    let alive = true; setSug(null);
+    const place = cleanName([g.venue, g.address].filter(Boolean).join(' '));
+    if (!place || !g.client) return;
+    setBusy(true);
+    const h = setTimeout(() => travelSuggest(g, client, gigs).then(r => { if (!alive) return; setBusy(false); setSug(r);
+      if (r && r.fee && (r.why !== 'geo' || r.near) && !touched.current) { set('travelFee', String(r.fee)); setAuto(true); } }), 900);
+    return () => { alive = false; clearTimeout(h); setBusy(false); };
+  }, [g.venue, g.address, g.client, rulesKey]);
+  const apply = () => { touched.current = true; set('travelFee', String(sug.fee)); setAuto(false); };
+  const where = sug && (sug.why === 'rule' ? 'ב' + sug.area : sug.why === 'history' ? 'כמו באירוע הקודם של ' + cleanName(g.client) + ' כאן' : (sug.place ? sug.place + ' · ' : '') + Math.round(sug.km) + ' ק״מ מ' + sug.area);
+  const hasRules = client && (client.travel || []).some(r => cleanName(r.area) && Number(r.fee) > 0);
+  return html`<div className="rounded-2xl glass-soft p-3 space-y-2">
+    <${Label} text="🚗 תוספת מרחק (₪)"><div className="relative"><span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted">₪</span>
+      <input type="number" min="0" inputMode="decimal" className="field pr-8" value=${g.travelFee || ''} onChange=${e => { touched.current = true; setAuto(false); set('travelFee', e.target.value); }} placeholder="0" /></div><//>
+    ${busy && html`<p className="text-xs text-muted">🔎 בודק מרחק…</p>`}
+    ${!busy && sug && sug.fee > 0 && html`<div className="flex flex-wrap items-center gap-2 text-sm">
+      <span className="flex-1 min-w-0">${sug.why === 'geo' && !sug.near ? '📍 הכי קרוב להסכם: ' : '🚗 '}${where} ← <b>₪${sug.fee}</b></span>
+      ${auto && Number(g.travelFee) === sug.fee ? html`<span className="text-xs font-bold text-ok">נוסף אוטומטית ✓</span><button type="button" onClick=${() => { touched.current = true; setAuto(false); set('travelFee', ''); }} className="text-xs underline text-muted">בטל</button>`
+        : Number(g.travelFee) !== sug.fee && html`<button type="button" onClick=${apply} className="rounded-full grad px-3 py-1 text-xs font-bold">הוסף ₪${sug.fee}</button>`}
+    </div>`}
+    ${!busy && sug && sug.none && html`<p className="text-xs text-muted">לא מצאתי את המקום במפה — אפשר להוסיף כתובת או עיר בשדה המקום.</p>`}
+    ${g.client && edit === null && html`<button type="button" onClick=${() => setEdit(((client && client.travel) || []).map(r => Object.assign({}, r)).concat(hasRules ? [] : [{ area: '', fee: '' }]))} className="text-xs font-semibold grad-text">${hasRules ? '✏️ תוספות המרחק של ' + cleanName(g.client) + ' (' + client.travel.length + ')' : '+ הגדר תוספות מרחק ל' + cleanName(g.client)}</button>`}
+    ${edit !== null && html`<div className="rounded-2xl bg-black/5 p-2">
+      <p className="mb-2 text-xs text-muted">כל עיר עם הסכום שסגרת עם ${cleanName(g.client)}. אירוע במקום שקרוב לעיר (עד ${NEAR_KM} ק״מ) יקבל את התוספת לבד.</p>
+      <${TravelRulesEditor} rules=${edit} onChange=${setEdit} />
+      <div className="mt-2 flex gap-2"><${Btn} kind="grad" onClick=${() => { onClientTravel(g.client, edit.filter(r => cleanName(r.area)).map(r => ({ area: cleanName(r.area), fee: Number(r.fee) || 0 }))); touched.current = !!Number(g.travelFee) && !auto; setEdit(null); }}>שמירה<//><${Btn} onClick=${() => setEdit(null)}>ביטול<//></div>
+    </div>`}
+  </div>`;
+}
+
+function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, isNew, onSave, onCancel, onAddType, onClientTravel }) {
   const [newType, setNewType] = useState(null);
   const initial = useMemo(() => { const auto = autoTitle(Object.assign({}, init0, { title: '' })); return (init0.title && init0.title === auto) ? Object.assign({}, init0, { title: '' }) : init0; }, []);
   const venues = useMemo(() => {
@@ -1676,6 +1755,7 @@ function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, i
         ${Number(g.fee) > 0 && g.vat !== 'none' && html`<p className="mt-2 text-sm text-muted">${g.vat === 'plus' ? 'סה״כ לגבייה: ' : 'מתוכם מע״מ: '}<b className="text-[var(--ink)]">${g.vat === 'plus' ? money(amt(g)) : money(vatPart(g))}</b>${g.vat === 'plus' ? ' (מע״מ ' + money(vatPart(g)) + ')' : ''}</p>`}
       </div>`}
 
+      ${showMoney && html`<${TravelBox} g=${g} set=${set} client=${known} gigs=${gigs} onClientTravel=${onClientTravel || (() => {})} />`}
       <button type="button" onClick=${() => setMore(v => !v)} aria-expanded=${more}
         className="flex w-full items-center justify-between rounded-2xl glass-soft px-4 py-3 text-sm font-semibold text-muted hover:text-[var(--ink)]">
         <span>${more ? 'פחות פרטים' : 'פרטים נוספים'}<span className="font-normal"> · שם, שעות, כתובת, אובר טיים, טלפון הפקה, ציוד${admin ? ', מסמכים' : ''}</span></span>
@@ -1689,9 +1769,6 @@ function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, i
           <${Label} text="סיום"><input type="time" className="field" value=${g.end} onChange=${e => set('end', e.target.value)} /><//>
         </div>
         <${Label} text="כתובת"><input className="field" value=${g.address} onChange=${e => set('address', e.target.value)} /><//>
-        ${showMoney && html`<${Label} text="תוספת מרחק (₪)"><div className="relative"><span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted">₪</span>
-          <input type="number" min="0" inputMode="decimal" className="field pr-8" value=${g.travelFee || ''} onChange=${e => set('travelFee', e.target.value)} placeholder="0" /></div>
-          ${Number(g.travelFee) > 0 && !otAmt(g) && html`<span className="mt-1 block text-xs text-muted">סה״כ לגבייה: <b className="text-[var(--ink)]">${money(amt(g))}</b>${g.vat !== 'none' ? ' (כולל מע״מ)' : ''}</span>`}<//>`}
         ${showMoney && html`<div>
           <span className="mb-1 block text-sm font-medium">⏱️ אובר טיים</span>
           <div className="grid grid-cols-2 gap-3">
@@ -2271,7 +2348,7 @@ function Clients({ book = [], setBook, admin, gigs, clients, setClients, onRenam
         if (!ok) return;
         const seen = new Set(), contacts = [];
         (twin.contacts || []).forEach(k => { const n = cleanName(k.name), ph = (k.phone || '').trim(); const key = n.toLowerCase() + '|' + ph; if ((n || ph) && !seen.has(key)) { seen.add(key); contacts.push({ name: n, phone: ph }); } });
-        const merged = Object.assign({}, twin, { phone: twin.phone || c.phone, email: twin.email || c.email, notes: [twin.notes, c.notes].filter(Boolean).join(' · '), contacts });
+        const merged = Object.assign({}, twin, { phone: twin.phone || c.phone, email: twin.email || c.email, notes: [twin.notes, c.notes].filter(Boolean).join(' · '), contacts, travel: (twin.travel || []).concat((c.travel || []).filter(r => !(twin.travel || []).some(t => sameName(t.area, r.area)))) });
         if (old0) onRename(old0.name, twin.name);
         setClients(l => l.filter(x => x.id !== c.id).map(x => x.id === twin.id ? merged : x));
         setEdit(null); notify('הלקוחות אוחדו ל"' + twin.name + '"');
@@ -2280,7 +2357,7 @@ function Clients({ book = [], setBook, admin, gigs, clients, setClients, onRenam
     }
     const old = clients.find(x => x.id === c.id);
     if (old && old.name !== name) onRename(old.name, name);
-    const rec = Object.assign({}, c, { name, contacts: (c.contacts || []).filter(k => (k.name || '').trim() || (k.phone || '').trim()) });
+    const rec = Object.assign({}, c, { name, contacts: (c.contacts || []).filter(k => (k.name || '').trim() || (k.phone || '').trim()), travel: (c.travel || []).filter(r => cleanName(r.area)).map(r => ({ area: cleanName(r.area), fee: Number(r.fee) || 0 })) });
     setClients(l => old ? l.map(x => x.id === c.id ? rec : x) : l.concat([rec]));
     setEdit(null);
   };
@@ -2303,13 +2380,14 @@ function Clients({ book = [], setBook, admin, gigs, clients, setClients, onRenam
             ${admin && c.s.owed > 0 && html`<span className="mt-2 inline-block rounded-full glass-soft px-2.5 py-0.5 text-xs font-bold text-warn">חייב ${money(c.s.owed)}</span>`}
             ${(c.contacts || []).length > 0 && html`<p className="mt-2 text-sm text-muted">אנשי קשר: ${c.contacts.map(k => personLabel(k.name, k.phone, book)).join(' | ')}</p>`}
             ${c.notes && html`<p className="mt-1 text-sm text-muted">${c.notes}</p>`}
+            ${admin && (c.travel || []).length > 0 && html`<p className="mt-1 text-xs text-muted">🚗 ${c.travel.map(r => r.area + ' ₪' + r.fee).join(' · ')}</p>`}
           </button>
           ${openC === c.id && html`
             <div className="mt-3 flex flex-wrap gap-2">
               ${c.phone && html`<${LinkBtn} href=${waUrl(c.phone)}><${MsgIcon} /> הודעה<//>`}
               ${c.phone && html`<${LinkBtn} href=${'tel:' + c.phone.replace(/[^\d+]/g, '')}>📞 חיוג<//>`}
               ${c.email && html`<${LinkBtn} href=${'mailto:' + c.email}>✉️ מייל<//>`}
-              <${Btn} onClick=${() => setEdit({ id: c.id, name: c.name, phone: c.phone || '', email: c.email || '', notes: c.notes || '', contacts: (c.contacts || []).slice() })}>עריכה<//>
+              <${Btn} onClick=${() => setEdit({ id: c.id, name: c.name, phone: c.phone || '', email: c.email || '', notes: c.notes || '', contacts: (c.contacts || []).slice(), travel: (c.travel || []).map(r => Object.assign({}, r)) })}>עריכה<//>
             </div>
             ${(c.contacts || []).length > 0 && html`<ul className="mt-3 space-y-1.5">${c.contacts.map(k => html`<li key=${k.name + k.phone} className="flex items-center gap-2 rounded-2xl glass-soft px-3 py-2 text-sm">
               <span className="flex-1 truncate"><b>${k.name || nameForPhone(book, k.phone) || 'ללא שם'}</b> <span className="ltr text-muted">${k.phone}</span></span>
@@ -2334,6 +2412,9 @@ function Clients({ book = [], setBook, admin, gigs, clients, setClients, onRenam
             <button type="button" onClick=${() => setEdit(Object.assign({}, edit, { contacts: (edit.contacts || []).concat([{ name: '', phone: '' }]) }))} className="text-sm font-semibold grad-text">+ איש קשר</button>
           </div>
           <${Label} text="הערות"><textarea rows="3" className="field" value=${edit.notes} onChange=${e => setEdit(Object.assign({}, edit, { notes: e.target.value }))} placeholder="למשל: משלם תמיד בהעברה, צריך חשבונית מס"></textarea><//>
+          <div><span className="mb-1 block text-sm font-medium">🚗 תוספות מרחק שסגרתם</span>
+            <p className="mb-2 text-xs text-muted">עיר + סכום. אירוע במקום קרוב לעיר יקבל את התוספת לבד.</p>
+            <${TravelRulesEditor} rules=${edit.travel || []} onChange=${l => setEdit(Object.assign({}, edit, { travel: l }))} /></div>
           <div className="flex gap-2 pt-2">
             <${Btn} kind="grad" disabled=${!edit.name.trim()} onClick=${() => save(edit)}>שמירה<//>
             <${Btn} onClick=${() => setEdit(null)}>ביטול<//>
@@ -3460,7 +3541,7 @@ function App() {
         onUnpay=${() => undoPaid(open)} onAdmin=${openAdmin}
         onDelete=${() => { ask('למחוק את "' + open.title + '"?', { danger: true }).then(ok => { if (ok) { setGigs(l => l.filter(g => g.id !== open.id)); setOpenId(null); setToast('האירוע נמחק'); } }) }} />`}
       ${editing && html`<${Modal} title=${byId(editing.id) ? 'עריכת אירוע' : 'אירוע חדש'} onClose=${() => setEditing(null)} wide>
-        <${GigForm} initial=${editing} subs=${subs} clients=${clients} gigs=${gigs} book=${book} admin=${unlocked} isNew=${!byId(editing.id)} onAddType=${addType} onSave=${saveGig} onCancel=${() => setEditing(null)} /><//>`}
+        <${GigForm} initial=${editing} subs=${subs} clients=${clients} gigs=${gigs} book=${book} admin=${unlocked} isNew=${!byId(editing.id)} onAddType=${addType} onSave=${saveGig} onCancel=${() => setEditing(null)} onClientTravel=${(name, travel) => setClients(l => { const n = cleanName(name); return l.some(c => sameName(c.name, n)) ? l.map(c => sameName(c.name, n) ? Object.assign({}, c, { travel }) : c) : l.concat([{ id: uid(), name: n, phone: '', email: '', notes: '', contacts: [], travel }]); })} /><//>`}
       ${paying && html`<${MarkPaid} gig=${paying} preset=${payPreset} onClose=${() => { setPayId(null); setPayPreset(null); }}
         onInvoice=${(num, date) => { const prev = { invIssued: !!paying.invIssued, invNumber: paying.invNumber || '', invDate: paying.invDate || '', docMode: modeOf(paying) }, id = paying.id;
           update(id, { invIssued: true, invNumber: num, invDate: date, docMode: isComb(paying) ? 'split' : modeOf(paying) }); setPayId(null); setPayPreset(null);

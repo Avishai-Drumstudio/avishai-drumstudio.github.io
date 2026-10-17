@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261018015251';
+window.STUDIO_VERSION = '20261018015611';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -2241,13 +2241,14 @@ function Payments({ gigs, onOpen, onPay, onPayMany, onInvoice, update }) {
   billable.forEach(g => { const s = payStatus(g); counts[s] = (counts[s] || 0) + 1; if (s === 'ממתין' || s === 'באיחור') counts['פתוחים']++; });
   const future = billable.filter(g => payStatus(g) === 'עתידי');
   const list = billable.filter(g => { const s = payStatus(g); return filter === 'הכל' || s === filter || (filter === 'פתוחים' && (s === 'ממתין' || s === 'באיחור')); })
-    .sort((a, b) => filter === 'שולם' ? (b.paidDate || '').localeCompare(a.paidDate || '') : (a.dueDate || '').localeCompare(b.dueDate || ''));
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.start || '').localeCompare(b.start || '')); // לפי זמן: הכי ישן ראשון, מתקדמים להיום
   const [view, setView] = useState('event');
   const owedGigs = billable.filter(isOwed);
   const groups = {};
   owedGigs.forEach(g => { const k = cleanName(g.client) || 'לקוח ללא שם'; const c = groups[k] = groups[k] || { name: k, phone: '', contact: '', total: 0, overdue: 0, gigs: [] };
     c.phone = c.phone || g.contactPhone || g.phone; c.contact = c.contact || g.contactName; c.total += amt(g); c.gigs.push(g); if (payStatus(g) === 'באיחור') c.overdue += amt(g); });
-  const debtors = Object.values(groups).sort((a, b) => (b.overdue ? 1 : 0) - (a.overdue ? 1 : 0) || b.total - a.total);
+  Object.values(groups).forEach(c => c.gigs.sort((a, b) => a.date.localeCompare(b.date)));
+  const debtors = Object.values(groups).sort((a, b) => a.gigs[0].date.localeCompare(b.gigs[0].date));
   const sum = l => l.reduce((a, g) => a + amt(g), 0);
   const total = sum(owedGigs), lateTotal = sum(owedGigs.filter(g => payStatus(g) === 'באיחור'));
   const t = todayISO();

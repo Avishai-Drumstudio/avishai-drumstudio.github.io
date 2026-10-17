@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261015142842';
+window.STUDIO_VERSION = '20261018015251';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1830,11 +1830,29 @@ function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, i
     </form>`;
 }
 
-function DocSheet({ gig, kind, onSave, onUnset, onClose }) {
+/* ===== מסמך / תשלום אחד על כמה אירועים של אותו לקוח ===== */
+function MultiPick({ list, sel, setSel, what }) {
+  if (!list.length) return null;
+  const tog = id => setSel(sel.includes(id) ? sel.filter(x => x !== id) : sel.concat([id]));
+  return html`<div className="mt-4 rounded-2xl glass-soft p-3">
+    <b className="block text-sm">🧾 ${what} על כמה אירועים?</b>
+    <span className="block text-xs text-muted">סמן אירועים נוספים של אותו לקוח — הם יקבלו את אותו מספר ואותו תאריך.</span>
+    <ul className="mt-2 space-y-1">${list.map(x => html`<li key=${x.id}><label className="flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm">
+      <input type="checkbox" className="h-4 w-4" style=${{ accentColor: 'var(--accent2)' }} checked=${sel.includes(x.id)} onChange=${() => tog(x.id)} />
+      <span className="min-w-0 flex-1 truncate">${fmtDate(x.date)} · ${x.title}</span><b>${money(amt(x))}</b></label></li>`)}</ul>
+    ${list.length > 1 && html`<button type="button" onClick=${() => setSel(sel.length === list.length ? [] : list.map(x => x.id))} className="mt-1 text-xs font-semibold grad-text">${sel.length === list.length ? 'נקה הכל' : 'סמן הכל'}</button>`}
+  </div>`;
+}
+const sameClientOthers = (gig, gigs, test) => (gigs || []).filter(x => x.id !== gig.id && cleanName(gig.client) && sameName(x.client, gig.client) && Number(x.fee) > 0 && modeOf(x) !== 'none' && test(x)).sort((a, b) => a.date.localeCompare(b.date));
+
+function DocSheet({ gig, kind, gigs = [], onSave, onUnset, onClose }) {
   const d = DOCS[kind], done = kind === 'inv' ? hasInv(gig) : kind === 'rec' ? hasRec(gig) : hasComb(gig);
   const [num, setNum] = useState((kind === 'inv' ? gig.invNumber : gig.docNumber) || '');
   const [date, setDate] = useState((kind === 'inv' ? gig.invDate : gig.docDate) || gig.paidDate || todayISO());
-  const save = () => onSave(num.trim(), date);
+  const others = useMemo(() => sameClientOthers(gig, gigs, x => kind === 'inv' ? !hasInv(x) : kind === 'rec' ? !hasRec(x) : !hasComb(x)), []);
+  const [sel, setSel] = useState([]);
+  const save = () => onSave(num.trim(), date, sel);
+  const total = amt(gig) + others.filter(x => sel.includes(x.id)).reduce((a, x) => a + amt(x), 0);
   return html`
     <${Modal} title=${d.icon + ' ' + d.name} onClose=${onClose}>
       <p className="text-sm text-muted">${d.hint}${kind === 'comb' ? ' — מסמן גם חשבונית מס וגם קבלה.' : ''}</p>
@@ -1842,6 +1860,8 @@ function DocSheet({ gig, kind, onSave, onUnset, onClose }) {
         <span className="min-w-0 flex-1"><b className="block truncate">${gig.client || autoTitle(gig)}</b><span className="block truncate text-xs text-muted">${autoTitle(gig)} · ${fmtDate(gig.date)}</span></span>
         <b className="text-xl">${money(amt(gig))}</b>
       </div>
+      ${!done && html`<${MultiPick} list=${others} sel=${sel} setSel=${setSel} what=${d.name + ' אחת'} />`}
+      ${sel.length > 0 && html`<p className="mt-2 text-sm">סה״כ ב${d.name}: <b>${money(total)}</b> · ${sel.length + 1} אירועים</p>`}
       <div className="mt-4 grid grid-cols-2 gap-3">
         <${Label} text=${'מספר ' + d.name}><input className="field" inputMode="numeric" value=${num} onChange=${e => setNum(e.target.value)} placeholder="אפשר גם אחר כך" /><//>
         <${Label} text="תאריך הפקה"><input type="date" className="field" value=${date} onChange=${e => setDate(e.target.value)} /><//>
@@ -1855,7 +1875,7 @@ function DocSheet({ gig, kind, onSave, onUnset, onClose }) {
     <//>`;
 }
 
-function MarkPaid({ gig, preset, onConfirm, onInvoice, onClose }) {
+function MarkPaid({ gig, gigs = [], preSel = [], preset, onConfirm, onInvoice, onClose }) {
   const invDone = hasInv(gig), noDoc = modeOf(gig) === 'none';
   const start = preset && !(invDone && preset !== 'rec') ? preset : invDone ? 'rec' : ((CFG.payDoc || 'comb') === 'rec' ? 'rec' : 'comb');
   const [kind, setKind] = useState(noDoc ? 'rec' : start);
@@ -1864,7 +1884,12 @@ function MarkPaid({ gig, preset, onConfirm, onInvoice, onClose }) {
   const [num, setNum] = useState('');
   const isInv = kind === 'inv' && !noDoc;
   const docName = noDoc ? '' : DOCS[kind].name;
-  const confirm = () => isInv ? onInvoice(num.trim(), date) : onConfirm(method, date, noDoc ? '' : num.trim(), noDoc ? null : (kind === 'comb' ? 'combined' : invDone ? 'split' : 'receipt'));
+  const others = useMemo(() => sameClientOthers(gig, gigs, x => isInv ? !hasInv(x) && !x.paidDate : !x.paidDate), [isInv]);
+  const [sel, setSel] = useState(() => preSel.filter(id => others.some(x => x.id === id)));
+  const first = useRef(true);
+  useEffect(() => { if (first.current) { first.current = false; return; } setSel([]); }, [isInv]);
+  const extra = others.filter(x => sel.includes(x.id)), total = amt(gig) + extra.reduce((a, x) => a + amt(x), 0);
+  const confirm = () => isInv ? onInvoice(num.trim(), date, sel) : onConfirm(method, date, noDoc ? '' : num.trim(), noDoc ? null : (kind === 'comb' ? 'combined' : invDone ? 'split' : 'receipt'), sel, kind);
   const opt = (k, sub) => { const dis = invDone && k !== 'rec'; return html`<button key=${k} type="button" disabled=${dis} onClick=${() => { setKind(k); setNum(''); }} aria-pressed=${kind === k}
     className=${'flex min-w-0 flex-col items-center rounded-2xl px-1.5 py-2.5 text-center transition disabled:opacity-40 ' + (kind === k ? 'grad' : 'glass-soft')}>
     <span className="text-xl leading-none" aria-hidden="true">${dis && k === 'inv' ? '✅' : DOCS[k].icon}</span>
@@ -1873,8 +1898,9 @@ function MarkPaid({ gig, preset, onConfirm, onInvoice, onClose }) {
   return html`
     <${Modal} title=${isInv ? 'הפקת חשבונית מס' : 'רישום קבלת תשלום'} onClose=${onClose}>
       <p className="text-sm text-muted">${gig.client || 'לקוח'} · ${gig.title}</p>
-      <p className="mt-1 text-4xl font-extrabold grad-text">${money(amt(gig))}</p>
-      ${gig.vat !== 'none' && html`<p className="text-sm text-muted">${vatNote(gig)}</p>`}
+      <p className="mt-1 text-4xl font-extrabold grad-text">${money(total)}</p>
+      ${sel.length > 0 && html`<p className="text-sm text-muted">${sel.length + 1} אירועים בתשלום אחד</p>`}
+      ${!sel.length && gig.vat !== 'none' && html`<p className="text-sm text-muted">${vatNote(gig)}</p>`}
       ${!noDoc && html`<div className="mt-4">
         <span className="mb-2 block text-xs font-semibold text-muted">איזה מסמך מפיקים?</span>
         <div className="grid grid-cols-3 gap-2">
@@ -1887,6 +1913,7 @@ function MarkPaid({ gig, preset, onConfirm, onInvoice, onClose }) {
         <div className="grid grid-cols-3 gap-2">${METHODS.map(m => html`
           <button key=${m} type="button" onClick=${() => setMethod(m)} aria-pressed=${method === m}
             className=${'rounded-2xl px-2 py-3 text-sm font-semibold transition ' + (method === m ? 'grad' : 'glass-soft')}>${m}</button>`)}</div>`}
+      ${!noDoc && html`<${MultiPick} list=${others} sel=${sel} setSel=${setSel} what=${isInv ? 'חשבונית אחת' : 'תשלום אחד'} />`}
       <div className=${'mt-4 grid gap-3 ' + (noDoc ? '' : 'grid-cols-2')}>
         <${Label} text=${isInv ? 'תאריך הפקה' : 'תאריך קבלת התשלום'}><input type="date" className="field" value=${date} onChange=${e => setDate(e.target.value)} /><//>
         ${!noDoc && html`<${Label} text=${'מספר ' + docName}><input className="field" inputMode="numeric" value=${num} onChange=${e => setNum(e.target.value)} placeholder="אפשר גם אחר כך" /><//>`}
@@ -2205,7 +2232,7 @@ function GigList({ gigs, subs, onOpen, admin }) {
 }
 
 /* ===== תשלומים ===== */
-function Payments({ gigs, onOpen, onPay, onInvoice, update }) {
+function Payments({ gigs, onOpen, onPay, onPayMany, onInvoice, update }) {
   const undoPaid = g => ask('לבטל את רישום התשלום של ' + (g.client || g.title) + '? הוא יחזור להיות "ממתין".', { ok: 'ביטול תשלום' }).then(ok => ok && update(g.id, { paidDate: '', method: '' }));
   const [filter, setFilter0] = useState('פתוחים'), [limit, setLimit] = useState(20);
   const setFilter = f => { setFilter0(f); setLimit(20); };
@@ -2249,7 +2276,7 @@ function Payments({ gigs, onOpen, onPay, onInvoice, update }) {
             <div className="mt-3 grid grid-cols-3 gap-1.5">
               <a href=${waUrl(c.phone, reminderMsg(c.gigs, c.contact || c.name))} onClick=${() => markReminded(c.gigs)} target="_blank" rel="noopener" className="flex min-w-0 items-center justify-center gap-1 rounded-full py-2.5 text-[13px] font-semibold"><${MsgIcon} size=${16} /><span className="truncate">${c.gigs.length > 1 ? 'תזכורת על הכל' : 'תזכורת'}</span><${RemindBadge} gigs=${c.gigs} /></a>
               <${BankBtn} gigs=${c.gigs} phone=${c.phone} name=${c.contact || c.name} />
-              <button onClick=${() => c.gigs.length === 1 ? onPay(c.gigs[0].id) : drill('רישום תשלום — ' + c.name, c.gigs, { sub: 'סה״כ ' + money(c.total) + ' · בחר על איזה אירוע התקבל התשלום' })} className="flex min-w-0 items-center justify-center gap-1 rounded-full py-2.5 text-[13px] font-semibold grad">✓ התקבל</button>
+              <button onClick=${() => c.gigs.length === 1 || !onPayMany ? (c.gigs.length === 1 ? onPay(c.gigs[0].id) : drill('רישום תשלום — ' + c.name, c.gigs, { sub: 'סה״כ ' + money(c.total) + ' · בחר על איזה אירוע התקבל התשלום' })) : onPayMany(c.gigs.slice().sort((a, b) => a.date.localeCompare(b.date)).map(x => x.id))} className="flex min-w-0 items-center justify-center gap-1 rounded-full py-2.5 text-[13px] font-semibold grad">✓ התקבל</button>
             </div>
             <${RemindNote} gigs=${c.gigs} className="mt-1.5 text-center" />
           </li>`)}</ul>`) : html`
@@ -3396,7 +3423,7 @@ function App() {
   }, [remindAsk && remindAsk.ids.join(), remindAsk && remindAsk.ready]);
   const update = useCallback((id, patch) => setGigs(l => l.map(g => g.id === id ? Object.assign({}, g, patch) : g)), [setGigs]);
   const byId = id => gigs.find(g => g.id === id);
-  const [docReq, setDocReq] = useState(null), [payPreset, setPayPreset] = useState(null);
+  const [docReq, setDocReq] = useState(null), [payPreset, setPayPreset] = useState(null), [paySel, setPaySel] = useState([]);
   const gigFromQuick = r => {
     const str = v => (typeof v === 'string' ? v : '').trim(), hm = v => /^\d{1,2}:\d{2}$/.test(str(v)) ? str(v).padStart(5, '0') : '';
     const date = /^\d{4}-\d{2}-\d{2}$/.test(str(r.date)) ? str(r.date) : todayISO();
@@ -3573,7 +3600,7 @@ function App() {
           </div></div>`}
           <div key=${'pg-' + tab} className="tabin">
           ${tab === 'admin' && html`<${AdminDashboard} gigs=${gigs} onOpen=${setOpenId} onPay=${setPayId} onLock=${lock} onFaceId=${enableFaceId} faceIdOn=${!!(data.admin && (data.admin.passkeys || []).length)} onChangePw=${() => setLogin('change')} go=${setTab} />`}
-          ${tab === 'payments' && html`<${Payments} gigs=${gigs} onOpen=${setOpenId} onPay=${setPayId} onInvoice=${setInvId} update=${update} />`}
+          ${tab === 'payments' && html`<${Payments} gigs=${gigs} onOpen=${setOpenId} onPay=${id => { setPaySel([]); setPayId(id); }} onPayMany=${ids => { setPaySel(ids.slice(1)); setPayId(ids[0]); }} onInvoice=${setInvId} update=${update} />`}
           ${tab === 'tax' && html`<${Tax} gigs=${gigs} update=${update} onUnpay=${undoPaid} onOpen=${setOpenId} onDoc=${(id, kind) => setDocReq({ id, kind })} onPay=${(id, kind) => { setPayPreset(kind); setPayId(id); }} exportCsv=${exportCsv} />`}
           ${tab === 'settings' && html`<${Settings} data=${data} book=${book} setBook=${setBook} gsync=${gsyncApi} freshData=${freshData} setConfig=${setConfig} renameType=${renameType} setData=${replaceData} mode=${mode} lastSync=${lastSync} theme=${theme} setTheme=${setTheme} backup=${backup} toast=${setToast} />`}</div>`}`}
       </main>
@@ -3604,22 +3631,26 @@ function App() {
         onDelete=${() => { ask('למחוק את "' + open.title + '"?', { danger: true }).then(ok => { if (ok) { setGigs(l => l.filter(g => g.id !== open.id)); setOpenId(null); setToast('האירוע נמחק'); } }) }} />`}
       ${editing && html`<${Modal} title=${byId(editing.id) ? 'עריכת אירוע' : 'אירוע חדש'} onClose=${() => setEditing(null)} wide>
         <${GigForm} initial=${editing} subs=${subs} clients=${clients} gigs=${gigs} book=${book} admin=${unlocked} isNew=${!byId(editing.id)} onAddType=${addType} onSave=${saveGig} onCancel=${() => setEditing(null)} onClientTravel=${(name, travel) => setClients(l => { const n = cleanName(name); return l.some(c => sameName(c.name, n)) ? l.map(c => sameName(c.name, n) ? Object.assign({}, c, { travel }) : c) : l.concat([{ id: uid(), name: n, phone: '', email: '', notes: '', contacts: [], travel }]); })} /><//>`}
-      ${paying && html`<${MarkPaid} gig=${paying} preset=${payPreset} onClose=${() => { setPayId(null); setPayPreset(null); }}
-        onInvoice=${(num, date) => { const prev = { invIssued: !!paying.invIssued, invNumber: paying.invNumber || '', invDate: paying.invDate || '', docMode: modeOf(paying) }, id = paying.id;
-          update(id, { invIssued: true, invNumber: num, invDate: date, docMode: isComb(paying) ? 'split' : modeOf(paying) }); setPayId(null); setPayPreset(null);
-          setToast({ msg: '📄 חשבונית מס סומנה כהופקה' + (num ? ' · #' + num : ''), undo: () => { update(id, prev); setToast('הסימון בוטל'); } }); }}
-        onConfirm=${(method, date, receipt, newMode) => { const prev = { paidDate: paying.paidDate || '', method: paying.method || '', docNumber: paying.docNumber || '', docIssued: !!paying.docIssued, docMode: modeOf(paying) }, id = paying.id;
-          update(id, Object.assign({ paidDate: date, method }, newMode ? { docMode: newMode, docNeeded: newMode !== 'none' } : {}, receipt ? { docNumber: receipt, docIssued: true } : {})); setPayId(null); setPayPreset(null);
-          if (!prev.paidDate) setTimeout(() => celebrate('paid'), 120);
-          setToast({ msg: money(amt(paying)) + ' התקבלו ב' + method + (receipt ? ' · קבלה ' + receipt : ''), undo: () => { update(id, prev); setToast('הרישום בוטל'); } }); }} />`}
-      ${docGig && html`<${DocSheet} gig=${docGig} kind=${docReq.kind} onClose=${() => setDocReq(null)}
+      ${paying && html`<${MarkPaid} gig=${paying} gigs=${gigs} preSel=${paySel} preset=${payPreset} onClose=${() => { setPayId(null); setPayPreset(null); setPaySel([]); }}
+        onInvoice=${(num, date, extra = []) => { const all = [paying].concat(gigs.filter(x => extra.includes(x.id)));
+          const prevs = all.map(x => [x.id, { invIssued: !!x.invIssued, invNumber: x.invNumber || '', invDate: x.invDate || '', docMode: modeOf(x) }]);
+          all.forEach(x => update(x.id, { invIssued: true, invNumber: num, invDate: date, docMode: isComb(x) ? 'split' : modeOf(x) })); setPayId(null); setPayPreset(null);
+          setToast({ msg: '📄 חשבונית מס סומנה כהופקה' + (num ? ' · #' + num : '') + (all.length > 1 ? ' · ' + all.length + ' אירועים' : ''), undo: () => { prevs.forEach(([id, p]) => update(id, p)); setToast('הסימון בוטל'); } }); }}
+        onConfirm=${(method, date, receipt, newMode, extra = [], kind) => { const all = [paying].concat(gigs.filter(x => extra.includes(x.id)));
+          const prevs = all.map(x => [x.id, { paidDate: x.paidDate || '', method: x.method || '', docNumber: x.docNumber || '', docIssued: !!x.docIssued, docMode: modeOf(x) }]);
+          all.forEach((x, i) => { const nm = i === 0 ? newMode : newMode ? (kind === 'comb' ? 'combined' : hasInv(x) ? 'split' : 'receipt') : null;
+            update(x.id, Object.assign({ paidDate: date, method }, nm ? { docMode: nm, docNeeded: nm !== 'none' } : {}, receipt ? { docNumber: receipt, docIssued: true } : {})); });
+          setPayId(null); setPayPreset(null); setPaySel([]);
+          if (!prevs[0][1].paidDate) setTimeout(() => celebrate('paid'), 120);
+          setToast({ msg: money(all.reduce((a, x) => a + amt(x), 0)) + ' התקבלו ב' + method + (receipt ? ' · קבלה ' + receipt : '') + (all.length > 1 ? ' · ' + all.length + ' אירועים' : ''), undo: () => { prevs.forEach(([id, p]) => update(id, p)); setToast('הרישום בוטל'); } }); }} />`}
+      ${docGig && html`<${DocSheet} gig=${docGig} gigs=${gigs} kind=${docReq.kind} onClose=${() => setDocReq(null)}
         onUnset=${() => { update(docGig.id, docReq.kind === 'inv' ? { invIssued: false } : { docIssued: false }); setDocReq(null); setToast('ההפקה בוטלה'); }}
-        onSave=${(num, date) => {
-          const g = docGig, k = docReq.kind;
-          const patch = k === 'inv' ? { invIssued: true, invNumber: num, invDate: date, docMode: isComb(g) ? 'split' : modeOf(g) }
+        onSave=${(num, date, extra = []) => {
+          const k = docReq.kind, all = [docGig].concat(gigs.filter(x => extra.includes(x.id)));
+          const patchOf = g => k === 'inv' ? { invIssued: true, invNumber: num, invDate: date, docMode: isComb(g) ? 'split' : modeOf(g) }
             : k === 'rec' ? { docIssued: true, docNumber: num, docDate: date, docMode: hasInv(g) ? 'split' : 'receipt' }
             : { docIssued: true, docNumber: num, docDate: date, docMode: 'combined', invIssued: false };
-          update(g.id, patch); setDocReq(null); setToast(DOCS[k].name + ' סומנה כהופקה' + (num ? ' · #' + num : ''));
+          all.forEach(g => update(g.id, patchOf(g))); setDocReq(null); setToast(DOCS[k].name + ' סומנה כהופקה' + (num ? ' · #' + num : '') + (all.length > 1 ? ' · ' + all.length + ' אירועים' : ''));
         }} />`}
       ${lockOn && appLocked && html`<${AppLock} admin=${data.admin} pin=${(data.config || {}).pin} onOk=${() => appUnlocked(data.admin.hash)} onSetPin=${pin => setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { pin }) }))} />`}
       ${login && html`<${AdminLogin} adminData=${data.admin} mode=${login} onSuccess=${onLoggedIn} onSetPassword=${onSetPassword} onClose=${() => setLogin(null)} />`}

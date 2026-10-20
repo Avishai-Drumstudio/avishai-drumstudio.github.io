@@ -211,14 +211,14 @@ window.SITE_DEFAULTS = {
     { title: "מרחוק", text: "מקליט אצלי, בתקשורת רציפה איתך" },
     { title: "כל ז'אנר", text: "רוק, פופ, פאנק, ים-תיכוני, חסידי" }
   ],
-  hProcess: "מסקיצה לערוצים בשלושה צעדים",
+  hProcess: "איך זה עובד",
   steps: [
     { title: "שולחים סקיצה", text: "שלח לי את השיר בוואטסאפ, עם רפרנס אם יש לך." },
     { title: "מתאימים סאונד ומקליטים", text: "בוחרים יחד תוף, סנר וסאונד שמתאימים לפרויקט, ואני מקליט." },
     { title: "מקבלים ערוצים", text: "ערוצים מופרדים ברמת Mix Ready, מוכנים לעבודה." }
   ],
   hProductions: "שירים שניגנתי בהם",
-  hCovers: "מתופף אחד, הרבה סגנונות",
+  hCovers: "קאברים",
   pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
   covers: [
     { url: "assets/covers/c1.mp4", poster: "assets/covers/c1.jpg", style: "רוק", title: "", show: true },
@@ -228,14 +228,15 @@ window.SITE_DEFAULTS = {
     { url: "assets/covers/c3.mp4", poster: "assets/covers/c3.jpg", style: "גרוב", title: "", show: true },
     { url: "assets/covers/c5.mp4", poster: "assets/covers/c5.jpg", style: "פופ-רוק", title: "", show: true }
   ],
-  hSources: "ככה נשמעים הערוצים",
+  hSources: "סורסים",
   pSources: "ערוצי תופים כמו שהם יוצאים מהאולפן, לפני מיקס.",
   hStudio: "האולפן והציוד",
   hTestimonials: "מה אומרים מפיקים",
   ctaTitle: "יש לך שיר שמחכה לתופים?",
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
-  order: ["reel", "covers", "facts", "process", "sources", "about", "studio", "productions", "testimonials", "marquee", "cta"],
+  order: ["reel", "process", "sources", "covers", "about", "facts", "studio", "testimonials", "productions", "marquee", "cta"],
+  layoutV: 2,
   show: { reel: true, covers: true, about: true, marquee: false, facts: true, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -305,6 +306,11 @@ window.mergeContent = function (saved) {
   // a bare social homepage (e.g. https://facebook.com) isn't a real profile — hide it
   d.socials = (d.socials || []).filter(x => x && !/^https?:\/\/(www\.)?(facebook|instagram|tiktok|youtube)\.com\/?$/i.test(String(x.url || "").trim()));
   if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
+  if (saved && (saved.layoutV || 0) < 2) {
+    const D = window.SITE_DEFAULTS;
+    d.order = D.order.slice(); d.layoutV = D.layoutV;
+    ["hProcess", "hSources", "hCovers", "hStudio"].forEach(k => d[k] = D[k]);
+  }
   const all = window.SITE_DEFAULTS.order.concat((d.custom || []).filter(c => c && c.id).map(c => "c_" + c.id));
   d.order = (d.order || []).filter(k => all.includes(k));
   all.forEach((k, i) => { if (d.order.includes(k)) return;

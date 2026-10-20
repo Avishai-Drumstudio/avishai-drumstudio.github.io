@@ -779,6 +779,28 @@ html,body{max-width:100%;overflow-x:hidden}
 .about__text .about__name{font-weight:700;font-size:clamp(1.15rem,4.4vw,1.4rem);color:var(--lime);margin-top:-6px}
 .about__body p,.about__body p:first-child{font-size:15.5px !important;line-height:1.75;font-weight:400 !important;color:#D5CDBE !important}
 
+/* ===== the page as a journey: chapter numbers behind clear titles ===== */
+.has-chap{position:relative;isolation:isolate}
+.chap{position:absolute;left:50%;top:50%;z-index:-1;transform:translate(-50%,-46%) scale(.85);opacity:0;pointer-events:none;
+  font:900 clamp(6rem,30vw,11rem)/1 Inter,system-ui,sans-serif;letter-spacing:-.05em;direction:ltr;
+  color:transparent;-webkit-text-stroke:1.5px rgba(46,211,195,.38);
+  background:linear-gradient(180deg,rgba(46,211,195,.14),transparent 75%);-webkit-background-clip:text;background-clip:text;
+  transition:opacity .9s ease,transform 1.1s cubic-bezier(.2,.8,.2,1)}
+.has-chap.chap-in .chap{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.has-chap h2{position:relative}
+.has-chap h2::after{content:"";display:block;width:0;height:3px;margin:12px auto 0;border-radius:3px;background:var(--tq-grad);transition:width .9s .25s cubic-bezier(.2,.8,.2,1)}
+.has-chap.chap-in h2::after{width:54px}
+.has-chap .rule{display:none}
+/* about: number sits behind the right-aligned title */
+.about__text.has-chap .chap{left:auto;right:-6px;top:0;transform:translateY(-30%) scale(.85)}
+.about__text.has-chap.chap-in .chap{transform:translateY(-34%) scale(1)}
+.about__text.has-chap h2::after{margin-inline:0 auto;margin-right:0}
+/* a thin path that leads from one chapter to the next */
+.chapter:not(:first-of-type)::before{content:"";display:block;width:2px;height:clamp(40px,8vw,70px);margin:0 auto clamp(18px,4vw,30px);border-radius:2px;
+  background:linear-gradient(to bottom,transparent,rgba(46,211,195,.65))}
+.reel.chapter::before{display:none}
+.reel .head h2{font-size:clamp(1.7rem,6.5vw,2.6rem)}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -837,7 +859,7 @@ html,body{max-width:100%;overflow-x:hidden}
 
   <!-- ============ REEL ============ -->
   <section class="reel" id="reel" aria-label="הפקות נבחרות">
-    <div class="wrap"><div class="head"><span class="eyebrow">הפקות נבחרות</span></div></div>
+    <div class="wrap"><div class="head"><h2>הפקות נבחרות</h2></div></div>
     <div class="reel__track" id="reelTrack"></div>
     <div class="reel__nav">
       <button class="reel__arrow" type="button" id="reelPrev" aria-label="הקודם"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1098,14 +1120,14 @@ window.SITE_DEFAULTS = {
     { title: "מרחוק", text: "מקליט אצלי, בתקשורת רציפה איתך" },
     { title: "כל ז'אנר", text: "רוק, פופ, פאנק, ים-תיכוני, חסידי" }
   ],
-  hProcess: "מסקיצה לערוצים בשלושה צעדים",
+  hProcess: "איך זה עובד",
   steps: [
     { title: "שולחים סקיצה", text: "שלח לי את השיר בוואטסאפ, עם רפרנס אם יש לך." },
     { title: "מתאימים סאונד ומקליטים", text: "בוחרים יחד תוף, סנר וסאונד שמתאימים לפרויקט, ואני מקליט." },
     { title: "מקבלים ערוצים", text: "ערוצים מופרדים ברמת Mix Ready, מוכנים לעבודה." }
   ],
   hProductions: "שירים שניגנתי בהם",
-  hCovers: "מתופף אחד, הרבה סגנונות",
+  hCovers: "קאברים",
   pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
   covers: [
     { url: "assets/covers/c1.mp4", poster: "assets/covers/c1.jpg", style: "רוק", title: "", show: true },
@@ -1115,14 +1137,15 @@ window.SITE_DEFAULTS = {
     { url: "assets/covers/c3.mp4", poster: "assets/covers/c3.jpg", style: "גרוב", title: "", show: true },
     { url: "assets/covers/c5.mp4", poster: "assets/covers/c5.jpg", style: "פופ-רוק", title: "", show: true }
   ],
-  hSources: "ככה נשמעים הערוצים",
+  hSources: "סורסים",
   pSources: "ערוצי תופים כמו שהם יוצאים מהאולפן, לפני מיקס.",
   hStudio: "האולפן והציוד",
   hTestimonials: "מה אומרים מפיקים",
   ctaTitle: "יש לך שיר שמחכה לתופים?",
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
-  order: ["reel", "covers", "facts", "process", "sources", "about", "studio", "productions", "testimonials", "marquee", "cta"],
+  order: ["reel", "process", "sources", "covers", "about", "facts", "studio", "testimonials", "productions", "marquee", "cta"],
+  layoutV: 2,
   show: { reel: true, covers: true, about: true, marquee: false, facts: true, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1192,6 +1215,11 @@ window.mergeContent = function (saved) {
   // a bare social homepage (e.g. https://facebook.com) isn't a real profile — hide it
   d.socials = (d.socials || []).filter(x => x && !/^https?:\/\/(www\.)?(facebook|instagram|tiktok|youtube)\.com\/?$/i.test(String(x.url || "").trim()));
   if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
+  if (saved && (saved.layoutV || 0) < 2) {
+    const D = window.SITE_DEFAULTS;
+    d.order = D.order.slice(); d.layoutV = D.layoutV;
+    ["hProcess", "hSources", "hCovers", "hStudio"].forEach(k => d[k] = D[k]);
+  }
   const all = window.SITE_DEFAULTS.order.concat((d.custom || []).filter(c => c && c.id).map(c => "c_" + c.id));
   d.order = (d.order || []).filter(k => all.includes(k));
   all.forEach((k, i) => { if (d.order.includes(k)) return;
@@ -1365,6 +1393,20 @@ window.mergeContent = function (saved) {
       $$("[data-split]", sec).forEach(splitWords);
     });
     S.order.forEach(k => { const el = document.getElementById(ids[k]); if(el){ main.appendChild(el); el.hidden = S.show[k] === false; } });
+
+    // the page as a short journey: each main part gets a big chapter number behind its title, in page order
+    (() => { const chapters = ["reel","process","sources","covers","about","studio"];
+      let n = 0;
+      S.order.forEach(k => { if(!chapters.includes(k)) return; const el = document.getElementById(ids[k]); if(!el || el.hidden) return;
+        if(k === "covers" && !S.covers.length) return; if(k === "reel" && !S.productions.length) return;
+        n++; el.classList.add("chapter");
+        const head = k === "about" ? el.querySelector(".about__text") : el.querySelector(".head");
+        if(!head || head.querySelector(".chap")) return;
+        const c = document.createElement("span"); c.className = "chap"; c.setAttribute("aria-hidden", "true"); c.textContent = String(n).padStart(2, "0");
+        head.classList.add("has-chap"); head.prepend(c); });
+      if("IntersectionObserver" in window){ const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add("chap-in"); io.unobserve(e.target); } }), {threshold:.2});
+        $$(".has-chap").forEach(x => io.observe(x)); } else $$(".has-chap").forEach(x => x.classList.add("chap-in"));
+    })();
 
     // menu: every visible section, in page order
     const navNames = { reel:"הפקות נבחרות", about:"קצת עליי", marquee:"ז'אנרים", facts:"במה אני שונה", process:"איך זה עובד", covers:"קאברים", productions:"הפקות", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", cta:"יצירת קשר" };

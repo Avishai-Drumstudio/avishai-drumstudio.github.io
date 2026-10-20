@@ -923,7 +923,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .reel__dots i{position:relative;overflow:hidden}
 .reel__dots i.on{width:46px;background:rgba(46,211,195,.25)}
 .reel__dots i.on::after{content:"";position:absolute;inset:0;border-radius:6px;background:var(--tq-grad);box-shadow:0 0 8px rgba(46,211,195,.7);transform-origin:right;transform:scaleX(1)}
-.reel__dots.is-auto i.on::after{animation:reelTime 4.2s linear both}
+.reel__dots.is-auto i.on::after{animation:reelTime 3.2s linear both}
 @keyframes reelTime{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 
 </style>
@@ -1471,13 +1471,18 @@ window.mergeContent = function (saved) {
     addEventListener("pointermove", e => { if(!down) return; const dx = e.clientX - sx; if(Math.abs(dx) > 5){ dragged = true; track.classList.add("is-drag"); } track.scrollLeft = sl - dx; });
     addEventListener("pointerup", () => { if(!down) return; down = false; track.classList.remove("is-drag"); if(dragged){ center(active); setTimeout(() => dragged = false, 50); } });
 
-    // gentle auto-advance until the visitor touches it
-    let timer = 0, visible = false;
-    const stopAuto = () => { clearInterval(timer); timer = -1; dots.classList.remove("is-auto"); };
+    // gentle auto-advance; touching it pauses for a moment, then it carries on by itself
+    const STEP = 3200; let timer = 0, visible = false, resumeT = 0;
+    const tick = () => { if(!visible || document.visibilityState !== "visible" || !$("#modal").hidden) return;
+      if(items.some(el => el.classList.contains("is-playing"))) return; // a video is playing inside the reel
+      dots.classList.remove("is-auto"); void dots.offsetWidth; dots.classList.add("is-auto"); center(active + 1 >= items.length ? 0 : active + 1); };
+    const startAuto = () => { if(reduce || timer) return; dots.classList.remove("is-auto"); void dots.offsetWidth; dots.classList.toggle("is-auto", visible);
+      timer = setInterval(tick, STEP); };
+    const stopAuto = () => { clearInterval(timer); timer = 0; dots.classList.remove("is-auto"); clearTimeout(resumeT);
+      resumeT = setTimeout(() => { if(!items.some(el => el.classList.contains("is-playing"))) startAuto(); }, 1500); };
     ["touchstart","wheel"].forEach(ev => track.addEventListener(ev, stopAuto, {passive:true}));
     if(!reduce && "IntersectionObserver" in window){
-      new IntersectionObserver(([e]) => { visible = e.isIntersecting; dots.classList.toggle("is-auto", visible && timer !== -1); }).observe(track);
-      timer = setInterval(() => { if(timer !== -1 && visible && document.visibilityState === "visible" && $("#modal").hidden) { dots.classList.remove("is-auto"); void dots.offsetWidth; dots.classList.add("is-auto"); center(active + 1 >= items.length ? 0 : active + 1); } }, 4200);
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; if(visible){ clearInterval(timer); timer = 0; startAuto(); } else dots.classList.remove("is-auto"); }).observe(track);
     }
     requestAnimationFrame(paint);
   }

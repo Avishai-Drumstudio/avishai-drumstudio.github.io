@@ -237,7 +237,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "process", "sources", "covers", "about", "facts", "studio", "testimonials", "productions", "marquee", "cta"],
-  layoutV: 7,
+  layoutV: 8,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -281,7 +281,10 @@ window.SITE_DEFAULTS = {
     { name: "כרטיס קול ופראמפים", show: true }
   ],
   custom: [],
-  testimonials: [],
+  testimonials: [
+    { name: "נתן שלום", role: "", text: "הערוצים של אבישי *מדויקים ברמה אחרת*, והסורסים פשוט נשמעים מעולה. כיף לעבוד איתו – ממליץ בחום.", show: true },
+    { name: "אבישי רוזן", role: "", text: "דינמי, מקליט מגוון סגנונות ותמיד זמין. *בן אדם זהב* – וכיף גדול לעבוד איתו.", show: true }
+  ],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
     { type: "youtube", url: "https://youtube.com/@avishaiyashar-4676?si=sjj83mEsxMoenPS5" },
@@ -307,6 +310,9 @@ window.mergeContent = function (saved) {
   // a bare social homepage (e.g. https://facebook.com) isn't a real profile — hide it
   d.socials = (d.socials || []).filter(x => x && !/^https?:\/\/(www\.)?(facebook|instagram|tiktok|youtube)\.com\/?$/i.test(String(x.url || "").trim()));
   if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
+  if (saved && (saved.layoutV || 0) < 8 && !(saved.testimonials || []).some(t => t && t.text && t.show !== false)) {
+    d.testimonials = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials)); d.layoutV = 8; // approved quotes
+  }
   if (saved && (saved.layoutV || 0) < 2) {
     const D = window.SITE_DEFAULTS;
     d.order = D.order.slice(); d.layoutV = D.layoutV;

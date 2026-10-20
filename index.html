@@ -877,6 +877,23 @@ html,body{max-width:100%;overflow-x:hidden}
 .c3__bar{width:min(180px,46vw);height:4px;border-radius:4px;background:rgba(237,228,211,.14)}
 .c3__bar i{border-radius:4px;background:var(--tq-grad);box-shadow:0 0 10px rgba(46,211,195,.6)}
 
+/* ===== testimonials: drifting, grabbable strip ===== */
+.quotes{display:block;overflow-x:auto;overflow-y:hidden;direction:ltr;scrollbar-width:none;margin-inline:calc(var(--gutter)*-1);padding:18px 0 22px;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);touch-action:pan-x pan-y;overscroll-behavior-x:contain}
+.quotes::-webkit-scrollbar{display:none}
+.quotes__track{display:flex;gap:18px;width:max-content;padding-inline:var(--gutter);animation:none !important}
+.quote{--f:1;direction:rtl;width:min(80vw,340px);flex:none;border-radius:26px;padding:24px 22px 18px;position:relative;
+  background:linear-gradient(155deg,rgba(46,211,195,calc(.05 + var(--f) * .12)),rgba(255,255,255,.02) 55%),var(--surface);
+  border:1px solid rgba(46,211,195,calc(.1 + var(--f) * .45));
+  transform:scale(calc(.9 + var(--f) * .1));opacity:calc(.45 + var(--f) * .55);
+  box-shadow:0 30px 60px -34px rgba(0,0,0,.9),0 0 calc(var(--f) * 46px) -14px rgba(46,211,195,.55)}
+.quote::before{display:none}
+.quote__mark{position:absolute;top:-22px;right:18px;width:46px;height:46px;border-radius:50%;background:var(--tq-grad);color:var(--on-lime);display:grid;place-items:center;
+  font:700 44px/1 Georgia,serif;padding-top:16px;box-shadow:0 10px 24px -8px rgba(46,211,195,.7);margin:0;opacity:1}
+.quote p{font-size:16.5px;line-height:1.7;margin-top:14px;color:#ECE5D8}
+.quote mark{background:linear-gradient(transparent 60%,rgba(46,211,195,.28) 60%);color:#fff;font-weight:800;padding:0 2px}
+.quote__who{border-top:1px solid rgba(237,228,211,.1)}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1223,7 +1240,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "process", "sources", "covers", "about", "facts", "studio", "testimonials", "productions", "marquee", "cta"],
-  layoutV: 7,
+  layoutV: 8,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1267,7 +1284,10 @@ window.SITE_DEFAULTS = {
     { name: "כרטיס קול ופראמפים", show: true }
   ],
   custom: [],
-  testimonials: [],
+  testimonials: [
+    { name: "נתן שלום", role: "", text: "הערוצים של אבישי *מדויקים ברמה אחרת*, והסורסים פשוט נשמעים מעולה. כיף לעבוד איתו – ממליץ בחום.", show: true },
+    { name: "אבישי רוזן", role: "", text: "דינמי, מקליט מגוון סגנונות ותמיד זמין. *בן אדם זהב* – וכיף גדול לעבוד איתו.", show: true }
+  ],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
     { type: "youtube", url: "https://youtube.com/@avishaiyashar-4676?si=sjj83mEsxMoenPS5" },
@@ -1293,6 +1313,9 @@ window.mergeContent = function (saved) {
   // a bare social homepage (e.g. https://facebook.com) isn't a real profile — hide it
   d.socials = (d.socials || []).filter(x => x && !/^https?:\/\/(www\.)?(facebook|instagram|tiktok|youtube)\.com\/?$/i.test(String(x.url || "").trim()));
   if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
+  if (saved && (saved.layoutV || 0) < 8 && !(saved.testimonials || []).some(t => t && t.text && t.show !== false)) {
+    d.testimonials = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials)); d.layoutV = 8; // approved quotes
+  }
   if (saved && (saved.layoutV || 0) < 2) {
     const D = window.SITE_DEFAULTS;
     d.order = D.order.slice(); d.layoutV = D.layoutV;
@@ -1858,22 +1881,36 @@ window.mergeContent = function (saved) {
       rail.scrollBy({ left: (card ? card.offsetWidth + 14 : 240) * (+btn.dataset.dir), behavior:"smooth" });
     }));
 
-    // testimonials: a light, slowly drifting strip of quote cards (?demo shows sample quotes so you can see the look)
-    let quotes = S.testimonials, demo = false;
-    if(!quotes.length && /[?&]demo\b/.test(location.search)){ demo = true; quotes = [
-      { name:"נתן שלום", role:"", text:"הערוצים של אבישי *מדויקים ברמה אחרת*, והסורסים פשוט נשמעים מעולה. כיף לעבוד איתו – ממליץ בחום." },
-      { name:"אבישי רוזן", role:"", text:"דינמי, מקליט מגוון סגנונות ותמיד זמין. *בן אדם זהב* – וכיף גדול לעבוד איתו." } ]; }
+    // testimonials: a strip that drifts slowly by itself; grab it to stop, swipe to browse, it carries on after
+    let quotes = S.testimonials;
     if(quotes.length){
       const card = q => `<figure class="quote">
           <span class="quote__mark" aria-hidden="true">”</span>
           <p>${esc(q.text).replace(/\*([^*]+)\*/g, "<mark>$1</mark>")}</p>
           <figcaption class="quote__who"><span class="quote__av" aria-hidden="true">${esc((q.name||"?").trim().charAt(0))}</span><span><b>${esc(q.name)}</b>${q.role ? `<small>${esc(q.role)}</small>` : ""}</span></figcaption>
         </figure>`;
-      const set = quotes.map(card).join("");
-      $("#quotes").innerHTML = `<div class="quotes__track">${set}${quotes.length > 1 ? set : ""}</div>`;
-      $("#quotes").classList.toggle("is-loop", quotes.length > 1);
-      $("#quotes").style.setProperty("--qn", quotes.length);
-      if(demo){ $("#testimonials").hidden = false; $("#testimonials").classList.add("is-demo"); }
+      const box = $("#quotes"), set = quotes.map(card).join(""), reps = quotes.length < 4 ? 4 : 2;
+      box.innerHTML = `<div class="quotes__track">${Array(reps).fill(set).join("")}</div>`;
+      const track = box.firstChild;
+      if(!reduce){
+        let held = false, resumeT = 0, last = 0, raf = 0, inView = false, x = 0;
+        const unit = () => track.scrollWidth / reps;           // width of one full set
+        const step = now => { const dt = Math.min(50, now - (last || now)); last = now;
+          if(!held && inView){ x = box.scrollLeft + dt * .035; const u = unit(); if(x >= u * 2) x -= u; box.scrollLeft = x; }
+          // the card nearest the middle stands out
+          const mid = box.getBoundingClientRect().left + box.clientWidth / 2;
+          for(const el of track.children){ const r = el.getBoundingClientRect(); const d = Math.min(1, Math.abs(r.left + r.width / 2 - mid) / (box.clientWidth * .6));
+            el.style.setProperty("--f", (1 - d).toFixed(3)); }
+          raf = requestAnimationFrame(step); };
+        const hold = () => { held = true; clearTimeout(resumeT); };
+        const release = () => { clearTimeout(resumeT); resumeT = setTimeout(() => { held = false; last = 0; }, 2200); };
+        box.addEventListener("pointerdown", hold); box.addEventListener("touchstart", hold, {passive:true});
+        ["pointerup","pointercancel","touchend","mouseleave"].forEach(ev => box.addEventListener(ev, release, {passive:true}));
+        box.addEventListener("scroll", () => { if(held){ const u = unit(); if(box.scrollLeft < u * .5) box.scrollLeft += u; else if(box.scrollLeft > u * 2.5) box.scrollLeft -= u; } }, {passive:true});
+        requestAnimationFrame(() => { box.scrollLeft = unit(); });
+        if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; }).observe(box); else inView = true;
+        raf = requestAnimationFrame(step);
+      }
     } else $("#testimonials").hidden = true;
 
     // socials

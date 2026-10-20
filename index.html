@@ -830,13 +830,27 @@ html,body{max-width:100%;overflow-x:hidden}
 .step__n{font-size:11.5px;padding:0 8px;margin-bottom:4px}
 .step h3{font-size:1.08rem}
 .step p{font-size:14.5px;line-height:1.55;margin-top:2px}
-/* ===== sources: 3D tilt, dancing waveform, spinning play ring ===== */
-#tracks{perspective:1000px}
-.track{--rx:0deg;--ty:0px;--op:1;transform:rotateX(var(--rx)) translateY(var(--ty));opacity:var(--op);transform-origin:50% 50%;
-  transition:box-shadow .5s,border-color .5s,background .5s;will-change:transform;
-  background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.01) 60%),var(--surface);position:relative;overflow:hidden}
+/* ===== sources: wallet-style stack — tap a card to pull it out ===== */
+.tracks{display:block;max-width:560px;margin-inline:auto;perspective:1100px}
+.track{--k:0;position:relative;overflow:hidden;padding:18px 18px;gap:0;border-radius:24px;transform-origin:50% 0;
+  background:linear-gradient(150deg,hsla(calc(172 + var(--k) * 26),62%,46%,.28),rgba(255,255,255,.02) 55%),var(--surface);
+  border:1px solid rgba(237,228,211,.12);box-shadow:0 -10px 30px -18px rgba(0,0,0,.9),0 24px 50px -30px rgba(0,0,0,.9);
+  transition:transform .6s cubic-bezier(.2,.8,.2,1),margin .6s cubic-bezier(.2,.8,.2,1),box-shadow .5s,border-color .5s;cursor:pointer}
+.track + .track{margin-top:-14px}
+.track:not(.is-open){transform:rotateX(14deg) scale(.97)}
+.track:not(.is-open):active{transform:rotateX(6deg) scale(.985)}
+.track.is-open{cursor:default;transform:translateZ(30px);z-index:3;border-color:rgba(46,211,195,.45);box-shadow:0 34px 80px -30px rgba(0,0,0,.95),0 0 50px -16px rgba(46,211,195,.45)}
+.track.is-open + .track{margin-top:18px}
+.track__body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s cubic-bezier(.2,.8,.2,1)}
+.track__in{overflow:hidden;display:grid;gap:16px;min-height:0}
+.track.is-open .track__body{grid-template-rows:1fr}
+.track.is-open .track__in{padding-top:16px}
+.track:not(.is-open) .track__time{opacity:.5}
+.track__top{position:relative;z-index:1}
+.track::after{content:"";position:absolute;top:0;left:24px;right:24px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);pointer-events:none}
+/* playing: dancing waveform, spinning ring, soft moving glow */
 .track::before{content:"";position:absolute;inset:-40% -10% auto;height:80%;background:radial-gradient(closest-side,rgba(46,211,195,.22),transparent);opacity:0;transition:opacity .6s;pointer-events:none}
-.track.is-playing{border-color:rgba(46,211,195,.55);box-shadow:0 30px 70px -30px rgba(0,0,0,.9),0 0 50px -12px rgba(46,211,195,.5)}
+.track.is-playing{border-color:rgba(46,211,195,.6)}
 .track.is-playing::before{opacity:1;animation:trGlow 3s ease-in-out infinite alternate}
 @keyframes trGlow{from{transform:translateX(-12%)}to{transform:translateX(12%)}}
 .track__btn{position:relative}
@@ -846,9 +860,11 @@ html,body{max-width:100%;overflow-x:hidden}
 .track.is-playing .wave i{animation:wDance .55s ease-in-out infinite alternate;animation-delay:var(--d,0s);transform-origin:50% 50%}
 @keyframes wDance{from{transform:scaleY(.72)}to{transform:scaleY(1.12)}}
 .track.is-playing .wave i.on{box-shadow:0 0 8px rgba(46,211,195,.45)}
-.wave i{transition:background .2s,transform .2s}
-@media (prefers-reduced-motion:reduce){.track{transform:none;opacity:1}.track.is-playing .wave i,.track.is-playing .track__btn::after,.track.is-playing::before{animation:none}}
-.step__n{display:none}.step{padding:24px 14px 12px}.steps{gap:22px}
+@media (min-width:820px){.tracks{grid-template-columns:none}}
+@media (prefers-reduced-motion:reduce){.track,.track__body{transition:none}.track.is-playing .wave i,.track.is-playing .track__btn::after,.track.is-playing::before{animation:none}}
+/* testimonials: highlighted phrase */
+.quote mark{background:none;color:#7FE7DC;font-weight:700}
+.quote__mark{width:auto;height:30px;font:700 64px/1 Georgia,"Times New Roman",serif;color:var(--lime);opacity:.85;display:block;margin-bottom:-6px}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1567,15 +1583,6 @@ window.mergeContent = function (saved) {
       place(); addEventListener("resize", place); setTimeout(place, 600); setTimeout(place, 2000);
       c.addEventListener("click", () => { const nx = [...$("#main").children].find(x => x.id !== "hero" && !x.hidden && x.offsetHeight); if(nx) nx.scrollIntoView({behavior: reduce ? "auto" : "smooth"}); }); })();
 
-    // sources: cards tilt in 3D as they pass through the screen
-    (() => { const cards = $$("#tracks .track"); if(!cards.length || reduce) return; let q = 0;
-      const upd = () => { q = 0; const mid = innerHeight / 2;
-        cards.forEach(el => { const r = el.getBoundingClientRect(); if(r.bottom < -50 || r.top > innerHeight + 50) return;
-          const d = Math.max(-1, Math.min(1, (r.top + r.height / 2 - mid) / (innerHeight * .6)));
-          el.style.setProperty("--rx", (d * 14).toFixed(2) + "deg"); el.style.setProperty("--ty", (Math.abs(d) * 18).toFixed(1) + "px");
-          el.style.setProperty("--op", (1 - Math.abs(d) * .35).toFixed(3)); }); };
-      addEventListener("scroll", () => { if(!q) q = requestAnimationFrame(upd); }, {passive:true}); addEventListener("resize", upd); upd(); })();
-
     // about: a studio fader — rides up with the scroll, and you can push it with a finger
     (() => { const f = $("#aboutFader"); if(!f) return; let held = false, cur = .3, want = .3, raf = 0;
       const set = v => { cur = v; f.style.setProperty("--v", v.toFixed(3)); };
@@ -1717,6 +1724,7 @@ window.mergeContent = function (saved) {
           <h3 class="track__name">${esc(t.name)}</h3>
           ${real(t.audio) ? `<span class="track__time"><span class="cur">0:00</span> / <span class="dur">0:00</span></span>` : ``}
         </div>
+        <div class="track__body"><div class="track__in">
         ${real(t.audio) ? `<div class="wave" role="slider" tabindex="0" aria-label="מיקום בשיר ${esc(t.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${bars(t.name).map((h,j) => `<i style="height:${h}%;--d:${((j * 37) % 11) * -.07}s"></i>`).join("")}<b class="wave__head" aria-hidden="true"></b></div>
         <div class="skip" dir="ltr">
           <button type="button" data-skip="-10" aria-label="10 שניות אחורה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 4 12l7 7M20 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>10</button>
@@ -1728,7 +1736,16 @@ window.mergeContent = function (saved) {
           <input type="range" min="0" max="100" value="0" aria-label="מעבר בין התופים לבד לבין ההפקה המלאה">
         </div>` : ``}
         ${real(t.drive) ? `<a class="btn btn--line" href="${esc(t.drive)}" target="_blank" rel="noopener">${icon('i-folder')}לערוצים המלאים</a>` : ``}
+        </div></div>
       </article>`).join("");
+    // a wallet-style stack: one source open, the rest tucked in behind — tap a card to pull it out
+    (() => { const box = $("#tracks"), cards = $$(".track", box); if(!cards.length) return;
+      cards.forEach((el,i) => el.style.setProperty("--k", i));
+      const open = el => { cards.forEach(c => c.classList.toggle("is-open", c === el)); box.classList.add("has-open"); };
+      open(cards[0]);
+      box.addEventListener("click", e => { const el = e.target.closest(".track"); if(!el || el.classList.contains("is-open")) return;
+        if(e.target.closest(".track__btn")) { open(el); return; } e.preventDefault(); open(el); }, true);
+    })();
     $$(".track").forEach(el => {
       const t = S.sources[el.dataset.i]; if(!real(t.audio)) return;
       const hasMix = real(t.mix);
@@ -1833,14 +1850,13 @@ window.mergeContent = function (saved) {
     // testimonials: a light, slowly drifting strip of quote cards (?demo shows sample quotes so you can see the look)
     let quotes = S.testimonials, demo = false;
     if(!quotes.length && /[?&]demo\b/.test(location.search)){ demo = true; quotes = [
-      { name:"שם המפיק", role:"מפיק מוזיקלי · אלבום 2026", text:"הקלטה מרחוק שהרגישה כמו באולפן שלי. שמעתי כל טייק בזמן אמת, והערוצים הגיעו למחרת – נקיים ומוכנים למיקס." },
-      { name:"שם האמן", role:"זמר · סינגל", text:"אבישי הבין בדיוק מה השיר צריך. התופים נתנו לשיר את האנרגיה שחסרה לו." },
-      { name:"שם נוסף", role:"מפיק · ים-תיכוני", text:"מקצועי, מהיר וקשוב. שלחתי סקיצה בערב ובבוקר כבר היו לי ערוצים." } ]; }
+      { name:"נתן שלום", role:"", text:"הערוצים של אבישי *מדויקים ברמה אחרת*, והסורסים פשוט נשמעים מעולה. כיף לעבוד איתו – ממליץ בחום." },
+      { name:"אבישי רוזן", role:"", text:"דינמי, מקליט מגוון סגנונות ותמיד זמין. *בן אדם זהב* – וכיף גדול לעבוד איתו." } ]; }
     if(quotes.length){
       const card = q => `<figure class="quote">
-          <svg class="quote__mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7H6.5A2.5 2.5 0 0 0 4 9.5V13h4v4H4M20 7h-3.5A2.5 2.5 0 0 0 14 9.5V13h4v4h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <p>${esc(q.text)}</p>
-          <figcaption class="quote__who"><span class="quote__av" aria-hidden="true">${esc((q.name||"?").trim().charAt(0))}</span><span><b>${esc(q.name)}</b><small>${esc(q.role || "")}</small></span></figcaption>
+          <span class="quote__mark" aria-hidden="true">”</span>
+          <p>${esc(q.text).replace(/\*([^*]+)\*/g, "<mark>$1</mark>")}</p>
+          <figcaption class="quote__who"><span class="quote__av" aria-hidden="true">${esc((q.name||"?").trim().charAt(0))}</span><span><b>${esc(q.name)}</b>${q.role ? `<small>${esc(q.role)}</small>` : ""}</span></figcaption>
         </figure>`;
       const set = quotes.map(card).join("");
       $("#quotes").innerHTML = `<div class="quotes__track">${set}${quotes.length > 1 ? set : ""}</div>`;

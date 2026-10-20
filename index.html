@@ -919,6 +919,13 @@ html,body{max-width:100%;overflow-x:hidden}
 .gear-more__btn{position:relative;z-index:1;background:#0f1716;box-shadow:0 -10px 30px 10px #0f1716}
 @media (prefers-reduced-motion:reduce){.gear-peek__c{animation:none}}
 
+/* selected productions: the active dot is a timer that fills until the next video */
+.reel__dots i{position:relative;overflow:hidden}
+.reel__dots i.on{width:46px;background:rgba(46,211,195,.25)}
+.reel__dots i.on::after{content:"";position:absolute;inset:0;border-radius:6px;background:var(--tq-grad);box-shadow:0 0 8px rgba(46,211,195,.7);transform-origin:right;transform:scaleX(1)}
+.reel__dots.is-auto i.on::after{animation:reelTime 4.2s linear both}
+@keyframes reelTime{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1466,11 +1473,11 @@ window.mergeContent = function (saved) {
 
     // gentle auto-advance until the visitor touches it
     let timer = 0, visible = false;
-    const stopAuto = () => { clearInterval(timer); timer = -1; };
+    const stopAuto = () => { clearInterval(timer); timer = -1; dots.classList.remove("is-auto"); };
     ["touchstart","wheel"].forEach(ev => track.addEventListener(ev, stopAuto, {passive:true}));
     if(!reduce && "IntersectionObserver" in window){
-      new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(track);
-      timer = setInterval(() => { if(timer !== -1 && visible && document.visibilityState === "visible" && $("#modal").hidden) center(active + 1 >= items.length ? 0 : active + 1); }, 4200);
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; dots.classList.toggle("is-auto", visible && timer !== -1); }).observe(track);
+      timer = setInterval(() => { if(timer !== -1 && visible && document.visibilityState === "visible" && $("#modal").hidden) { dots.classList.remove("is-auto"); void dots.offsetWidth; dots.classList.add("is-auto"); center(active + 1 >= items.length ? 0 : active + 1); } }, 4200);
     }
     requestAnimationFrame(paint);
   }

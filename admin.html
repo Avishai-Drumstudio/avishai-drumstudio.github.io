@@ -213,7 +213,7 @@ window.SITE_DEFAULTS = {
   ],
   hProcess: "איך זה עובד",
   steps: [
-    { title: "הסקיצה", text: "שולחים לי את השיר בוואטסאפ – סקיצה או פלייבק, עם טמפו ורפרנס לסאונד שאתה אוהב." },
+    { title: "הסקיצה", text: "שולחים לי את השיר – סקיצה או פלייבק, עם טמפו ורפרנס לסאונד שאתה אוהב." },
     { title: "הסאונד", text: "בוחרים יחד מערכת תופים, סנר וכיוון – סאונד שמתאים בדיוק להפקה שלך." },
     { title: "ההקלטה", text: "אני שולח לך גייד ואתה נותן הערות, או שמתחברים לייב בווידאו ואתה שומע את האולפן בזמן אמת – כאילו אתה בחדר." },
     { title: "הערוצים", text: "תוך 24 שעות אצלך: ערוצים נקיים ומוכנים למיקס, בפורמט שנוח לך. כולל עד 3 סבבי תיקונים." }
@@ -237,7 +237,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "process", "sources", "covers", "about", "facts", "studio", "testimonials", "productions", "marquee", "cta"],
-  layoutV: 6,
+  layoutV: 7,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -312,7 +312,7 @@ window.mergeContent = function (saved) {
     d.order = D.order.slice(); d.layoutV = D.layoutV;
     ["hProcess", "hSources", "hCovers", "hStudio"].forEach(k => d[k] = D[k]);
   }
-  if (saved && (saved.layoutV || 0) < 6) {
+  if (saved && (saved.layoutV || 0) < 7) {
     d.show = Object.assign({}, d.show, { facts: false }); // the three boxes repeat the steps // new process wording (24h, 3 revisions, live remote session)
     const D = window.SITE_DEFAULTS; d.layoutV = D.layoutV;
     d.steps = JSON.parse(JSON.stringify(D.steps));

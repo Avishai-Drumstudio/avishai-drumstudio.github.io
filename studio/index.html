@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261018015611';
+window.STUDIO_VERSION = '20261021002811';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -1680,11 +1680,11 @@ function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, i
   /* מחיר בסיס ואובר טיים של הלקוח נכנסים לבד */
   const feeAuto = useRef(isNew && !Number(init0.fee));
   useEffect(() => {
-    if (!isNew || !known) return;
+    if (!isNew || !known || bySub) return; // מחליף מנגן — אין סכום כברירת מחדל
     const r = clientRate(known, g.date);
     setG(p => Object.assign({}, p, r && (feeAuto.current || !Number(p.fee)) ? { fee: String(r) } : {}, Number(known.otRate) && !Number(p.otRate) ? { otRate: String(known.otRate) } : {}, known.vat && known.vat !== 'none' && (!p.vat || p.vat === 'none') ? { vat: known.vat, vatRate: p.vatRate !== undefined && p.vatRate !== '' ? p.vatRate : CFG.vatRate } : {}));
     if (r) feeAuto.current = true;
-  }, [known && known.id, g.date]);
+  }, [known && known.id, g.date, bySub]);
   const otGuess = (() => { const bh = Number(known && known.baseHours); const st = g.loadIn || g.start; if (!bh || !st || !g.end) return null;
     const m = t => { const [h, mi] = t.split(':').map(Number); return h * 60 + mi; }; let d = m(g.end) - m(st); if (d <= 0) d += 1440;
     const extra = Math.round((d / 60 - bh) * 4) / 4; return extra > 0 ? { st, extra, total: d / 60 } : null; })();
@@ -1759,7 +1759,7 @@ function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, i
         <div className="flex gap-1.5" role="radiogroup" aria-label="מי מנגן">
           <button type="button" role="radio" aria-checked=${!bySub && !g.needSub} onClick=${() => { setBySub(false); setG(p => Object.assign({}, p, { subId: '', newSub: null, needSub: false })); }}
             className=${'flex-1 rounded-full px-2 py-2 text-sm font-semibold transition ' + (!bySub && !g.needSub ? 'grad' : 'glass-soft text-muted')}>🥁 אני מנגן</button>
-          <button type="button" role="radio" aria-checked=${bySub} onClick=${() => { setBySub(true); set('needSub', false); if (!g.subId && subs.length) set('subId', subs[0].id); if (!subs.length) set('newSub', { name: '', phone: '' }); }}
+          <button type="button" role="radio" aria-checked=${bySub} onClick=${() => { setBySub(true); setG(p => Object.assign({}, p, { needSub: false }, isNew && (feeAuto.current || !Number(p.fee)) ? { fee: '', travelFee: '', otRate: '', otHours: '' } : {})); feeAuto.current = isNew; if (!g.subId && subs.length) set('subId', subs[0].id); if (!subs.length) set('newSub', { name: '', phone: '' }); }}
             className=${'flex-1 rounded-full px-2 py-2 text-sm font-semibold transition ' + (bySub ? 'grad' : 'glass-soft text-muted')}>${SUB_ICON} מחליף</button>
           <button type="button" role="radio" aria-checked=${!bySub && !!g.needSub} onClick=${() => { setBySub(false); setG(p => Object.assign({}, p, { subId: '', newSub: null, needSub: true })); }}
             className=${'flex-1 rounded-full px-2 py-2 text-sm font-semibold transition ' + (!bySub && g.needSub ? '' : 'glass-soft text-muted')} style=${!bySub && g.needSub ? { background: NEED_BG, color: '#111' } : null}>🚨 צריך מחליף</button>
@@ -1790,7 +1790,7 @@ function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, i
         ${Number(g.fee) > 0 && g.vat !== 'none' && html`<p className="mt-2 text-sm text-muted">${g.vat === 'plus' ? 'סה״כ לגבייה: ' : 'מתוכם מע״מ: '}<b className="text-[var(--ink)]">${g.vat === 'plus' ? money(amt(g)) : money(vatPart(g))}</b>${g.vat === 'plus' ? ' (מע״מ ' + money(vatPart(g)) + ')' : ''}</p>`}
       </div>`}
 
-      ${showMoney && html`<${TravelBox} g=${g} set=${set} client=${known} gigs=${gigs} onClientTravel=${onClientTravel || (() => {})} />`}
+      ${showMoney && !bySub && html`<${TravelBox} g=${g} set=${set} client=${known} gigs=${gigs} onClientTravel=${onClientTravel || (() => {})} />`}
       <button type="button" onClick=${() => setMore(v => !v)} aria-expanded=${more}
         className="flex w-full items-center justify-between rounded-2xl glass-soft px-4 py-3 text-sm font-semibold text-muted hover:text-[var(--ink)]">
         <span>${more ? 'פחות פרטים' : 'פרטים נוספים'}<span className="font-normal"> · שם, שעות, כתובת, אובר טיים, טלפון הפקה, ציוד${admin ? ', מסמכים' : ''}</span></span>

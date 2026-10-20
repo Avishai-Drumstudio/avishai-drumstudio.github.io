@@ -1144,10 +1144,10 @@ window.SITE_DEFAULTS = {
   ],
   hProcess: "איך זה עובד",
   steps: [
-    { title: "שולחים לי את השיר", text: "סקיצה או פלייבק בוואטסאפ, עם טמפו ורפרנס לסאונד שאתה אוהב." },
-    { title: "מתאימים את הסאונד", text: "בוחרים יחד מערכת, סנר וכיוון – כדי שהתופים ישבו בדיוק בתוך ההפקה שלך." },
-    { title: "מקליטים – כאילו אתה בחדר", text: "אתה איתי בהקלטה בשידור חי בווידאו, ופלאגין מיוחד מעביר את הסאונד מהאולפן ישר אליך באיכות מלאה. שומע כל טייק בזמן אמת ומכוון אותי, בדיוק כמו באולפן שלך." },
-    { title: "מקבל ערוצים תוך 24 שעות", text: "ערוצים נפרדים ונקיים, מוכנים למיקס, בפורמט שנוח לך לעבוד איתו. כולל עד 3 סבבי תיקונים." }
+    { title: "שולחים לי את השיר", text: "סקיצה או פלייבק, עם טמפו ורפרנס." },
+    { title: "מתאימים את הסאונד", text: "בוחרים יחד מערכת, סנר וכיוון." },
+    { title: "מקליטים – איך שנוח לך", text: "אני שולח לך גייד ואתה מעיר, או שמתחברים לייב בווידאו ואתה שומע את האולפן בזמן אמת – כאילו אתה בחדר." },
+    { title: "ערוצים תוך 24 שעות", text: "נקיים ומוכנים למיקס, בפורמט שנוח לך. עד 3 סבבי תיקונים." }
   ],
   hProductions: "שירים שניגנתי בהם",
   hCovers: "קאברים",
@@ -1168,7 +1168,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "process", "sources", "covers", "about", "facts", "studio", "testimonials", "productions", "marquee", "cta"],
-  layoutV: 3,
+  layoutV: 4,
   show: { reel: true, covers: true, about: true, marquee: false, facts: true, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1243,7 +1243,7 @@ window.mergeContent = function (saved) {
     d.order = D.order.slice(); d.layoutV = D.layoutV;
     ["hProcess", "hSources", "hCovers", "hStudio"].forEach(k => d[k] = D[k]);
   }
-  if (saved && (saved.layoutV || 0) < 3) { // new process wording (24h, 3 revisions, live remote session)
+  if (saved && (saved.layoutV || 0) < 4) { // new process wording (24h, 3 revisions, live remote session)
     const D = window.SITE_DEFAULTS; d.layoutV = D.layoutV;
     d.steps = JSON.parse(JSON.stringify(D.steps));
     (d.facts || []).forEach((f, i) => { if (f && f.title === "מרחוק") d.facts[i] = Object.assign({}, D.facts[1]); });

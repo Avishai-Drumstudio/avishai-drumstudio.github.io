@@ -1144,10 +1144,10 @@ window.SITE_DEFAULTS = {
   ],
   hProcess: "איך זה עובד",
   steps: [
-    { title: "שולחים לי את השיר", text: "סקיצה או פלייבק, עם טמפו ורפרנס." },
-    { title: "מתאימים את הסאונד", text: "בוחרים יחד מערכת, סנר וסאונד שמתאים להפקה שלך." },
-    { title: "מקליטים – איך שנוח לך", text: "אני שולח לך גייד ואתה מעיר, או שמתחברים לייב בווידאו ואתה שומע את האולפן בזמן אמת – כאילו אתה בחדר." },
-    { title: "ערוצים תוך 24 שעות", text: "נקיים ומוכנים למיקס, בפורמט שנוח לך. עד 3 סבבי תיקונים." }
+    { title: "הסקיצה", text: "שולחים לי את השיר בוואטסאפ – סקיצה או פלייבק, עם טמפו ורפרנס לסאונד שאתה אוהב." },
+    { title: "הסאונד", text: "בוחרים יחד מערכת תופים, סנר וכיוון – סאונד שמתאים בדיוק להפקה שלך." },
+    { title: "ההקלטה", text: "אני שולח לך גייד ואתה נותן הערות, או שמתחברים לייב בווידאו ואתה שומע את האולפן בזמן אמת – כאילו אתה בחדר." },
+    { title: "הערוצים", text: "תוך 24 שעות אצלך: ערוצים נקיים ומוכנים למיקס, בפורמט שנוח לך. כולל עד 3 סבבי תיקונים." }
   ],
   hProductions: "שירים שניגנתי בהם",
   hCovers: "קאברים",
@@ -1168,8 +1168,8 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "process", "sources", "covers", "about", "facts", "studio", "testimonials", "productions", "marquee", "cta"],
-  layoutV: 5,
-  show: { reel: true, covers: true, about: true, marquee: false, facts: true, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
+  layoutV: 6,
+  show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
     { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true },
@@ -1243,7 +1243,8 @@ window.mergeContent = function (saved) {
     d.order = D.order.slice(); d.layoutV = D.layoutV;
     ["hProcess", "hSources", "hCovers", "hStudio"].forEach(k => d[k] = D[k]);
   }
-  if (saved && (saved.layoutV || 0) < 5) { // new process wording (24h, 3 revisions, live remote session)
+  if (saved && (saved.layoutV || 0) < 6) {
+    d.show = Object.assign({}, d.show, { facts: false }); // the three boxes repeat the steps // new process wording (24h, 3 revisions, live remote session)
     const D = window.SITE_DEFAULTS; d.layoutV = D.layoutV;
     d.steps = JSON.parse(JSON.stringify(D.steps));
     (d.facts || []).forEach((f, i) => { if (f && f.title === "מרחוק") d.facts[i] = Object.assign({}, D.facts[1]); });

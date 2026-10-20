@@ -232,12 +232,13 @@ window.SITE_DEFAULTS = {
   hSources: "סורסים",
   pSources: "ערוצי תופים כמו שהם יוצאים מהאולפן, לפני מיקס.",
   hStudio: "האולפן והציוד",
+  studioHl: "Gretsch USA Custom · 4 סנרים · מיקרופונים: Sennheiser, Warm Audio",
   hTestimonials: "מה אומרים מפיקים",
   ctaTitle: "יש לך שיר שמחכה לתופים?",
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
-  order: ["reel", "process", "sources", "covers", "about", "facts", "studio", "testimonials", "productions", "marquee", "cta"],
-  layoutV: 8,
+  order: ["reel", "testimonials", "process", "sources", "covers", "about", "studio", "facts", "productions", "marquee", "cta"],
+  layoutV: 9,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -312,6 +313,10 @@ window.mergeContent = function (saved) {
   if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
   if (saved && (saved.layoutV || 0) < 8 && !(saved.testimonials || []).some(t => t && t.text && t.show !== false)) {
     d.testimonials = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials)); d.layoutV = 8; // approved quotes
+  }
+  if (saved && (saved.layoutV || 0) < 9) { // testimonials move up, right after the productions
+    const o = (d.order || []).filter(k => k !== "testimonials"); const at = o.indexOf("reel");
+    o.splice(at < 0 ? 0 : at + 1, 0, "testimonials"); d.order = o; d.layoutV = 9;
   }
   if (saved && (saved.layoutV || 0) < 2) {
     const D = window.SITE_DEFAULTS;
@@ -499,7 +504,7 @@ window.mergeContent = function (saved) {
         el("div", {class:"grid2"},
           field(S,"hProcess","איך זה עובד"), field(S,"hProductions","הפקות"),
           field(S,"hSources","סורסים"), field(S,"pSources","שורה מתחת לסורסים"),
-          field(S,"hStudio","האולפן והציוד"), field(S,"hTestimonials","המלצות"))),
+          field(S,"hStudio","האולפן והציוד"), field(S,"studioHl","שורת ציוד בולט (מתחת לסרטון האולפן)"), field(S,"hTestimonials","המלצות"))),
       el("div", {class:"card"},
         el("b", {}, "פס יצירת קשר בסוף הדף"),
         field(S,"ctaTitle","כותרת"), field(S,"ctaText","טקסט")),

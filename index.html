@@ -894,6 +894,18 @@ html,body{max-width:100%;overflow-x:hidden}
 .quote mark{background:linear-gradient(transparent 60%,rgba(46,211,195,.28) 60%);color:#fff;font-weight:800;padding:0 2px}
 .quote__who{border-top:1px solid rgba(237,228,211,.1)}
 
+/* studio: compact — highlights + collapsible full gear list */
+.studio__hl{text-align:center;color:var(--sand);font-size:15px;font-weight:600;margin:18px auto 0;max-width:34ch;line-height:1.6;direction:rtl}
+.gear-more{display:grid;justify-items:center;margin-top:18px}
+.gear-more__btn{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 20px;border-radius:999px;border:1.5px solid rgba(46,211,195,.55);color:var(--lime);font-weight:700;font-size:15px;background:rgba(46,211,195,.06)}
+.gear-more__btn svg{width:18px;height:18px;transition:transform .4s var(--ease)}
+.gear-more__btn.is-open svg{transform:rotate(180deg)}
+.gear-wrap{display:grid;grid-template-rows:0fr;width:100%;transition:grid-template-rows .7s cubic-bezier(.2,.8,.2,1)}
+.gear-wrap__in{overflow:hidden;min-height:0}
+.gear-wrap.is-open{grid-template-rows:1fr}
+.gear-wrap.is-open .gear-wrap__in{padding-top:28px}
+.studio__hl{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:420px}.studio__hl span{padding:7px 13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13.5px;font-weight:600;unicode-bidi:isolate}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1074,7 +1086,11 @@ html,body{max-width:100%;overflow-x:hidden}
         <div class="rule"><i></i></div>
       </div>
       <div class="studio-video" id="studioVideo" data-reveal></div>
-      <div id="gearCats"></div>
+      <p class="studio__hl" id="studioHl"></p>
+      <div class="gear-more">
+        <button class="gear-more__btn" id="gearMore" type="button" aria-expanded="false" aria-controls="gearWrap"><span>לרשימת הציוד המלאה</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="gear-wrap" id="gearWrap"><div class="gear-wrap__in"><div id="gearCats"></div></div></div>
+      </div>
     </div>
   </section>
 
@@ -1235,12 +1251,13 @@ window.SITE_DEFAULTS = {
   hSources: "סורסים",
   pSources: "ערוצי תופים כמו שהם יוצאים מהאולפן, לפני מיקס.",
   hStudio: "האולפן והציוד",
+  studioHl: "Gretsch USA Custom · 4 סנרים · מיקרופונים: Sennheiser, Warm Audio",
   hTestimonials: "מה אומרים מפיקים",
   ctaTitle: "יש לך שיר שמחכה לתופים?",
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
-  order: ["reel", "process", "sources", "covers", "about", "facts", "studio", "testimonials", "productions", "marquee", "cta"],
-  layoutV: 8,
+  order: ["reel", "testimonials", "process", "sources", "covers", "about", "studio", "facts", "productions", "marquee", "cta"],
+  layoutV: 9,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1315,6 +1332,10 @@ window.mergeContent = function (saved) {
   if (!String(d.bgVideo || "").trim()) d.bgVideo = window.SITE_DEFAULTS.bgVideo;
   if (saved && (saved.layoutV || 0) < 8 && !(saved.testimonials || []).some(t => t && t.text && t.show !== false)) {
     d.testimonials = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials)); d.layoutV = 8; // approved quotes
+  }
+  if (saved && (saved.layoutV || 0) < 9) { // testimonials move up, right after the productions
+    const o = (d.order || []).filter(k => k !== "testimonials"); const at = o.indexOf("reel");
+    o.splice(at < 0 ? 0 : at + 1, 0, "testimonials"); d.order = o; d.layoutV = 9;
   }
   if (saved && (saved.layoutV || 0) < 2) {
     const D = window.SITE_DEFAULTS;
@@ -1500,6 +1521,13 @@ window.mergeContent = function (saved) {
       $$("[data-split]", sec).forEach(splitWords);
     });
     S.order.forEach(k => { const el = document.getElementById(ids[k]); if(el){ main.appendChild(el); el.hidden = S.show[k] === false; } });
+
+    // studio: one line of highlights; the full gear list opens only on request
+    (() => { const hl = $("#studioHl"); if(hl){ const items = String(S.studioHl || "").split(/[·•|]/).map(x => x.trim()).filter(Boolean); hl.innerHTML = items.map(x => `<span dir="auto">${esc(x)}</span>`).join(""); hl.hidden = !items.length; }
+      const b = $("#gearMore"), w = $("#gearWrap"); if(!b || !w) return;
+      if(!(S.gear || []).length){ b.parentElement.hidden = true; return; }
+      b.addEventListener("click", () => { const open = !w.classList.contains("is-open"); w.classList.toggle("is-open", open); b.classList.toggle("is-open", open);
+        b.setAttribute("aria-expanded", open); b.firstChild.textContent = open ? "סגירת רשימת הציוד" : "לרשימת הציוד המלאה"; }); })();
 
     // the page as a short journey: each main part gets a big chapter number behind its title, in page order
     (() => { const chapters = ["reel","process","sources","covers","about","studio"];

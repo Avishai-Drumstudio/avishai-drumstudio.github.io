@@ -906,6 +906,19 @@ html,body{max-width:100%;overflow-x:hidden}
 .gear-wrap.is-open .gear-wrap__in{padding-top:28px}
 .studio__hl{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:420px}.studio__hl span{padding:7px 13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13.5px;font-weight:600;unicode-bidi:isolate}
 
+/* gear teaser: a little fan of photos peeking above the button */
+.gear-peek{position:relative;width:min(300px,80vw);height:120px;margin-bottom:-26px;z-index:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gear-peek__c{--i:0;--n:5;--o:calc(var(--i) - (var(--n) - 1) / 2);position:absolute;left:50%;bottom:0;width:86px;height:104px;margin-left:-43px;border-radius:14px;overflow:hidden;
+  background:#EFE8DA;box-shadow:0 14px 30px -12px rgba(0,0,0,.85),0 0 0 2px rgba(15,23,22,.9);
+  transform:translateX(calc(var(--o) * 52px)) translateY(calc(var(--o) * var(--o) * 5px)) rotate(calc(var(--o) * 9deg));transform-origin:50% 120%;
+  transition:transform .55s cubic-bezier(.2,.8,.2,1);animation:peekBob 4s ease-in-out infinite;animation-delay:calc(var(--i) * -.6s)}
+.gear-peek__c img{width:100%;height:100%;object-fit:contain;padding:6px}
+@keyframes peekBob{0%,100%{translate:0 0}50%{translate:0 -5px}}
+.gear-peek:hover .gear-peek__c{transform:translateX(calc(var(--o) * 60px)) translateY(calc(var(--o) * var(--o) * 5px - 8px)) rotate(calc(var(--o) * 12deg))}
+.gear-more.is-open .gear-peek{display:none}
+.gear-more__btn{position:relative;z-index:1;background:#0f1716;box-shadow:0 -10px 30px 10px #0f1716}
+@media (prefers-reduced-motion:reduce){.gear-peek__c{animation:none}}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1086,8 +1099,8 @@ html,body{max-width:100%;overflow-x:hidden}
         <div class="rule"><i></i></div>
       </div>
       <div class="studio-video" id="studioVideo" data-reveal></div>
-      <p class="studio__hl" id="studioHl"></p>
       <div class="gear-more">
+        <button class="gear-peek" id="gearPeek" type="button" aria-label="לרשימת הציוד המלאה" tabindex="-1"></button>
         <button class="gear-more__btn" id="gearMore" type="button" aria-expanded="false" aria-controls="gearWrap"><span>לרשימת הציוד המלאה</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="gear-wrap" id="gearWrap"><div class="gear-wrap__in"><div id="gearCats"></div></div></div>
       </div>
@@ -1522,12 +1535,18 @@ window.mergeContent = function (saved) {
     });
     S.order.forEach(k => { const el = document.getElementById(ids[k]); if(el){ main.appendChild(el); el.hidden = S.show[k] === false; } });
 
-    // studio: one line of highlights; the full gear list opens only on request
-    (() => { const hl = $("#studioHl"); if(hl){ const items = String(S.studioHl || "").split(/[·•|]/).map(x => x.trim()).filter(Boolean); hl.innerHTML = items.map(x => `<span dir="auto">${esc(x)}</span>`).join(""); hl.hidden = !items.length; }
-      const b = $("#gearMore"), w = $("#gearWrap"); if(!b || !w) return;
+    // studio: a few gear photos peek out as a teaser; the full list opens on request
+    (() => { const b = $("#gearMore"), w = $("#gearWrap"), peek = $("#gearPeek"); if(!b || !w) return;
       if(!(S.gear || []).length){ b.parentElement.hidden = true; return; }
+      const pics = S.gear.filter(g => real(g.img));
+      // pick a mix: different categories first
+      const seen = new Set(), pick = [];
+      pics.forEach(g => { if(pick.length < 5 && !seen.has(g.category)){ seen.add(g.category); pick.push(g); } });
+      pics.forEach(g => { if(pick.length < 5 && !pick.includes(g)) pick.push(g); });
+      if(peek){ peek.innerHTML = pick.map((g,i) => `<span class="gear-peek__c" style="--i:${i};--n:${pick.length}"><img src="${esc(g.img)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>`).join("");
+        peek.hidden = !pick.length; peek.addEventListener("click", () => b.click()); }
       b.addEventListener("click", () => { const open = !w.classList.contains("is-open"); w.classList.toggle("is-open", open); b.classList.toggle("is-open", open);
-        b.setAttribute("aria-expanded", open); b.firstChild.textContent = open ? "סגירת רשימת הציוד" : "לרשימת הציוד המלאה"; }); })();
+        b.parentElement.classList.toggle("is-open", open); b.setAttribute("aria-expanded", open); b.firstChild.textContent = open ? "סגירת רשימת הציוד" : "לרשימת הציוד המלאה"; }); })();
 
     // the page as a short journey: each main part gets a big chapter number behind its title, in page order
     (() => { const chapters = ["reel","process","sources","covers","about","studio"];

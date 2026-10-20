@@ -774,6 +774,11 @@ html,body{max-width:100%;overflow-x:hidden}
 .video--tall:has(iframe) .video__cap{display:none}
 @media (prefers-reduced-motion:reduce){.studio-video{animation:none}}
 
+/* about: big "קצת עליי", smaller name, smaller body */
+.about__text .about__big{font-weight:900;font-size:clamp(2.3rem,8vw,3.6rem);line-height:1.05;letter-spacing:-.01em}
+.about__text .about__name{font-weight:700;font-size:clamp(1.15rem,4.4vw,1.4rem);color:var(--lime);margin-top:-6px}
+.about__body p,.about__body p:first-child{font-size:15.5px !important;line-height:1.75;font-weight:400 !important;color:#D5CDBE !important}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -856,7 +861,8 @@ html,body{max-width:100%;overflow-x:hidden}
         </div>
       </figure>
       <div class="about__text">
-        <h2 data-split id="aboutTitle"></h2>
+        <h2 class="about__big" data-split>קצת עליי</h2>
+        <h3 class="about__name" id="aboutTitle"></h3>
         <div class="about__body" id="aboutBody" data-reveal></div>
         <a class="btn btn--lime js-wa" target="_blank" rel="noopener" data-reveal><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>בוא נדבר על ההפקה הבאה</a>
       </div>

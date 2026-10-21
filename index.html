@@ -1453,6 +1453,7 @@ window.SITE_DEFAULTS = {
   heroImage: "assets/hero.jpg",
   bgVideo: "assets/hero.mp4",
   introVideo: "https://youtu.be/SMZbWh5Qp8A",
+  heroIntroEnd: 20, // opening background = the last N seconds of the intro video, with a sound button (0 = use the studio clip)
   studioVideo: "https://youtube.com/shorts/acj-V-isUmU",
   studioTitle: "My Drum Studio",
   productionsFirst: 2,
@@ -1898,6 +1899,39 @@ window.mergeContent = function (saved) {
         setTimeout(() => $("#heroYt")?.classList.add("is-on"), 2200); // hide YouTube's first-second UI
       }
     }
+
+    // opening background: the ending of the intro video (YouTube), looped, with sound on request
+    (() => { const id = ytId(S.introVideo), SEG = parseFloat(S.heroIntroEnd) || 0;
+      if(!id || SEG <= 0 || /claude/i.test(location.hostname)) return;
+      const box = $("#heroMedia"), loc = $("#heroVid");
+      box.insertAdjacentHTML("beforeend", `<iframe class="hero__yt" id="heroYt" tabindex="-1" aria-hidden="true" title="" src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&playsinline=1&controls=0&disablekb=1&iv_load_policy=3&fs=0&rel=0&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}" allow="autoplay; encrypted-media"></iframe>`);
+      const fr = $("#heroYt"); let dur = 0, start = 0, seeked = false, shown = false, soundOn = false, heroIn = true;
+      const cmd = (func, args = []) => { try { fr.contentWindow.postMessage(JSON.stringify({event:"command", func, args}), "*"); } catch(e){} };
+      const listen = () => { try { fr.contentWindow.postMessage(JSON.stringify({event:"listening", id:"heroYt", channel:"widget"}), "*"); } catch(e){} };
+      fr.addEventListener("load", () => { listen(); setTimeout(listen, 600); setTimeout(listen, 1500); });
+      addEventListener("message", e => {
+        if(!/youtube/.test(e.origin) || e.source !== fr.contentWindow) return;
+        let d; try { d = typeof e.data === "string" ? JSON.parse(e.data) : e.data; } catch(err){ return; }
+        const info = d && d.info; if(!info) return;
+        if(info.duration && !dur){ dur = info.duration; start = Math.max(0, dur - SEG); }
+        if(dur && !seeked){ seeked = true; cmd("seekTo", [start, true]); cmd("playVideo"); }
+        const t = info.currentTime;
+        if(typeof t === "number" && dur){
+          if(t >= dur - .7) cmd("seekTo", [start, true]); // loop just the ending
+          if(!shown && t > start + .4 && t < dur){ shown = true; fr.classList.add("is-on"); setTimeout(() => loc && loc.pause(), 1300); }
+        }
+        if(info.playerState === 0){ cmd("seekTo", [start, true]); cmd("playVideo"); }
+      });
+      // sound button now drives the YouTube clip
+      let sb = $("#heroSnd"); if(!sb) return; const nb = sb.cloneNode(true); sb.replaceWith(nb); sb = nb; sb.hidden = false;
+      const apply = () => { if(soundOn && heroIn && $("#modal").hidden && !$("#heroPlayer")){ cmd("unMute"); cmd("setVolume", [100]); cmd("playVideo"); } else cmd("mute"); };
+      const paint = () => { sb.classList.toggle("is-on", soundOn); sb.setAttribute("aria-pressed", soundOn); sb.querySelector("span").textContent = soundOn ? "השתקה" : "הפעלת סאונד"; };
+      sb.addEventListener("click", e => { e.stopPropagation(); soundOn = !soundOn; if(loc) loc.muted = true; apply(); paint(); });
+      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { heroIn = e.isIntersecting; apply(); }, {threshold:.35}).observe($("#hero"));
+      const md = $("#modal"); if(md) new MutationObserver(apply).observe(md, {attributes:true, attributeFilter:["hidden"]});
+      new MutationObserver(apply).observe($("#hero"), {attributes:true, attributeFilter:["class"]});
+      paint();
+    })();
 
     // intro video in a modal
     const introId = ytId(S.introVideo);

@@ -1902,22 +1902,23 @@ window.mergeContent = function (saved) {
       if(real(S.heroImage) && v.getAttribute("poster") !== S.heroImage) v.poster = S.heroImage;
       if(v.getAttribute("src") !== bg) v.src = bg;
       if(!v.parentNode) $("#heroMedia").appendChild(v);
-      let soundOn = true, heroIn = true; // sound is on — it starts the moment the browser allows (first touch)
-      const tryPlay = () => { v.muted = !(soundOn && heroIn); const p = v.play(); if(p && p.catch) p.catch(() => {}); };
+      let soundOn = true, heroIn = true, touched = false; // sound is on — it starts the moment the browser allows (first touch)
+      // always autoplay muted (phones refuse autoplay with sound); sound joins only after the first touch
+      const tryPlay = () => { v.muted = !(touched && soundOn && heroIn); const p = v.play(); if(p && p.catch) p.catch(() => { if(!v.muted){ v.muted = true; v.play().catch(() => {}); } }); };
       // sound on/off: starts muted (phones only allow that), one tap turns the studio sound on
       const sb = $("#heroSnd");
       if(sb && /hero\.mp4/.test(bg)){
         sb.hidden = false;
         const paint = () => { const on = !v.muted; sb.classList.toggle("is-on", on); sb.setAttribute("aria-pressed", on); sb.setAttribute("aria-label", on ? "השתקה" : "הפעלת סאונד"); };
         const audible = () => !v.muted;
-        sb.addEventListener("click", e => { e.stopPropagation(); soundOn = !audible(); v.muted = !(soundOn && heroIn); if(soundOn){ v.volume = 1; const p = v.play(); if(p && p.catch) p.catch(() => {}); } paint(); });
-        const first = () => { ["pointerdown","touchend","keydown"].forEach(ev => removeEventListener(ev, first, true)); if(soundOn && heroIn){ v.muted = false; v.volume = 1; const p = v.play(); if(p && p.catch) p.catch(() => {}); } paint(); };
+        sb.addEventListener("click", e => { e.stopPropagation(); touched = true; soundOn = !audible(); v.muted = !(soundOn && heroIn); if(soundOn){ v.volume = 1; const p = v.play(); if(p && p.catch) p.catch(() => {}); } paint(); });
+        const first = () => { touched = true; ["pointerdown","touchend","keydown"].forEach(ev => removeEventListener(ev, first, true)); if(soundOn && heroIn){ v.muted = false; v.volume = 1; const p = v.play(); if(p && p.catch) p.catch(() => {}); } paint(); };
         ["pointerdown","touchend","keydown"].forEach(ev => addEventListener(ev, first, true));
         v.addEventListener("volumechange", () => paint());
         // leaving the opening screen quiets it; coming back brings the sound back
-        if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { heroIn = e.isIntersecting; if(soundOn) v.muted = !heroIn; }, {threshold:.35}).observe($("#hero"));
+        if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { heroIn = e.isIntersecting; v.muted = !(touched && soundOn && heroIn); }, {threshold:.35}).observe($("#hero"));
         // another video opens in the popup — the opening clip goes quiet
-        const md = $("#modal"); if(md) new MutationObserver(() => { if(soundOn) v.muted = !md.hidden || !heroIn; }).observe(md, {attributes:true, attributeFilter:["hidden"]});
+        const md = $("#modal"); if(md) new MutationObserver(() => { v.muted = !(touched && soundOn && heroIn && md.hidden); }).observe(md, {attributes:true, attributeFilter:["hidden"]});
         paint();
       }
       tryPlay(); v.addEventListener("canplay", tryPlay, {once:true});

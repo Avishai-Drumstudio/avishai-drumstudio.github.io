@@ -1057,6 +1057,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .scr__rec{left:auto;right:8px;top:8px}
 .scr__name{right:auto;left:4px;bottom:4px;padding:2px 4px}
 .scr__rec{right:auto;left:8px;top:8px;font-size:9px;padding:1px 6px}
+.scr__tile--me video.fg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1750,7 +1751,7 @@ window.mergeContent = function (saved) {
           <line class="sn__stick" x1="150" y1="-14" x2="92" y2="30"/></svg></div>`,
       `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>לייב</span>
           <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>המפיק</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
-          <div class="scr__tile scr__tile--me"><img class="bg" src="assets/me-call.jpg" alt="" loading="lazy"><img class="fg" src="assets/me-call.jpg" alt="" loading="lazy"><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>
+          <div class="scr__tile scr__tile--me"><img class="bg" src="assets/me-call.jpg" alt="" loading="lazy"><video class="fg" muted playsinline loop preload="none" poster="assets/me-call.jpg" data-src="assets/me-call.mp4"></video><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>
           </div></div>`,
       `<div class="sc sc--stems"><div class="daw">${["Kick","Snare","Toms","OH","Room"].map((t,k) => `<span class="daw__row" style="--k:${k}"><b>${t}</b><span class="daw__lane">${wave(26)}</span></span>`).join("")}<span class="daw__head"></span></div>
         <em class="sc__sent">נשלח ✓ <small>תוך 24 שעות</small></em></div>`
@@ -1824,7 +1825,9 @@ window.mergeContent = function (saved) {
           c.style.setProperty("--f", f.toFixed(3)); c.classList.toggle("is-on", f > 0);
           // game-style "level complete" pop the moment a card fills up
           if(f >= .985 && !c.classList.contains("is-full")){ c.classList.add("is-full", "pop"); burst(c); setTimeout(() => c.classList.remove("pop"), 700); }
-          else if(f < .6) c.classList.remove("is-full"); }); };
+          else if(f < .6) c.classList.remove("is-full");
+          const v = c.querySelector(".step__media video"); if(v && !reduce){ const go = f > 0 && r.bottom > 0 && r.top < innerHeight;
+            if(go){ if(!v.src) v.src = v.dataset.src; if(v.paused) v.play().catch(() => {}); } else if(!v.paused) v.pause(); } }); };
       const burst = c => { const ic = c.querySelector(".step__icon"); if(!ic) return;
         for(let k = 0; k < 10; k++){ const p = document.createElement("i"); p.className = "spark"; const a = k / 10 * Math.PI * 2 + Math.random() * .4, d = 34 + Math.random() * 26;
           p.style.setProperty("--x", (Math.cos(a) * d).toFixed(1) + "px"); p.style.setProperty("--y", (Math.sin(a) * d).toFixed(1) + "px"); ic.appendChild(p); setTimeout(() => p.remove(), 700); } };

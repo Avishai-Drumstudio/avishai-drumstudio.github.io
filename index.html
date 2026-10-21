@@ -937,47 +937,81 @@ html,body{max-width:100%;overflow-x:hidden}
 .step .step__n{display:none!important}
 .step__media{aspect-ratio:2/1}
 
-/* ---------- animated scenes over the step clips (run only while the card is lit) ---------- */
-.step__media .ov{position:absolute;z-index:2;direction:rtl;font-family:inherit;color:#fff;text-align:right;pointer-events:none}
-.step__media .ov *{animation-play-state:paused}
-.step.is-on .step__media .ov *,.step.is-on .step__media .ov{animation-play-state:running}
-.ov--chat{left:10px;right:10px;bottom:12px;display:flex;align-items:flex-end;gap:6px;justify-content:flex-start}
-.ov__bub{display:flex;align-items:center;gap:8px;background:rgba(18,24,22,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(46,211,195,.35);border-radius:14px 14px 4px 14px;padding:7px 10px;animation:ovIn 5s infinite both}
-.ov__bub b{display:block;font-size:12px;font-weight:700;line-height:1.2}
-.ov__bub small{display:block;font-size:10.5px;color:#b9c6c1;line-height:1.3}
-.ov__note{width:26px;height:26px;border-radius:8px;background:#2ED3C3;color:#0c1412;display:grid;place-items:center;font-size:15px;font-weight:800;flex:none}
-.ov__ticks{font-size:11px;color:#2ED3C3;font-weight:800;animation:ovTick 5s infinite both}
-@keyframes ovIn{0%,8%{opacity:0;transform:translateY(14px) scale(.92)}16%,86%{opacity:1;transform:none}96%,100%{opacity:0;transform:translateY(-6px)}}
-@keyframes ovTick{0%,30%{opacity:0}38%,86%{opacity:1}96%,100%{opacity:0}}
-.ov--pick{left:50%;bottom:12px;transform:translateX(-50%);display:grid;justify-items:center;gap:5px;animation:ovFade 5s infinite both}
-.ov--pick small{font-size:10.5px;color:#d5dfdb;background:rgba(18,24,22,.7);padding:1px 8px;border-radius:8px}
-.ov__pills{display:flex;gap:6px;background:rgba(18,24,22,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:4px}
-.ov__pills i{font-style:normal;font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;color:#c9d4d0;animation:ovPill 5s infinite both}
-.ov__pills i:nth-child(1){animation-delay:.5s}.ov__pills i:nth-child(3){animation-delay:1.1s}
-.ov__pills i.win{animation:ovWin 5s infinite both}
-@keyframes ovPill{0%,4%{background:transparent;color:#c9d4d0}6%,16%{background:rgba(255,255,255,.18);color:#fff}20%,100%{background:transparent;color:#c9d4d0}}
-@keyframes ovWin{0%,38%{background:transparent;color:#c9d4d0}44%,90%{background:#2ED3C3;color:#0c1412;box-shadow:0 0 16px rgba(46,211,195,.6)}96%,100%{background:transparent;color:#c9d4d0}}
-@keyframes ovFade{0%,4%{opacity:0}10%,90%{opacity:1}97%,100%{opacity:0}}
-.ov--rec{top:10px;right:10px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;background:rgba(18,24,22,.75);padding:3px 9px;border-radius:999px;letter-spacing:.02em}
-.ov--rec i{width:7px;height:7px;border-radius:50%;background:#ff4d4d;box-shadow:0 0 8px #ff4d4d;animation:ovBlink 1.2s infinite}
+/* ---------- drawn, animated scene for each step (runs only while the card is lit) ---------- */
+.step__media{background:radial-gradient(120% 90% at 50% 110%,rgba(46,211,195,.28),transparent 60%),radial-gradient(60% 60% at 85% 0%,rgba(46,211,195,.12),transparent 70%),linear-gradient(180deg,#121a17,#0c1210)}
+.step__media::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:18px 18px;mask-image:radial-gradient(80% 80% at 50% 50%,#000,transparent);-webkit-mask-image:radial-gradient(80% 80% at 50% 50%,#000,transparent)}
+.step__media::after{height:22%}
+.sc{position:absolute;inset:0;direction:rtl;color:#fff;filter:saturate(calc(.15 + var(--f) * .85)) brightness(calc(.6 + var(--f) * .4));transition:filter .4s}
+.sc,.sc *,.sc *::after{animation-play-state:paused!important}
+.step.is-on .sc,.step.is-on .sc *,.step.is-on .sc *::after{animation-play-state:running!important}
+.sc .ov__note{width:22px;height:22px;border-radius:7px;font-size:13px}
+/* 1 — a phone gets the song */
+.sc__fl{position:absolute;left:var(--x);top:var(--y);color:#2ED3C3;font-size:20px;opacity:.0;animation:scFloat 3.2s var(--d,0s) infinite ease-in-out}
+@keyframes scFloat{0%{opacity:0;transform:translateY(10px) rotate(-10deg)}30%,60%{opacity:.75}100%{opacity:0;transform:translateY(-18px) rotate(12deg)}}
+.ph{position:absolute;left:50%;top:10px;bottom:-24px;width:min(150px,46%);transform:translateX(-50%);border-radius:22px 22px 0 0;background:linear-gradient(180deg,#1d2623,#141b18);border:2px solid #34413c;border-bottom:0;box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 3px #0c1210;padding:22px 9px 0;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.ph__isl{position:absolute;top:7px;left:50%;width:34px;height:8px;margin-left:-17px;border-radius:6px;background:#050807}
+.ph__msg{align-self:flex-start;font-size:10.5px;background:#2a3531;border-radius:10px 10px 10px 3px;padding:5px 8px;line-height:1.3;animation:scPop 6s infinite both}
+.ph__file{align-self:flex-start;display:flex;align-items:center;gap:6px;background:#22302c;border:1px solid rgba(46,211,195,.4);border-radius:10px 10px 10px 3px;padding:5px 7px;animation:scPop 6s .7s infinite both}
+.ph__file b{display:block;font-size:10.5px;font-weight:700;line-height:1.2}.ph__file small{display:block;font-size:9px;color:#a9b8b2}
+.ph__ticks{align-self:flex-start;font-size:10px;font-weight:800;color:#2ED3C3;animation:scPop 6s 1.5s infinite both}
+@keyframes scPop{0%,6%{opacity:0;transform:translateY(12px) scale(.9)}14%,84%{opacity:1;transform:none}94%,100%{opacity:0}}
+/* 2 — picking the snare sound */
+.sc--snare .sn{position:absolute;left:50%;top:14px;width:min(180px,58%);transform:translateX(-50%);overflow:visible}
+.sn__shell{fill:#8a5a2b;stroke:rgba(0,0,0,.35);stroke-width:1;animation:snShell 6s infinite}
+.sn__hoop{fill:none;stroke:#d9e2df;stroke-width:3}
+.sn__lugs rect{fill:#e5ecea;opacity:.85}
+.sn__head{fill:#eef2f0;stroke:#d9e2df;stroke-width:3}
+.sn__ring{fill:none;stroke:#2ED3C3;stroke-width:2;opacity:0;transform-origin:90px 32px;animation:snRing .75s infinite ease-out}
+.sn__glow{fill:#2ED3C3;opacity:.25;filter:blur(8px)}
+.sn__stick{stroke:#e9c98f;stroke-width:5;stroke-linecap:round;transform-origin:140px -4px;animation:snHit .75s infinite cubic-bezier(.5,0,.75,0)}
+@keyframes snHit{0%,100%{transform:rotate(18deg)}45%{transform:rotate(0)}55%{transform:rotate(3deg)}}
+@keyframes snRing{0%,40%{opacity:0;transform:scale(.6)}48%{opacity:1}100%{opacity:0;transform:scale(2.6)}}
+@keyframes snShell{0%,30%{fill:#8a5a2b}34%,60%{fill:#c9a24a}64%,100%{fill:#8fa4ad}}
+.sc__pills{position:absolute;left:50%;bottom:12px;transform:translateX(-50%)}
+.sc__pills i{animation:none}
+.sc__pills .p1{animation:pk1 6s infinite}.sc__pills .p3{animation:pk3 6s infinite}.sc__pills .p2{animation:pk2 6s infinite}
+@keyframes pk1{0%,30%{background:rgba(255,255,255,.2);color:#fff}34%,100%{background:transparent;color:#c9d4d0}}
+@keyframes pk3{0%,32%{background:transparent;color:#c9d4d0}36%,60%{background:rgba(255,255,255,.2);color:#fff}64%,100%{background:transparent;color:#c9d4d0}}
+@keyframes pk2{0%,62%{background:transparent;color:#c9d4d0;box-shadow:none}66%,100%{background:#2ED3C3;color:#0c1412;box-shadow:0 0 16px rgba(46,211,195,.6)}}
+/* 3 — live video call */
+.scr{position:absolute;left:50%;top:12px;bottom:12px;width:min(260px,80%);transform:translateX(-50%);border-radius:12px;background:#0a0f0d;border:2px solid #34413c;box-shadow:0 10px 30px rgba(0,0,0,.5);display:grid;grid-template-columns:1fr 1.3fr;gap:5px;padding:6px 6px 26px}
+.scr__tile{position:relative;border-radius:8px;background:linear-gradient(160deg,#1c2925,#121a17);display:grid;place-items:center;align-content:center;gap:4px;overflow:hidden}
+.scr__tile small{font-size:9.5px;color:#c9d4d0}
+.scr__tile--me{background:radial-gradient(90% 90% at 50% 100%,rgba(46,211,195,.25),transparent),#141d1a;border:1.5px solid #2ED3C3;animation:scSpeak 1.5s infinite}
+@keyframes scSpeak{50%{box-shadow:0 0 0 3px rgba(46,211,195,.25)}}
+.kit{width:62%;fill:none;stroke:#e5ecea;stroke-width:2;stroke-linecap:round}
+.kit__cym{stroke:#e9c98f;stroke-width:2.5;transform-origin:41px 10px;animation:kitCym .75s infinite}
+.kit__st{stroke:#e9c98f;stroke-width:2.5;transform-origin:14px 4px;animation:kitSt .375s infinite alternate}
+@keyframes kitCym{0%,100%{transform:rotate(0)}30%{transform:rotate(-6deg)}}
+@keyframes kitSt{from{transform:rotate(-14deg)}to{transform:rotate(6deg)}}
+.scr .ov__face{width:28px;height:28px}
+.scr__rec{position:absolute;top:10px;right:10px;z-index:2;display:flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;background:rgba(0,0,0,.6);padding:2px 7px;border-radius:999px}
+.scr__rec i{width:6px;height:6px;border-radius:50%;background:#ff4d4d;box-shadow:0 0 8px #ff4d4d;animation:ovBlink 1.2s infinite}
 @keyframes ovBlink{50%{opacity:.25}}
-.ov--pip{left:10px;bottom:12px;display:flex;align-items:center;gap:8px;background:rgba(18,24,22,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(46,211,195,.35);border-radius:12px;padding:6px 9px 6px 6px;animation:ovIn 5s infinite both}
-.ov__face{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#2ED3C3,#1b6f68);display:grid;place-items:center;flex:none}
-.ov__face svg{width:18px;height:18px;fill:none;stroke:#0c1412;stroke-width:2.2;stroke-linecap:round}
-.ov--pip b{display:block;font-size:11.5px;font-weight:700;line-height:1.2}
-.ov__lv{display:flex;align-items:flex-end;gap:2px;height:10px;margin-top:3px}
-.ov__lv i{width:3px;height:100%;background:#2ED3C3;border-radius:2px;transform-origin:bottom;animation:ovLv .7s infinite alternate ease-in-out}
-.ov__lv i:nth-child(2){animation-delay:-.2s}.ov__lv i:nth-child(3){animation-delay:-.45s}.ov__lv i:nth-child(4){animation-delay:-.1s}.ov__lv i:nth-child(5){animation-delay:-.6s}
+.scr__bar{position:absolute;bottom:5px;left:0;right:0;display:flex;justify-content:center;gap:8px}
+.scr__bar i{width:16px;height:16px;border-radius:50%;background:#2a3531}.scr__bar i.end{background:#e5484d}
+/* 4 — stems get printed and sent */
+.daw{position:absolute;left:12px;right:12px;top:10px;bottom:30px;border-radius:10px;background:rgba(10,15,13,.85);border:1px solid #2a3531;padding:6px 8px;display:grid;gap:3px;direction:ltr;overflow:hidden}
+.daw__row{display:grid;grid-template-columns:36px 1fr;align-items:center;gap:6px;min-height:0}
+.daw__row b{font-size:9.5px;font-weight:600;color:#c9d4d0;text-align:left}
+.daw__lane{height:100%;max-height:18px;display:flex;align-items:center;gap:2px;background:rgba(46,211,195,.06);border-radius:4px;padding:0 3px;clip-path:inset(0 100% 0 0);animation:dawRec 6s infinite both;animation-delay:calc(var(--k) * .12s)}
+.daw__lane i{flex:1;height:calc(var(--h) * 100%);background:#2ED3C3;border-radius:1px;opacity:.85}
+.daw__head{position:absolute;top:0;bottom:0;left:52px;width:2px;background:#fff;box-shadow:0 0 8px #fff;animation:dawHead 6s infinite both}
+@keyframes dawRec{0%,4%{clip-path:inset(0 100% 0 0)}50%,92%{clip-path:inset(0 0 0 0)}100%{clip-path:inset(0 0 0 0);opacity:0}}
+@keyframes dawHead{0%,4%{left:52px;opacity:1}50%{left:calc(100% - 4px);opacity:1}54%,100%{left:calc(100% - 4px);opacity:0}}
+.sc__sent{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);font-style:normal;font-size:11px;font-weight:800;color:#0c1412;background:#2ED3C3;border-radius:999px;padding:3px 12px;white-space:nowrap;box-shadow:0 0 18px rgba(46,211,195,.5);animation:scSent 6s infinite both}
+.sc__sent small{font-weight:600;font-size:10px;opacity:.8}
+@keyframes scSent{0%,52%{opacity:0;transform:translate(-50%,8px) scale(.85)}58%,92%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.sc *,.sc *::after{animation:none!important}.daw__lane{clip-path:none}.ph__msg,.ph__file,.ph__ticks,.sc__sent{opacity:1}}
+.sc .ov__pills{display:flex;gap:6px;background:rgba(18,24,22,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:4px}
+.sc .ov__pills i{font-style:normal;font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;color:#c9d4d0}
+.sc .ov__note{background:#2ED3C3;color:#0c1412;display:grid;place-items:center;font-weight:800;flex:none}
+.sc .ov__face{border-radius:50%;background:linear-gradient(135deg,#2ED3C3,#1b6f68);display:grid;place-items:center}
+.sc .ov__face svg{width:16px;height:16px;fill:none;stroke:#0c1412;stroke-width:2.2;stroke-linecap:round}
+.sc .ov__lv{display:flex;align-items:flex-end;gap:2px;height:10px}
+.sc .ov__lv i{width:3px;height:100%;background:#2ED3C3;border-radius:2px;transform-origin:bottom;animation:ovLv .7s infinite alternate ease-in-out}
+.sc .ov__lv i:nth-child(2){animation-delay:-.2s}.sc .ov__lv i:nth-child(3){animation-delay:-.45s}.sc .ov__lv i:nth-child(4){animation-delay:-.1s}.sc .ov__lv i:nth-child(5){animation-delay:-.6s}
 @keyframes ovLv{from{transform:scaleY(.2)}to{transform:scaleY(1)}}
-.ov--stems{left:10px;top:50%;transform:translateY(-50%);width:132px;display:grid;gap:3px;background:rgba(18,24,22,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:7px 8px;direction:ltr;text-align:left;animation:ovFade 5s infinite both}
-.ov--stems span{display:grid;grid-template-columns:38px 1fr;align-items:center;gap:6px}
-.ov--stems b{font-size:10px;font-weight:600;color:#d5dfdb;line-height:1.25}
-.ov--stems span i{height:4px;border-radius:3px;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
-.ov--stems span i::after{content:"";position:absolute;inset:0;background:#2ED3C3;transform-origin:left;transform:scaleX(0);animation:ovBar 5s infinite both;animation-delay:calc(var(--k) * .25s);animation-play-state:inherit}
-.step.is-on .ov--stems span i::after{animation-play-state:running}
-@keyframes ovBar{0%,6%{transform:scaleX(0)}30%,92%{transform:scaleX(1)}100%{transform:scaleX(0)}}
-.ov--stems em{font-style:normal;font-size:10.5px;font-weight:800;color:#0c1412;background:#2ED3C3;border-radius:6px;text-align:center;margin-top:3px;direction:rtl;animation:ovTick 5s infinite both;animation-delay:.6s}
-@media (prefers-reduced-motion:reduce){.step__media .ov,.step__media .ov *{animation:none!important;opacity:1!important}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1655,16 +1689,28 @@ window.mergeContent = function (saved) {
     // facts + steps
     $("#factsBox").innerHTML = (S.facts || []).filter(f => f.title).map(f => `<div class="fact"><b>${esc(f.title)}</b><small>${esc(f.text)}</small></div>`).join("");
     const stepIcons = ["i-send","i-sliders","i-video","i-check"];
-    // little animated scenes on top of each step clip
+    // a small animated scene for each step (drawn, no footage)
+    const wave = n => Array.from({length:n}, (_, k) => `<i style="--h:${(.25 + Math.abs(Math.sin(k * 1.7 + n) * .55) + (k % 5 === 0 ? .2 : 0)).toFixed(2)}"></i>`).join("");
     const stepOv = [
-      `<div class="ov ov--chat"><div class="ov__bub"><span class="ov__note">♪</span><span><b>השיר_החדש<bdi dir="ltr">.wav</bdi></b><small><bdi dir="ltr">92 BPM</bdi> · רפרנס מצורף</small></span></div><span class="ov__ticks">✓✓</span></div>`,
-      `<div class="ov ov--pick"><small>בוחרים סאונד</small><div class="ov__pills"><i>חם</i><i class="win">מודרני</i><i>וינטג׳</i></div></div>`,
-      `<span class="ov ov--rec"><i></i>לייב</span><div class="ov ov--pip"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><span><b>המפיק בשיחה</b><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>`,
-      `<div class="ov ov--stems">${["Kick","Snare","Toms","OH","Room"].map((t,k) => `<span style="--k:${k}"><b>${t}</b><i></i></span>`).join("")}<em>נשלח ✓</em></div>`
+      `<div class="sc sc--chat"><span class="sc__fl" style="--x:14%;--y:30%">♪</span><span class="sc__fl" style="--x:80%;--y:24%;--d:.8s">♫</span><span class="sc__fl" style="--x:86%;--y:66%;--d:1.6s">♪</span>
+        <div class="ph"><span class="ph__isl"></span><div class="ph__msg">היי! יש לי שיר חדש 🎶</div>
+          <div class="ph__file"><span class="ov__note">♪</span><span><b>סקיצה – שיר חדש</b><small><bdi dir="ltr">92 BPM</bdi> · רפרנס</small></span></div><span class="ph__ticks">✓✓</span></div></div>`,
+      `<div class="sc sc--snare"><svg class="sn" viewBox="0 0 160 100"><ellipse class="sn__glow" cx="80" cy="34" rx="58" ry="14"/>
+          <path class="sn__shell" d="M26 34v34c0 8 24 15 54 15s54-7 54-15V34"/><path class="sn__hoop" d="M26 66c0 8 24 15 54 15s54-7 54-15"/>
+          <g class="sn__lugs"><rect x="40" y="44" width="5" height="16" rx="2"/><rect x="62" y="47" width="5" height="16" rx="2"/><rect x="93" y="47" width="5" height="16" rx="2"/><rect x="115" y="44" width="5" height="16" rx="2"/></g>
+          <ellipse class="sn__head" cx="80" cy="34" rx="54" ry="13"/><ellipse class="sn__ring" cx="80" cy="34" rx="20" ry="5"/>
+          <line class="sn__stick" x1="140" y1="-4" x2="90" y2="30"/></svg>
+        <div class="ov__pills sc__pills"><i class="p1">חם</i><i class="p2">מודרני</i><i class="p3">וינטג׳</i></div></div>`,
+      `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>לייב</span>
+          <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>המפיק</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
+          <div class="scr__tile scr__tile--me"><svg class="kit" viewBox="0 0 60 40"><ellipse cx="18" cy="24" rx="11" ry="4"/><path d="M7 24v8c0 2 5 4 11 4s11-2 11-4v-8"/><circle cx="42" cy="28" r="9"/><path class="kit__cym" d="M30 10h22"/><path d="M41 10v10"/><path class="kit__st" d="M14 4l8 16"/></svg><small>אבישי · האולפן</small></div>
+          <div class="scr__bar"><i></i><i></i><i class="end"></i></div></div></div>`,
+      `<div class="sc sc--stems"><div class="daw">${["Kick","Snare","Toms","OH","Room"].map((t,k) => `<span class="daw__row" style="--k:${k}"><b>${t}</b><span class="daw__lane">${wave(26)}</span></span>`).join("")}<span class="daw__head"></span></div>
+        <em class="sc__sent">נשלח ✓ <small>תוך 24 שעות</small></em></div>`
     ];
     $("#steps").insertAdjacentHTML("beforeend", (S.steps || []).filter(s => s.title).map((s,i) => `
       <li class="step${i < 4 ? " has-media" : ""}">
-        ${i < 4 ? `<span class="step__media" aria-hidden="true"><video muted playsinline loop preload="none" poster="assets/steps/s${i+1}.jpg" data-src="assets/steps/s${i+1}.mp4"></video>${stepOv[i] || ""}</span>` : ""}
+        ${i < 4 ? `<span class="step__media" aria-hidden="true">${stepOv[i] || ""}</span>` : ""}
         <span class="step__icon"><svg viewBox="0 0 24 24"><use href="#${stepIcons[i % stepIcons.length]}"/></svg></span>
         <span class="step__n">שלב ${i+1}</span>
         <h3>${esc(s.title)}</h3>
@@ -1731,10 +1777,7 @@ window.mergeContent = function (saved) {
           c.style.setProperty("--f", f.toFixed(3)); c.classList.toggle("is-on", f > 0);
           // game-style "level complete" pop the moment a card fills up
           if(f >= .985 && !c.classList.contains("is-full")){ c.classList.add("is-full", "pop"); burst(c); setTimeout(() => c.classList.remove("pop"), 700); }
-          else if(f < .6) c.classList.remove("is-full");
-          // the clip in the card plays only while the card is lit and on screen
-          const v = c.querySelector(".step__media video"); if(v && !reduce){ const go = f > 0 && r.bottom > 0 && r.top < innerHeight;
-            if(go){ if(!v.src) v.src = v.dataset.src; if(v.paused) v.play().catch(() => {}); } else if(!v.paused) v.pause(); } }); };
+          else if(f < .6) c.classList.remove("is-full"); }); };
       const burst = c => { const ic = c.querySelector(".step__icon"); if(!ic) return;
         for(let k = 0; k < 10; k++){ const p = document.createElement("i"); p.className = "spark"; const a = k / 10 * Math.PI * 2 + Math.random() * .4, d = 34 + Math.random() * 26;
           p.style.setProperty("--x", (Math.cos(a) * d).toFixed(1) + "px"); p.style.setProperty("--y", (Math.sin(a) * d).toFixed(1) + "px"); ic.appendChild(p); setTimeout(() => p.remove(), 700); } };

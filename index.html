@@ -1170,6 +1170,20 @@ html,body{max-width:100%;overflow-x:hidden}
 /* new vertical opening video: show it as shot — no extra zoom */
 .hero__mp4,.hero__poster{object-position:50% 50%!important;animation:none!important}
 
+/* opening video pulled back: the whole vertical frame as a card, soft blurred room behind it */
+@media (max-aspect-ratio:1/1){
+  .hero:not(.is-yt) .hero__blur{position:absolute;inset:-40px;background:url(assets/hero-blur.jpg) center/cover;filter:blur(24px) brightness(.45) saturate(1.2)}
+  .hero:not(.is-yt) .hero__mp4,.hero:not(.is-yt) .hero__poster{inset:auto;top:calc(70px + 1.5svh);left:50%;right:auto;bottom:auto;width:min(80vw,calc((100svh - 360px) * .5625));height:auto;aspect-ratio:9/16;transform:translateX(-50%)!important;border-radius:22px;object-fit:cover;box-shadow:0 0 0 1px rgba(46,211,195,.3),0 24px 60px rgba(0,0,0,.6)}
+  .hero:not(.is-yt) .hero__media{transform:none!important}
+  .hero:not(.is-yt) .fog,.hero:not(.is-yt) .hero__fx,.hero:not(.is-yt) .scrollcue{display:none!important}
+}
+@media (max-aspect-ratio:1/1){
+  .hero:not(.is-yt) .hero__blur{z-index:0}
+  .hero:not(.is-yt) .hero__poster,.hero:not(.is-yt) .hero__mp4{z-index:1}
+  .hero:not(.is-yt) .hero__haze{background:linear-gradient(to bottom,transparent 45%,rgba(13,19,17,.85) 70%,#0d1311 100%)!important}
+  .hero:not(.is-yt) .snd{top:calc(70px + 1.5svh + 12px);left:calc(50% - min(40vw,calc((100svh - 360px) * .28125)) + 12px);width:38px;height:38px}
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1206,7 +1220,7 @@ html,body{max-width:100%;overflow-x:hidden}
   <section class="hero" id="hero">
     <div class="hero__bg" id="heroBg">
       <div class="hero__media" id="heroMedia">
-        <img class="hero__poster" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high" onerror="this.remove()">
+        <span class="hero__blur" aria-hidden="true"></span><img class="hero__poster" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high" onerror="this.remove()">
         <video class="hero__mp4" id="heroVid" src="assets/hero.mp4" poster="assets/hero.jpg" muted autoplay loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
       </div>
       <div class="fog" aria-hidden="true"><i></i><i></i><i></i></div>

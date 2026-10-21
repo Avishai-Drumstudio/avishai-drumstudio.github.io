@@ -1013,6 +1013,35 @@ html,body{max-width:100%;overflow-x:hidden}
 .sc .ov__lv i:nth-child(2){animation-delay:-.2s}.sc .ov__lv i:nth-child(3){animation-delay:-.45s}.sc .ov__lv i:nth-child(4){animation-delay:-.1s}.sc .ov__lv i:nth-child(5){animation-delay:-.6s}
 @keyframes ovLv{from{transform:scaleY(.2)}to{transform:scaleY(1)}}
 
+/* v2: shorter scenes, cooler snare, me in the call */
+.step__media{aspect-ratio:5/2}
+.sc--snare .sn{top:8%;height:84%;width:auto;max-width:96%}
+.sn__ring.r2{animation-delay:.18s}
+.sn__w{fill:none;stroke:#2ED3C3;stroke-width:3;stroke-linecap:round;opacity:.9;stroke-dasharray:6 9;animation:snFlow .9s linear infinite,snAmp .75s infinite ease-out;transform-box:fill-box;transform-origin:center}
+.sn__w--r{animation-direction:reverse,normal}
+.sn__waves{filter:drop-shadow(0 0 6px rgba(46,211,195,.8))}
+@keyframes snFlow{to{stroke-dashoffset:30}}
+@keyframes snAmp{0%,40%{transform:scaleY(.25);opacity:.35}50%{transform:scaleY(1.25);opacity:1}100%{transform:scaleY(.25);opacity:.35}}
+.sn__shell{animation:none;fill:#1f2a27;stroke:#2ED3C3;stroke-width:1.5}
+.sn__hoop{stroke:#9fb3ad}
+.sn__lugs rect{fill:#9fb3ad}
+.sn__head{fill:#e9efed}
+.sn__stick{transform-origin:150px -14px}
+.sn__glow{animation:snGlow .75s infinite ease-out}
+@keyframes snGlow{0%,40%{opacity:.15}50%{opacity:.6}100%{opacity:.15}}
+.scr{top:8px;bottom:8px;padding-bottom:22px;grid-template-columns:1fr 1.5fr}
+.scr__bar i{width:13px;height:13px}
+.scr__tile--me{padding:0;border:1.5px solid #2ED3C3}
+.scr__tile--me img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:meZoom 8s ease-in-out infinite alternate}
+@keyframes meZoom{from{transform:scale(1)}to{transform:scale(1.12) translateY(3%)}}
+.scr__name{position:absolute;right:5px;bottom:5px;display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;color:#fff;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:6px}
+.scr__name .ov__lv{height:8px}
+.scr__tile:not(.scr__tile--me) .ov__lv{opacity:.35}
+.sc--chat .ph{top:8px}
+.daw{top:8px;bottom:28px;gap:2px}
+.ph{padding-top:20px;gap:4px}.ph__msg,.ph__file{padding:4px 7px}
+.ph__file b{white-space:nowrap}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1694,16 +1723,18 @@ window.mergeContent = function (saved) {
     const stepOv = [
       `<div class="sc sc--chat"><span class="sc__fl" style="--x:14%;--y:30%">♪</span><span class="sc__fl" style="--x:80%;--y:24%;--d:.8s">♫</span><span class="sc__fl" style="--x:86%;--y:66%;--d:1.6s">♪</span>
         <div class="ph"><span class="ph__isl"></span><div class="ph__msg">היי! יש לי שיר חדש 🎶</div>
-          <div class="ph__file"><span class="ov__note">♪</span><span><b>סקיצה – שיר חדש</b><small><bdi dir="ltr">92 BPM</bdi> · רפרנס</small></span></div><span class="ph__ticks">✓✓</span></div></div>`,
-      `<div class="sc sc--snare"><svg class="sn" viewBox="0 0 160 100"><ellipse class="sn__glow" cx="80" cy="34" rx="58" ry="14"/>
+          <div class="ph__file"><span class="ov__note">♪</span><span><b>שיר חדש</b><small><bdi dir="ltr">92 BPM</bdi> · רפרנס</small></span></div><span class="ph__ticks">✓✓</span></div></div>`,
+      `<div class="sc sc--snare"><svg class="sn" viewBox="-130 -20 420 120">
+          <g class="sn__waves"><path class="sn__w" d="M-130 40 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/><path class="sn__w sn__w--r" d="M178 40 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/></g>
+          <ellipse class="sn__glow" cx="80" cy="34" rx="58" ry="14"/>
           <path class="sn__shell" d="M26 34v34c0 8 24 15 54 15s54-7 54-15V34"/><path class="sn__hoop" d="M26 66c0 8 24 15 54 15s54-7 54-15"/>
           <g class="sn__lugs"><rect x="40" y="44" width="5" height="16" rx="2"/><rect x="62" y="47" width="5" height="16" rx="2"/><rect x="93" y="47" width="5" height="16" rx="2"/><rect x="115" y="44" width="5" height="16" rx="2"/></g>
-          <ellipse class="sn__head" cx="80" cy="34" rx="54" ry="13"/><ellipse class="sn__ring" cx="80" cy="34" rx="20" ry="5"/>
-          <line class="sn__stick" x1="140" y1="-4" x2="90" y2="30"/></svg>
-        <div class="ov__pills sc__pills"><i class="p1">חם</i><i class="p2">מודרני</i><i class="p3">וינטג׳</i></div></div>`,
+          <ellipse class="sn__head" cx="80" cy="34" rx="54" ry="13"/>
+          <ellipse class="sn__ring" cx="88" cy="32" rx="22" ry="5.5"/><ellipse class="sn__ring r2" cx="88" cy="32" rx="22" ry="5.5"/>
+          <line class="sn__stick" x1="150" y1="-14" x2="92" y2="30"/></svg></div>`,
       `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>לייב</span>
           <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>המפיק</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
-          <div class="scr__tile scr__tile--me"><svg class="kit" viewBox="0 0 60 40"><ellipse cx="18" cy="24" rx="11" ry="4"/><path d="M7 24v8c0 2 5 4 11 4s11-2 11-4v-8"/><circle cx="42" cy="28" r="9"/><path class="kit__cym" d="M30 10h22"/><path d="M41 10v10"/><path class="kit__st" d="M14 4l8 16"/></svg><small>אבישי · האולפן</small></div>
+          <div class="scr__tile scr__tile--me"><img src="assets/me-call.jpg" alt="" loading="lazy"><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span>אבישי · באולפן</span></div>
           <div class="scr__bar"><i></i><i></i><i class="end"></i></div></div></div>`,
       `<div class="sc sc--stems"><div class="daw">${["Kick","Snare","Toms","OH","Room"].map((t,k) => `<span class="daw__row" style="--k:${k}"><b>${t}</b><span class="daw__lane">${wave(26)}</span></span>`).join("")}<span class="daw__head"></span></div>
         <em class="sc__sent">נשלח ✓ <small>תוך 24 שעות</small></em></div>`

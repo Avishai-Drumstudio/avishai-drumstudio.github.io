@@ -1143,6 +1143,7 @@ html,body{max-width:100%;overflow-x:hidden}
 @keyframes sndWave{50%{opacity:.4}}
 @keyframes sndHint{0%,100%{box-shadow:0 0 0 0 rgba(46,211,195,0)}50%{box-shadow:0 0 0 7px rgba(46,211,195,.25)}}
 @media (min-width:761px){.snd{top:auto;bottom:34px;left:28px}}
+.snd{width:44px;height:44px;padding:0;justify-content:center;gap:0}.snd svg{width:21px;height:21px}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1180,8 +1181,8 @@ html,body{max-width:100%;overflow-x:hidden}
   <section class="hero" id="hero">
     <div class="hero__bg" id="heroBg">
       <div class="hero__media" id="heroMedia">
-        <img class="hero__poster" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high" onerror="this.remove()">
-        <video class="hero__mp4" id="heroVid" src="assets/hero.mp4" poster="assets/hero.jpg" muted autoplay loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+        <img class="hero__poster" id="heroImg" src="https://i.ytimg.com/vi/SMZbWh5Qp8A/maxresdefault.jpg" alt="" fetchpriority="high" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://i.ytimg.com/vi/SMZbWh5Qp8A/hqdefault.jpg'}else this.remove()">
+        <video class="hero__mp4" id="heroVid" muted autoplay loop playsinline webkit-playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
       </div>
       <div class="fog" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
@@ -1197,7 +1198,7 @@ html,body{max-width:100%;overflow-x:hidden}
         <button class="btn btn--ghost" type="button" id="watchIntro"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play"/></svg><span>צפו בסרטון</span></button>
       </div>
     </div>
-    <button class="snd" id="heroSnd" type="button" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path class="snd__spk" d="M4 9h3l5-4v14l-5-4H4z"/><path class="snd__on" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/><path class="snd__off" d="M16 9l5 6M21 9l-5 6"/></svg><span>הפעלת סאונד</span></button>
+    <button class="snd" id="heroSnd" type="button" aria-pressed="false" aria-label="סאונד" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path class="snd__spk" d="M4 9h3l5-4v14l-5-4H4z"/><path class="snd__on" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/><path class="snd__off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
     <button class="scrollcue" type="button" aria-label="גלו עוד"><i></i><span>גלו עוד</span></button>
   </section>
 
@@ -1859,9 +1860,12 @@ window.mergeContent = function (saved) {
       </li>`).join(""));
 
     // hero background: poster + video (YouTube or mp4)
-    const img = $("#heroImg"); if(real(S.heroImage)) img.src = S.heroImage;
+    const img = $("#heroImg"); if(real(S.heroImage) && !(ytId(S.introVideo) && parseFloat(S.heroIntroEnd) > 0)) img.src = S.heroImage;
     const bg = String(S.bgVideo||"").trim();
-    if(real(bg) && /\.(mp4|webm)(\?|$)/i.test(bg) && !/claude/i.test(location.hostname)){
+    const ytHero = !!ytId(S.introVideo) && parseFloat(S.heroIntroEnd) > 0 && !/claude/i.test(location.hostname);
+    if(ytHero){ const hv = $("#heroVid"); if(hv){ hv.removeAttribute("src"); hv.load(); hv.remove(); }
+      const im = $("#heroImg"), yid = ytId(S.introVideo); if(im && !im.src.includes(yid)) im.src = `https://i.ytimg.com/vi/${yid}/maxresdefault.jpg`; }
+    else if(real(bg) && /\.(mp4|webm)(\?|$)/i.test(bg) && !/claude/i.test(location.hostname)){
       // silent studio clip: built by hand so iPhone treats it as muted and lets it play inline
       const v = $("#heroVid") || document.createElement("video"); // already in the page, so it starts right away
       v.className = "hero__mp4";
@@ -1878,7 +1882,7 @@ window.mergeContent = function (saved) {
       const sb = $("#heroSnd");
       if(sb && /hero\.mp4/.test(bg)){
         sb.hidden = false;
-        const paint = () => { sb.classList.toggle("is-on", soundOn); sb.setAttribute("aria-pressed", soundOn); sb.querySelector("span").textContent = soundOn ? "השתקה" : "הפעלת סאונד"; };
+        const paint = () => { sb.classList.toggle("is-on", soundOn); sb.setAttribute("aria-pressed", soundOn); sb.setAttribute("aria-label", soundOn ? "השתקה" : "הפעלת סאונד"); };
         sb.addEventListener("click", e => { e.stopPropagation(); soundOn = !soundOn; v.muted = !soundOn; if(soundOn){ v.volume = 1; const p = v.play(); if(p && p.catch) p.catch(() => {}); } paint(); });
         // leaving the opening screen quiets it; coming back brings the sound back
         if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { heroIn = e.isIntersecting; if(soundOn) v.muted = !heroIn; }, {threshold:.35}).observe($("#hero"));
@@ -1922,14 +1926,21 @@ window.mergeContent = function (saved) {
         }
         if(info.playerState === 0){ cmd("seekTo", [start, true]); cmd("playVideo"); }
       });
-      // sound button now drives the YouTube clip
+      // sound: on by default (as soon as the browser allows — first touch on the page), the speaker icon mutes it
       let sb = $("#heroSnd"); if(!sb) return; const nb = sb.cloneNode(true); sb.replaceWith(nb); sb = nb; sb.hidden = false;
+      soundOn = true; let muted = true;
       const apply = () => { if(soundOn && heroIn && $("#modal").hidden && !$("#heroPlayer")){ cmd("unMute"); cmd("setVolume", [100]); cmd("playVideo"); } else cmd("mute"); };
-      const paint = () => { sb.classList.toggle("is-on", soundOn); sb.setAttribute("aria-pressed", soundOn); sb.querySelector("span").textContent = soundOn ? "השתקה" : "הפעלת סאונד"; };
-      sb.addEventListener("click", e => { e.stopPropagation(); soundOn = !soundOn; if(loc) loc.muted = true; apply(); paint(); });
+      const paint = () => { const on = soundOn && !muted; sb.classList.toggle("is-on", on); sb.setAttribute("aria-pressed", on); sb.setAttribute("aria-label", on ? "השתקה" : "הפעלת סאונד"); };
+      addEventListener("message", e => { if(e.source !== fr.contentWindow) return; let d; try { d = typeof e.data === "string" ? JSON.parse(e.data) : e.data; } catch(err){ return; }
+        if(d && d.info && typeof d.info.muted === "boolean"){ muted = d.info.muted; paint(); } });
+      sb.addEventListener("click", e => { e.stopPropagation(); soundOn = !(soundOn && !muted); if(loc) loc.muted = true; apply(); paint(); });
+      // phones only allow sound after a touch — the first touch anywhere turns it on (unless they muted it)
+      const first = () => { ["pointerdown","touchend","keydown"].forEach(ev => removeEventListener(ev, first, true)); if(soundOn) apply(); };
+      ["pointerdown","touchend","keydown"].forEach(ev => addEventListener(ev, first, true));
       if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { heroIn = e.isIntersecting; apply(); }, {threshold:.35}).observe($("#hero"));
       const md = $("#modal"); if(md) new MutationObserver(apply).observe(md, {attributes:true, attributeFilter:["hidden"]});
       new MutationObserver(apply).observe($("#hero"), {attributes:true, attributeFilter:["class"]});
+      setTimeout(apply, 1500);
       paint();
     })();
 

@@ -1066,6 +1066,29 @@ html,body{max-width:100%;overflow-x:hidden}
 .scr__tile--me{flex:none;height:100%;aspect-ratio:3/4}
 .scr__tile:not(.scr__tile--me){flex:none;width:96px}
 
+/* stems v2: a real-looking DAW window (rainbow tracks like his screen) */
+.step:has(.sc--stems) .step__media{aspect-ratio:5/2}
+.sc--stems .daw{left:10px;right:10px;top:20px;bottom:6px;padding:0;gap:0;background:#2a2d31;border:1px solid #44484e;border-radius:6px;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.daw__tb{flex:none;height:9px;background:#3a3e44;border-bottom:1px solid #1d1f22;display:flex;align-items:center;gap:3px;padding:0 4px}
+.daw__tb i{width:10px;height:4px;border-radius:1px;background:#5b6068}.daw__tb b{flex:1}
+.daw__ruler{flex:none;height:5px;margin-left:58px;background:repeating-linear-gradient(90deg,#6a6f77 0 1px,transparent 1px 12px),#24272b;border-bottom:1px solid #1d1f22}
+.sc--stems .daw__row{flex:1;display:grid;grid-template-columns:58px 1fr;gap:0;min-height:0;border-bottom:1px solid #1f2124}
+.daw__hd{display:flex;align-items:center;gap:2px;background:#33373c;border-right:1px solid #1d1f22;padding:0 2px;overflow:hidden}
+.daw__hd i{width:3px;align-self:stretch;background:hsl(var(--hue) 85% 55%)}
+.daw__hd b{flex:1;font-size:6.5px;font-weight:600;color:#d7dbe0;white-space:nowrap;overflow:hidden;text-align:left}
+.daw__hd u{text-decoration:none;font-size:5px;line-height:6px;width:6px;text-align:center;border-radius:1px;background:#4a4f56;color:#c8ccd2}
+.sc--stems .daw__lane{max-height:none;height:auto;border-radius:1px;margin:1px 0;padding:0 2px;gap:1px;background:hsl(var(--hue) 85% 52%);animation-delay:calc(var(--k) * .05s)}
+.sc--stems .daw__lane i{background:rgba(10,12,14,.55);opacity:1;border-radius:0}
+.daw__tp{flex:none;height:10px;background:#3a3e44;border-top:1px solid #1d1f22;display:flex;align-items:center;justify-content:center;gap:4px}
+.daw__tp i{width:6px;height:6px;border-radius:1px;background:#6a6f77}.daw__tp i.play{background:#3ddc6a}.daw__tp i.rec{border-radius:50%;background:#e5484d}
+.daw__tp b{font-size:6.5px;color:#9be7a8;font-family:ui-monospace,monospace;background:#1b1d20;padding:0 3px;border-radius:2px}
+.sc--stems .daw__head{left:58px;top:14px;bottom:10px;width:1.5px;background:#fff;box-shadow:0 0 6px #fff}
+@keyframes dawHead{0%,4%{left:58px;opacity:1}50%{left:calc(100% - 3px);opacity:1}54%,100%{left:calc(100% - 3px);opacity:0}}
+.sc--stems .sc__sent{bottom:auto;top:50%;transform:translate(-50%,-50%)}
+@keyframes scSent{0%,52%{opacity:0;transform:translate(-50%,-40%) scale(.85)}58%,92%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0}}
+.sc--stems .daw__row{align-items:stretch}.sc--stems .daw__lane{align-items:center}
+.sc--stems .daw__lane{gap:0;justify-content:space-between}.sc--stems .daw__lane i{flex:none;width:1.2px;background:rgba(8,10,12,.7)}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1760,7 +1783,10 @@ window.mergeContent = function (saved) {
           <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>המפיק</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
           <div class="scr__tile scr__tile--me"><video class="fg" muted playsinline loop preload="none" poster="assets/me-call.jpg" data-src="assets/me-call.mp4"></video><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>
           </div></div>`,
-      `<div class="sc sc--stems"><div class="daw">${["Kick","Snare","Toms","OH","Room"].map((t,k) => `<span class="daw__row" style="--k:${k}"><b>${t}</b><span class="daw__lane">${wave(26)}</span></span>`).join("")}<span class="daw__head"></span></div>
+      `<div class="sc sc--stems"><div class="daw"><span class="daw__tb"><i></i><i></i><i></i><b></b><i></i><i></i></span>
+          <span class="daw__ruler"></span>
+          ${[["Kick In",0],["Kick Out",22],["Snare Top",45],["Snare Bot",70],["Hi-Hat",110],["Toms",170],["OH L",200],["OH R",225],["Room",270],["Room Mono",315]].map(([t,h],k) => `<span class="daw__row" style="--k:${k};--hue:${h}"><span class="daw__hd"><i></i><b>${t}</b><u>M</u><u>S</u></span><span class="daw__lane">${wave(90)}</span></span>`).join("")}
+          <span class="daw__tp"><i></i><i class="play"></i><i class="rec"></i><b>00:00:24</b></span><span class="daw__head"></span></div>
         <em class="sc__sent">נשלח ✓ <small>תוך 24 שעות</small></em></div>`
     ];
     $("#steps").insertAdjacentHTML("beforeend", (S.steps || []).filter(s => s.title).map((s,i) => `

@@ -1827,7 +1827,7 @@ window.mergeContent = function (saved) {
           if(f >= .985 && !c.classList.contains("is-full")){ c.classList.add("is-full", "pop"); burst(c); setTimeout(() => c.classList.remove("pop"), 700); }
           else if(f < .6) c.classList.remove("is-full");
           const v = c.querySelector(".step__media video"); if(v && !reduce){ const go = f > 0 && r.bottom > 0 && r.top < innerHeight;
-            if(go){ if(!v.src) v.src = v.dataset.src; if(v.paused) v.play().catch(() => {}); } else if(!v.paused) v.pause(); } }); };
+            if(go){ if(!v.src){ v.muted = true; v.autoplay = true; v.src = v.dataset.src; } if(v.paused) v.play().catch(() => {}); } else if(!v.paused) v.pause(); } }); };
       const burst = c => { const ic = c.querySelector(".step__icon"); if(!ic) return;
         for(let k = 0; k < 10; k++){ const p = document.createElement("i"); p.className = "spark"; const a = k / 10 * Math.PI * 2 + Math.random() * .4, d = 34 + Math.random() * 26;
           p.style.setProperty("--x", (Math.cos(a) * d).toFixed(1) + "px"); p.style.setProperty("--y", (Math.sin(a) * d).toFixed(1) + "px"); ic.appendChild(p); setTimeout(() => p.remove(), 700); } };

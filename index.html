@@ -1088,6 +1088,9 @@ html,body{max-width:100%;overflow-x:hidden}
 @keyframes scSent{0%,52%{opacity:0;transform:translate(-50%,-40%) scale(.85)}58%,92%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0}}
 .sc--stems .daw__row{align-items:stretch}.sc--stems .daw__lane{align-items:center}
 .sc--stems .daw__lane{gap:0;justify-content:space-between}.sc--stems .daw__lane i{flex:none;width:1.2px;background:rgba(8,10,12,.7)}
+.step:has(.sc--stems) .step__media{aspect-ratio:2/1}.sc--stems .daw__row{grid-template-columns:64px 1fr}.daw__ruler{margin-left:64px}.sc--stems .daw__head{left:64px}.daw__hd b{font-size:6.3px}
+@keyframes dawHead{0%,4%{left:64px;opacity:1}50%{left:calc(100% - 3px);opacity:1}54%,100%{left:calc(100% - 3px);opacity:0}}
+.sc--stems .daw__row{grid-template-columns:72px 1fr}.daw__ruler{margin-left:72px}.sc--stems .daw__head{left:72px}@keyframes dawHead{0%,4%{left:72px;opacity:1}50%{left:calc(100% - 3px);opacity:1}54%,100%{left:calc(100% - 3px);opacity:0}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1785,7 +1788,7 @@ window.mergeContent = function (saved) {
           </div></div>`,
       `<div class="sc sc--stems"><div class="daw"><span class="daw__tb"><i></i><i></i><i></i><b></b><i></i><i></i></span>
           <span class="daw__ruler"></span>
-          ${[["Kick In",0],["Kick Out",22],["Snare Top",45],["Snare Bot",70],["Hi-Hat",110],["Toms",170],["OH L",200],["OH R",225],["Room",270],["Room Mono",315]].map(([t,h],k) => `<span class="daw__row" style="--k:${k};--hue:${h}"><span class="daw__hd"><i></i><b>${t}</b><u>M</u><u>S</u></span><span class="daw__lane">${wave(90)}</span></span>`).join("")}
+          ${["Kick In","Kick Out","Bass Drum","Snare Top","Snare Bottom","Hi-Hat","Tom 1","Tom 2","Floor","OH R","OH L","Room R","Room L"].map((t,k) => `<span class="daw__row" style="--k:${k};--hue:${Math.round(k * 26)}"><span class="daw__hd"><i></i><b>${t}</b><u>M</u><u>S</u></span><span class="daw__lane">${wave(90)}</span></span>`).join("")}
           <span class="daw__tp"><i></i><i class="play"></i><i class="rec"></i><b>00:00:24</b></span><span class="daw__head"></span></div>
         <em class="sc__sent">נשלח ✓ <small>תוך 24 שעות</small></em></div>`
     ];

@@ -1047,6 +1047,16 @@ html,body{max-width:100%;overflow-x:hidden}
 .sc__sent{bottom:4px;font-size:10px;padding:2px 10px}
 .scr{top:6px;bottom:6px;padding:5px 5px 20px}
 .scr__rec{right:auto;left:10px;top:9px}
+.step__media{aspect-ratio:7/2}
+.scr__tile--me img.bg{object-fit:cover;filter:blur(8px) brightness(.55);transform:scale(1.2);animation:none}
+.scr__tile--me img.fg{object-fit:contain;animation:none}
+.scr__tile--me{animation:scSpeak 1.5s infinite}
+.scr{width:min(240px,74%)}
+.daw__row b{font-size:8.5px}.daw{gap:1px}
+.scr{top:20px;bottom:6px;padding:4px;width:min(250px,76%)}
+.scr__rec{left:auto;right:8px;top:8px}
+.scr__name{right:auto;left:4px;bottom:4px;padding:2px 4px}
+.scr__rec{right:auto;left:8px;top:8px;font-size:9px;padding:1px 6px}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1740,8 +1750,8 @@ window.mergeContent = function (saved) {
           <line class="sn__stick" x1="150" y1="-14" x2="92" y2="30"/></svg></div>`,
       `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>לייב</span>
           <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>המפיק</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
-          <div class="scr__tile scr__tile--me"><img src="assets/me-call.jpg" alt="" loading="lazy"><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span>אבישי · באולפן</span></div>
-          <div class="scr__bar"><i></i><i></i><i class="end"></i></div></div></div>`,
+          <div class="scr__tile scr__tile--me"><img class="bg" src="assets/me-call.jpg" alt="" loading="lazy"><img class="fg" src="assets/me-call.jpg" alt="" loading="lazy"><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>
+          </div></div>`,
       `<div class="sc sc--stems"><div class="daw">${["Kick","Snare","Toms","OH","Room"].map((t,k) => `<span class="daw__row" style="--k:${k}"><b>${t}</b><span class="daw__lane">${wave(26)}</span></span>`).join("")}<span class="daw__head"></span></div>
         <em class="sc__sent">נשלח ✓ <small>תוך 24 שעות</small></em></div>`
     ];

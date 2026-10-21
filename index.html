@@ -1092,6 +1092,33 @@ html,body{max-width:100%;overflow-x:hidden}
 @keyframes dawHead{0%,4%{left:64px;opacity:1}50%{left:calc(100% - 3px);opacity:1}54%,100%{left:calc(100% - 3px);opacity:0}}
 .sc--stems .daw__row{grid-template-columns:72px 1fr}.daw__ruler{margin-left:72px}.sc--stems .daw__head{left:72px}@keyframes dawHead{0%,4%{left:72px;opacity:1}50%{left:calc(100% - 3px);opacity:1}54%,100%{left:calc(100% - 3px);opacity:0}}
 
+/* WhatsApp-style chat (step 1) */
+.step:has(.sc--chat) .step__media{aspect-ratio:2/1}
+.ph.wa{top:8px;bottom:-30px;width:min(170px,52%);padding:16px 0 0;gap:0;background:#000;border-color:#2b2f2d}
+.ph.wa .ph__isl{top:4px;z-index:3}
+.wa__hd{flex:none;display:flex;align-items:center;gap:4px;background:#008069;color:#fff;padding:3px 5px 4px}
+.wa__back{font-size:13px;line-height:1;opacity:.9}
+.wa__av{width:16px;height:16px;border-radius:50%;background:#dfe5e7;display:grid;place-items:center;flex:none}
+.wa__av svg{width:11px;height:11px;fill:none;stroke:#8696a0;stroke-width:2.4;stroke-linecap:round}
+.wa__nm b{display:block;font-size:8.5px;font-weight:700;line-height:1.1}.wa__nm small{display:block;font-size:6.5px;opacity:.85;line-height:1.1}
+.wa__body{flex:1;display:flex;flex-direction:column;gap:3px;padding:5px 5px;background-color:#efeae2;background-image:radial-gradient(circle at 20% 30%,rgba(0,0,0,.05) 1.2px,transparent 1.6px),radial-gradient(circle at 70% 70%,rgba(0,0,0,.04) 1.6px,transparent 2px),radial-gradient(circle at 50% 10%,rgba(0,0,0,.035) 1px,transparent 1.4px);background-size:14px 14px,19px 19px,11px 11px;overflow:hidden}
+.wa__m{position:relative;max-width:86%;font-size:7.6px;line-height:1.3;color:#111b21;padding:3px 6px 3px;border-radius:6px;box-shadow:0 1px .5px rgba(11,20,26,.13);animation:scPop 6s infinite both}
+.wa__m em{font-style:normal;font-size:5.5px;color:#667781;margin-inline-start:5px;white-space:nowrap;vertical-align:-1px}
+.wa__in{align-self:flex-start;background:#fff;border-top-right-radius:0}
+.wa__out{align-self:flex-end;background:#d9fdd3;border-top-left-radius:0}
+.m2{animation-delay:.8s}.m3{animation-delay:1.9s}
+.wa__au{display:flex;align-items:center;gap:4px;width:80%}
+.wa__pl{font-size:7px;color:#54656f}
+.wa__wv{flex:1;display:flex;align-items:center;gap:1px;height:10px;direction:ltr}
+.wa__wv i{flex:1;height:calc(var(--h) * 100%);background:#8696a0;border-radius:1px}
+.wa__tk{color:#8696a0;font-weight:700;animation:waRead 6s infinite both}
+@keyframes waRead{0%,45%{color:#8696a0}52%,100%{color:#53bdeb}}
+.wa__ft{flex:none;display:flex;align-items:center;gap:3px;background:#efeae2;padding:2px 4px 30px}
+.wa__inp{flex:1;font-size:7px;color:#8696a0;background:#fff;border-radius:999px;padding:3px 7px}
+.wa__mic{width:15px;height:15px;border-radius:50%;background:#00a884;display:grid;place-items:center;flex:none}
+.wa__mic svg{width:9px;height:9px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round}
+.step:has(.sc--chat) .step__media::after{height:12%}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1771,15 +1798,25 @@ window.mergeContent = function (saved) {
     // a small animated scene for each step (drawn, no footage)
     const wave = n => Array.from({length:n}, (_, k) => `<i style="--h:${(.25 + Math.abs(Math.sin(k * 1.7 + n) * .55) + (k % 5 === 0 ? .2 : 0)).toFixed(2)}"></i>`).join("");
     const stepOv = [
-      `<div class="sc sc--chat"><span class="sc__fl" style="--x:14%;--y:30%">♪</span><span class="sc__fl" style="--x:80%;--y:24%;--d:.8s">♫</span><span class="sc__fl" style="--x:86%;--y:66%;--d:1.6s">♪</span>
-        <div class="ph"><span class="ph__isl"></span><div class="ph__msg">היי! יש לי שיר חדש 🎶</div>
-          <div class="ph__file"><span class="ov__note">♪</span><span><b>שיר חדש</b><small><bdi dir="ltr">92 BPM</bdi> · רפרנס</small></span></div><span class="ph__ticks">✓✓</span></div></div>`,
+      `<div class="sc sc--chat"><div class="ph wa"><span class="ph__isl"></span>
+          <div class="wa__hd"><span class="wa__back">›</span><span class="wa__av"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><span class="wa__nm"><b>המפיק 🎧</b><small>מחובר/ת</small></span></div>
+          <div class="wa__body">
+            <div class="wa__m wa__in m1">היי אבישי! יש לי שיר חדש 🎶<em>14:02</em></div>
+            <div class="wa__m wa__in wa__au m2"><span class="wa__pl">▶</span><span class="wa__wv">${wave(22)}</span><em>0:42</em></div>
+            <div class="wa__m wa__out m3">קיבלתי! מתחיל לעבוד 🥁<em>14:03 <span class="wa__tk">✓✓</span></em></div>
+          </div>
+          <div class="wa__ft"><span class="wa__inp">הודעה</span><span class="wa__mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg></span></div></div></div>`,
       `<div class="sc sc--snare"><svg class="sn" viewBox="-130 -20 420 120">
+          <defs><linearGradient id="bbShell" x1="0" x2="1"><stop offset="0" stop-color="#030303"/><stop offset=".18" stop-color="#2b2b2e"/><stop offset=".3" stop-color="#6d6d72"/><stop offset=".36" stop-color="#1a1a1c"/><stop offset=".7" stop-color="#0b0b0c"/><stop offset=".86" stop-color="#3a3a3e"/><stop offset="1" stop-color="#040404"/></linearGradient>
+            <linearGradient id="bbGold" x1="0" x2="1"><stop offset="0" stop-color="#8a5f1c"/><stop offset=".3" stop-color="#f6d77e"/><stop offset=".5" stop-color="#c8962f"/><stop offset=".75" stop-color="#ffe39a"/><stop offset="1" stop-color="#8a5f1c"/></linearGradient></defs>
           <g class="sn__waves"><path class="sn__w" d="M-130 40 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/><path class="sn__w sn__w--r" d="M178 40 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/></g>
           <ellipse class="sn__glow" cx="80" cy="34" rx="58" ry="14"/>
-          <path class="sn__shell" d="M26 34v34c0 8 24 15 54 15s54-7 54-15V34"/><path class="sn__hoop" d="M26 66c0 8 24 15 54 15s54-7 54-15"/>
-          <g class="sn__lugs"><rect x="40" y="44" width="5" height="16" rx="2"/><rect x="62" y="47" width="5" height="16" rx="2"/><rect x="93" y="47" width="5" height="16" rx="2"/><rect x="115" y="44" width="5" height="16" rx="2"/></g>
+          <path d="M26 34v34c0 8 24 15 54 15s54-7 54-15V34" fill="url(#bbShell)"/>
+          <path d="M30 40c4 5 22 9 50 9" stroke="rgba(255,255,255,.25)" stroke-width="1.2" fill="none"/>
+          <g fill="url(#bbGold)"><rect x="33" y="40" width="3.2" height="30" rx="1.6"/><rect x="50" y="44" width="3.2" height="31" rx="1.6"/><rect x="78.4" y="46" width="3.2" height="32" rx="1.6"/><rect x="106.8" y="44" width="3.2" height="31" rx="1.6"/><rect x="123.8" y="40" width="3.2" height="30" rx="1.6"/></g>
+          <path d="M25 68c0 9 24 16 55 16s55-7 55-16" fill="none" stroke="url(#bbGold)" stroke-width="4" stroke-linecap="round"/>
           <ellipse class="sn__head" cx="80" cy="34" rx="54" ry="13"/>
+          <ellipse cx="80" cy="34" rx="55.5" ry="14" fill="none" stroke="url(#bbGold)" stroke-width="4"/>
           <ellipse class="sn__ring" cx="88" cy="32" rx="22" ry="5.5"/><ellipse class="sn__ring r2" cx="88" cy="32" rx="22" ry="5.5"/>
           <line class="sn__stick" x1="150" y1="-14" x2="92" y2="30"/></svg></div>`,
       `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>לייב</span>

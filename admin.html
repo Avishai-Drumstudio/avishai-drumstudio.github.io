@@ -237,8 +237,8 @@ window.SITE_DEFAULTS = {
   ctaTitle: "יש לך שיר שמחכה לתופים?",
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
-  order: ["reel", "testimonials", "process", "sources", "covers", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 9,
+  order: ["reel", "testimonials", "covers", "process", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
+  layoutV: 10,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -317,6 +317,10 @@ window.mergeContent = function (saved) {
   if (saved && (saved.layoutV || 0) < 9) { // testimonials move up, right after the productions
     const o = (d.order || []).filter(k => k !== "testimonials"); const at = o.indexOf("reel");
     o.splice(at < 0 ? 0 : at + 1, 0, "testimonials"); d.order = o; d.layoutV = 9;
+  }
+  if (saved && (saved.layoutV || 0) < 10) { // a video section between the text sections: covers move up after the testimonials
+    const o = (d.order || []).filter(k => k !== "covers"), at = o.indexOf("testimonials"), r = o.indexOf("reel");
+    o.splice(at >= 0 ? at + 1 : (r >= 0 ? r + 1 : 0), 0, "covers"); d.order = o; d.layoutV = 10;
   }
   if (saved && (saved.layoutV || 0) < 2) {
     const D = window.SITE_DEFAULTS;
@@ -601,7 +605,7 @@ window.mergeContent = function (saved) {
     }},
     { name:"המלצות", build: () => [
       el("h2", {}, "המלצות"), el("p", {}, "הסקציה מופיעה באתר כשיש לפחות המלצה אחת מוצגת."),
-      listEditor(S.testimonials, { title:x => x.name, fields:[["name","שם"],["role","תפקיד / על מה עבדנו"],["text","ההמלצה","textarea"]], blank:() => ({name:"",role:"",text:"",show:true}), addLabel:"הוספת המלצה" })
+      listEditor(S.testimonials, { title:x => x.name, fields:[["name","שם"],["role","תפקיד / על מה עבדנו"],["photo","קישור לתמונה (לא חובה)"],["text","ההמלצה","textarea"]], blank:() => ({name:"",role:"",text:"",show:true}), addLabel:"הוספת המלצה" })
     ]}
   ];
 

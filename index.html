@@ -1899,7 +1899,7 @@ window.mergeContent = function (saved) {
       const upd = () => { q = 0; const line = innerHeight * .78, b = box.getBoundingClientRect();
         if(reduce){ fill.style.transform = "translateX(-50%) scaleY(1)"; cards.forEach(c => { c.style.setProperty("--f", 1); c.classList.add("is-on"); }); return; }
         fill.style.transform = `translateX(-50%) scaleY(${Math.max(0, Math.min(1, (line - b.top) / b.height)).toFixed(3)})`;
-        cards.forEach(c => { const r = c.getBoundingClientRect(), f = Math.max(0, Math.min(1, (line - r.top) / (r.height * .8)));
+        cards.forEach(c => { const r = c.getBoundingClientRect(), f = Math.max(0, Math.min(1, (line - r.top) / (r.height * 1.05)));
           c.style.setProperty("--f", f.toFixed(3)); c.classList.toggle("is-on", f > 0);
           // game-style "level complete" pop the moment a card fills up
           if(f >= .985 && !c.classList.contains("is-full")){ c.classList.add("is-full", "pop"); burst(c); setTimeout(() => c.classList.remove("pop"), 700); }

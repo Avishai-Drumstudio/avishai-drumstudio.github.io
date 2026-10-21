@@ -1119,6 +1119,18 @@ html,body{max-width:100%;overflow-x:hidden}
 .wa__mic svg{width:9px;height:9px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round}
 .step:has(.sc--chat) .step__media::after{height:12%}
 
+/* snare v3: his Black Beauty photo */
+.sc--snare .sn{top:6%;height:90%}
+.sc--snare .sn__glow{fill:#2ED3C3;filter:blur(18px)}
+.sc--snare .sn__ring{stroke-width:5;transform-box:fill-box;transform-origin:center}
+.sc--snare .sn__stick{stroke-width:13;transform-origin:430px -66px}
+.sc--snare .sn__w{stroke-width:2.2}
+/* chat: no empty space — messages sit at the bottom, input bar visible */
+.step:has(.sc--chat) .step__media{aspect-ratio:5/2}
+.ph.wa{bottom:0;border-radius:20px 20px 0 0}
+.wa__body{justify-content:flex-end}
+.wa__ft{padding:3px 4px 5px}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1806,19 +1818,12 @@ window.mergeContent = function (saved) {
             <div class="wa__m wa__out m3">קיבלתי! מתחיל לעבוד 🥁<em>14:03 <span class="wa__tk">✓✓</span></em></div>
           </div>
           <div class="wa__ft"><span class="wa__inp">הודעה</span><span class="wa__mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg></span></div></div></div>`,
-      `<div class="sc sc--snare"><svg class="sn" viewBox="-130 -20 420 120">
-          <defs><linearGradient id="bbShell" x1="0" x2="1"><stop offset="0" stop-color="#030303"/><stop offset=".18" stop-color="#2b2b2e"/><stop offset=".3" stop-color="#6d6d72"/><stop offset=".36" stop-color="#1a1a1c"/><stop offset=".7" stop-color="#0b0b0c"/><stop offset=".86" stop-color="#3a3a3e"/><stop offset="1" stop-color="#040404"/></linearGradient>
-            <linearGradient id="bbGold" x1="0" x2="1"><stop offset="0" stop-color="#8a5f1c"/><stop offset=".3" stop-color="#f6d77e"/><stop offset=".5" stop-color="#c8962f"/><stop offset=".75" stop-color="#ffe39a"/><stop offset="1" stop-color="#8a5f1c"/></linearGradient></defs>
-          <g class="sn__waves"><path class="sn__w" d="M-130 40 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/><path class="sn__w sn__w--r" d="M178 40 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/></g>
-          <ellipse class="sn__glow" cx="80" cy="34" rx="58" ry="14"/>
-          <path d="M26 34v34c0 8 24 15 54 15s54-7 54-15V34" fill="url(#bbShell)"/>
-          <path d="M30 40c4 5 22 9 50 9" stroke="rgba(255,255,255,.25)" stroke-width="1.2" fill="none"/>
-          <g fill="url(#bbGold)"><rect x="33" y="40" width="3.2" height="30" rx="1.6"/><rect x="50" y="44" width="3.2" height="31" rx="1.6"/><rect x="78.4" y="46" width="3.2" height="32" rx="1.6"/><rect x="106.8" y="44" width="3.2" height="31" rx="1.6"/><rect x="123.8" y="40" width="3.2" height="30" rx="1.6"/></g>
-          <path d="M25 68c0 9 24 16 55 16s55-7 55-16" fill="none" stroke="url(#bbGold)" stroke-width="4" stroke-linecap="round"/>
-          <ellipse class="sn__head" cx="80" cy="34" rx="54" ry="13"/>
-          <ellipse cx="80" cy="34" rx="55.5" ry="14" fill="none" stroke="url(#bbGold)" stroke-width="4"/>
-          <ellipse class="sn__ring" cx="88" cy="32" rx="22" ry="5.5"/><ellipse class="sn__ring r2" cx="88" cy="32" rx="22" ry="5.5"/>
-          <line class="sn__stick" x1="150" y1="-14" x2="92" y2="30"/></svg></div>`,
+      `<div class="sc sc--snare"><svg class="sn" viewBox="-250 -70 900 400">
+          <g class="sn__waves"><g transform="translate(-250 0) scale(2)"><path class="sn__w" d="M0 70 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/></g><g transform="translate(426 0) scale(2)"><path class="sn__w sn__w--r" d="M0 70 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/></g></g>
+          <ellipse class="sn__glow" cx="200" cy="200" rx="190" ry="60"/>
+          <image href="assets/snare-bb.webp" x="0" y="0" width="400" height="314"/>
+          <ellipse class="sn__ring" cx="215" cy="66" rx="70" ry="22"/><ellipse class="sn__ring r2" cx="215" cy="66" rx="70" ry="22"/>
+          <line class="sn__stick" x1="430" y1="-66" x2="240" y2="58"/></svg></div>`,
       `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>לייב</span>
           <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>המפיק</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
           <div class="scr__tile scr__tile--me"><video class="fg" muted playsinline loop preload="none" poster="assets/me-call.jpg" data-src="assets/me-call.mp4"></video><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>

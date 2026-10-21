@@ -195,7 +195,7 @@ window.SITE_DEFAULTS = {
   heroImage: "assets/hero.jpg",
   bgVideo: "assets/hero.mp4",
   introVideo: "https://youtu.be/SMZbWh5Qp8A",
-  heroIntroEnd: 38, heroIntroCut: 2.5, // play N seconds of the ending, stopping heroIntroCut seconds before the end (the outro logo); // opening background = the last N seconds of the intro video, with a sound button (0 = use the studio clip)
+  heroIntroEnd: 0, heroIntroCut: 2.5, // play N seconds of the ending, stopping heroIntroCut seconds before the end (the outro logo); // opening background = the last N seconds of the intro video, with a sound button (0 = use the studio clip)
   studioVideo: "https://youtube.com/shorts/acj-V-isUmU",
   studioTitle: "My Drum Studio",
   productionsFirst: 2,
@@ -239,7 +239,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 11,
+  layoutV: 12,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -327,6 +327,7 @@ window.mergeContent = function (saved) {
     const o = (d.order || []).filter(k => k !== "covers"), at = o.indexOf("process"), s = o.indexOf("sources");
     o.splice(at >= 0 ? at + 1 : (s >= 0 ? s : o.length), 0, "covers"); d.order = o; d.layoutV = 11;
   }
+  if (saved && (saved.layoutV || 0) < 12) { d.heroIntroEnd = 0; d.layoutV = Math.max(d.layoutV || 0, 12); } // the new opening video lives on the site
   if (saved && (saved.layoutV || 0) < 2) {
     const D = window.SITE_DEFAULTS;
     d.order = D.order.slice(); d.layoutV = D.layoutV;

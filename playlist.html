@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>פלייליסט ההפקות</title>
+<link rel="icon" href="assets/icon-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root{--bg:#0f1513;--card:#17201d;--card2:#1e2a26;--line:#2a3833;--ink:#eef3f1;--muted:#9fb0aa;--lime:#2ED3C3;--on:#0b1412;--bad:#ff6b6b;--ok:#3ddc97}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:Rubik,system-ui,sans-serif;font-size:16px;line-height:1.5;padding:18px 16px 60px;max-width:640px;margin:auto}
+h1{font-size:1.6rem;font-weight:800;margin-bottom:4px}
+.sub{color:var(--muted);font-size:14.5px;margin-bottom:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:999px;padding:11px 20px;font:700 15px Rubik,sans-serif;cursor:pointer;background:var(--lime);color:var(--on)}
+.btn--ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn--sm{padding:7px 14px;font-size:13.5px}
+.btn:disabled{opacity:.5}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+select,input{width:100%;background:var(--card2);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:11px 12px;font:15px Rubik,sans-serif}
+label{display:block;font-size:13.5px;color:var(--muted);margin:0 0 6px}
+.row{display:flex;gap:8px;align-items:center}
+.msg{padding:12px 14px;border-radius:12px;font-size:14.5px;margin-bottom:12px}
+.msg--err{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.4)}
+.msg--ok{background:rgba(46,211,195,.1);border:1px solid rgba(46,211,195,.35)}
+.msg a{color:var(--lime)}
+.stats{display:flex;gap:8px;margin:6px 0 14px;flex-wrap:wrap}
+.chip{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:var(--muted)}
+.chip b{color:var(--ink)}
+.song{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+.song.is-in{border-color:rgba(61,220,151,.35)}
+.song__hd{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.song__t{font-weight:700;font-size:15.5px}
+.song__a{color:var(--muted);font-size:13.5px}
+.tag{flex:none;font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px}
+.tag--in{background:rgba(61,220,151,.15);color:var(--ok)}
+.tag--out{background:rgba(255,107,107,.12);color:var(--bad)}
+.tag--wait{background:var(--card2);color:var(--muted)}
+.cands{margin-top:10px;display:grid;gap:8px}
+.cand{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:center;background:var(--card2);border-radius:12px;padding:8px}
+.cand img{width:96px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;display:block}
+.cand__t{font-size:13.5px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cand__c{font-size:12px;color:var(--muted);margin:2px 0 6px}
+.cand__b{display:flex;gap:6px;flex-wrap:wrap}
+.cand a.watch{font-size:12.5px;color:var(--lime);text-decoration:none;padding:7px 4px}
+.hidden{display:none!important}
+.small{font-size:13px;color:var(--muted)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--muted);border-top-color:transparent;border-radius:50%;animation:s 1s linear infinite;vertical-align:-2px}
+@keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<h1>🎵 פלייליסט ההפקות</h1>
+<p class="sub">בודק אילו שירים שניגנת בהם חסרים בפלייליסט ביוטיוב, ומוסיף בלחיצה.</p>
+
+<div id="err" class="msg msg--err hidden"></div>
+<div id="note" class="msg msg--ok hidden"></div>
+
+<div class="box" id="connectBox">
+  <p style="margin-bottom:10px">שלב 1: התחברות לחשבון של ערוץ היוטיוב (avishy407).</p>
+  <button class="btn" id="connect">התחברות עם גוגל</button>
+</div>
+
+<div class="box hidden" id="plBox">
+  <label for="pl">שלב 2: בוחרים את הפלייליסט</label>
+  <div class="row"><select id="pl"></select><button class="btn btn--ghost btn--sm" id="reload" title="רענון">↻</button></div>
+  <p class="small" style="margin-top:6px" id="plInfo"></p>
+</div>
+
+<div id="listWrap" class="hidden">
+  <div class="stats" id="stats"></div>
+  <div id="songs"></div>
+  <div class="box">
+    <label for="manual">להוסיף שיר אחר: מדביקים קישור יוטיוב</label>
+    <div class="row"><input id="manual" placeholder="https://youtu.be/..." inputmode="url"><button class="btn btn--sm" id="manualAdd">הוסף</button></div>
+  </div>
+</div>
+
+<script>
+const CLIENT_ID = "196522008239-2ncgd0fmjbmla2j6lteranivnso2q139.apps.googleusercontent.com";
+const SCOPE = "https://www.googleapis.com/auth/youtube";
+const API = "https://www.googleapis.com/youtube/v3/";
+const ENABLE_URL = "https://console.cloud.google.com/apis/library/youtube.googleapis.com?project=studio-manager-7eb85";
+
+// songs Avishai played drums on (found in published credits) + the ones already on the site
+const SONGS = [
+  { t:"לזרוח כמו שאני", a:"אליהו רפאל כאין", q:"אליהו רפאל כאין לזרוח", k:["לזרוח"] },
+  { t:"נקודות של אור", a:"נתנאל אבקסיס", q:"נתנאל אבקסיס נקודות של אור", k:["נקודות של אור"] },
+  { t:"קריה יפיפיה", a:"להקת נשמחה", q:"להקת נשמחה קריה יפיפיה", k:["קריה יפיפיה","נשמחה"] },
+  { t:"ואני בחסדך", a:"משה הרמן ואליסף פיניש", q:"משה הרמן אליסף פיניש ואני בחסדך", k:["בחסדך"] },
+  { t:"עורי יחידה", a:"יאיר כהן", q:"יאיר כהן עורי יחידה", k:["עורי יחידה"] },
+  { t:"מחרוזת הודיה ואמונה", a:"להקת נהורא", q:"להקת נהורא מחרוזת הודיה ואמונה", k:["נהורא"] },
+  { t:"מחרוזת שמחה", a:"להקת אשירה", q:"להקת אשירה מחרוזת שמחה", k:["אשירה"] },
+  { t:"מחרוזת פורים", a:"ישיבת באר התחיה", q:"ישיבת באר התחיה מחרוזת פורים", k:["באר התחיה"] },
+  { t:"מחרוזת שבת", a:"ישיבת מעלה גלבוע", q:"ישיבת מעלה גלבוע מחרוזת שבת", k:["מעלה גלבוע"] },
+  { t:"קבלת שבת", a:"ישיבת נחלת יוסף שבי שומרון", q:"ישיבת נחלת יוסף שבי שומרון קבלת שבת", k:["נחלת יוסף"] },
+  { t:"מחרוזת שירי רבאק", a:"הרבנות הצבאית ואיחוד הלהקות", id:"5eJqw0t3e9c", k:["רבאק"] },
+  { t:"בוא נהיה שמש", a:"האחיות ג׳משיד", id:"XopiF8ylTAo", k:["נהיה שמש","ג׳משיד","גמשיד"] },
+  { t:"חמש דקות", a:"אבישי רוזן", id:"1ui0jm29em4", k:["חמש דקות"] },
+  { t:"יש פה מקום", a:"מיכל גרינגליק", id:"mvIhYC6DV9A", k:["יש פה מקום"] },
+  { t:"אהבת תורה", a:"להקת מזמור שיר", id:"dnbj0Vzzb-w", k:["אהבת תורה"] },
+  { t:"נשאר רק געגוע", a:"מיה משרקי", id:"i3dohlGVZD4", k:["געגוע"] }
+];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => String(s || "").replace(/[״"׳'`’]/g, "").replace(/[֑-ׇ]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+const store = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } }, set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} } };
+
+let token = null, items = [], plId = "", client = null;
+const saved = store.get("yt_tok"); if(saved && saved.exp > Date.now() + 60000) token = saved.t;
+
+function showErr(html){ const e = $("#err"); e.innerHTML = html; e.classList.toggle("hidden", !html); }
+function note(html){ const e = $("#note"); e.innerHTML = html; e.classList.toggle("hidden", !html); if(html) setTimeout(() => e.classList.add("hidden"), 3500); }
+
+async function api(path, opts = {}){
+  const r = await fetch(API + path, { ...opts, headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json", ...(opts.headers || {}) } });
+  if(r.status === 401){ token = null; store.set("yt_tok", null); uiConnected(false); throw new Error("auth"); }
+  const j = await r.json().catch(() => ({}));
+  if(!r.ok){
+    const reason = j?.error?.errors?.[0]?.reason || j?.error?.status || "";
+    if(/accessNotConfigured|SERVICE_DISABLED/i.test(reason) || /has not been used|is disabled/i.test(j?.error?.message || ""))
+      showErr(`צריך להפעיל את YouTube בפרויקט הגוגל (פעם אחת): <a href="${ENABLE_URL}" target="_blank" rel="noopener">לחץ כאן ← Enable</a>, חכה דקה ונסה שוב.`);
+    else if(/quotaExceeded|dailyLimitExceeded/i.test(reason)) showErr("יוטיוב הגביל את מספר הבדיקות להיום. נסה שוב מחר.");
+    else showErr("שגיאה מיוטיוב: " + esc(j?.error?.message || r.status));
+    throw new Error(reason || r.status);
+  }
+  return j;
+}
+
+function uiConnected(on){ $("#connectBox").classList.toggle("hidden", on); $("#plBox").classList.toggle("hidden", !on); if(!on) $("#listWrap").classList.add("hidden"); }
+
+function connect(){
+  if(!window.google?.accounts?.oauth2){ showErr("הכניסה של גוגל עוד נטענת, נסה שוב בעוד שנייה."); return; }
+  client = client || google.accounts.oauth2.initTokenClient({ client_id: CLIENT_ID, scope: SCOPE, hint: "avishy407@gmail.com",
+    callback: r => { if(r.error){ showErr("ההתחברות לא הצליחה: " + esc(r.error)); return; }
+      token = r.access_token; store.set("yt_tok", { t: token, exp: Date.now() + (r.expires_in || 3600) * 1000 }); showErr(""); uiConnected(true); loadPlaylists(); } });
+  client.requestAccessToken({ prompt: token ? "" : "consent" });
+}
+
+async function loadPlaylists(){
+  const sel = $("#pl"); sel.innerHTML = `<option>טוען…</option>`;
+  try {
+    let all = [], page = "";
+    do { const j = await api(`playlists?part=snippet,contentDetails&mine=true&maxResults=50${page ? "&pageToken=" + page : ""}`); all = all.concat(j.items || []); page = j.nextPageToken; } while(page);
+    if(!all.length){ sel.innerHTML = `<option value="">אין פלייליסטים בחשבון הזה</option>`; showErr("לא נמצאו פלייליסטים. אולי התחברת עם חשבון אחר מזה של הערוץ? נסה להתחבר שוב עם avishy407."); return; }
+    const last = store.get("yt_pl");
+    sel.innerHTML = all.map(p => `<option value="${p.id}" ${p.id === last ? "selected" : ""}>${esc(p.snippet.title)} (${p.contentDetails.itemCount})</option>`).join("");
+    if(!last || !all.some(p => p.id === last)){
+      const guess = all.find(p => /הפק|תופים|drum|ניגנתי|productions|work/i.test(p.snippet.title)); if(guess) sel.value = guess.id; }
+    pickPlaylist();
+  } catch(e){ if(e.message !== "auth") console.warn(e); }
+}
+
+async function pickPlaylist(){
+  plId = $("#pl").value; if(!plId) return; store.set("yt_pl", plId);
+  $("#plInfo").innerHTML = `<span class="spin"></span> קורא את הפלייליסט…`;
+  items = []; let page = "";
+  try {
+    do { const j = await api(`playlistItems?part=snippet,contentDetails&playlistId=${plId}&maxResults=50${page ? "&pageToken=" + page : ""}`); items = items.concat(j.items || []); page = j.nextPageToken; } while(page);
+  } catch(e){ return; }
+  $("#plInfo").textContent = `בפלייליסט יש ${items.length} סרטונים.`;
+  $("#listWrap").classList.remove("hidden");
+  render();
+}
+
+function inPlaylist(s){
+  const ids = new Set(items.map(i => i.contentDetails.videoId));
+  if(s.id && ids.has(s.id)) return items.find(i => i.contentDetails.videoId === s.id);
+  return items.find(i => { const t = norm(i.snippet.title + " " + (i.snippet.videoOwnerChannelTitle || "")); return s.k.some(k => t.includes(norm(k))); });
+}
+
+function render(){
+  let inC = 0, outC = 0;
+  $("#songs").innerHTML = SONGS.map((s, n) => { const hit = inPlaylist(s); hit ? inC++ : outC++;
+    return `<div class="song ${hit ? "is-in" : ""}" id="s${n}">
+      <div class="song__hd"><div><div class="song__t">${esc(s.t)}</div><div class="song__a">${esc(s.a)}</div></div>
+        <span class="tag ${hit ? "tag--in" : "tag--out"}">${hit ? "✓ בפלייליסט" : "חסר"}</span></div>
+      ${hit ? `<div class="small" style="margin-top:4px">נמצא: ${esc(hit.snippet.title)}</div>` : `<div class="cands" id="c${n}"><div class="small"><span class="spin"></span> מחפש ביוטיוב…</div></div>`}
+    </div>`; }).join("");
+  $("#stats").innerHTML = `<span class="chip">בפלייליסט: <b>${inC}</b></span><span class="chip">חסרים: <b>${outC}</b></span><span class="chip">סה״כ: <b>${SONGS.length}</b></span>`;
+  SONGS.forEach((s, n) => { if(!inPlaylist(s)) findCands(s, n); });
+}
+
+async function findCands(s, n){
+  const box = $("#c" + n); if(!box) return;
+  const cacheKey = "yt_c_" + (s.id || s.q); let list = store.get(cacheKey);
+  try {
+    if(!list){
+      if(s.id){ const j = await api(`videos?part=snippet&id=${s.id}`); list = (j.items || []).map(v => ({ id: v.id, t: v.snippet.title, c: v.snippet.channelTitle, th: v.snippet.thumbnails?.medium?.url })); }
+      else { const j = await api(`search?part=snippet&type=video&maxResults=3&regionCode=IL&relevanceLanguage=he&q=${encodeURIComponent(s.q)}`);
+        list = (j.items || []).map(v => ({ id: v.id.videoId, t: v.snippet.title, c: v.snippet.channelTitle, th: v.snippet.thumbnails?.medium?.url })); }
+      store.set(cacheKey, list);
+    }
+  } catch(e){ box.innerHTML = `<div class="small">החיפוש לא הצליח.</div>`; return; }
+  if(!list.length){ box.innerHTML = `<div class="small">לא נמצא ביוטיוב. אפשר להדביק קישור למטה.</div>`; return; }
+  box.innerHTML = `<div class="small">${s.id ? "הסרטון שכבר באתר:" : "תוצאות חיפוש – בחר את הנכון:"}</div>` + list.map(v => `
+    <div class="cand"><img src="${esc(v.th)}" alt="" loading="lazy">
+      <div><div class="cand__t">${esc(v.t)}</div><div class="cand__c">${esc(v.c)}</div>
+        <div class="cand__b"><button class="btn btn--sm" data-add="${esc(v.id)}" data-n="${n}">הוסף לפלייליסט</button><a class="watch" href="https://youtu.be/${esc(v.id)}" target="_blank" rel="noopener">צפייה ↗</a></div></div></div>`).join("");
+}
+
+async function addVideo(id, btn){
+  if(!plId || !id) return;
+  if(items.some(i => i.contentDetails.videoId === id)){ note("הסרטון הזה כבר בפלייליסט."); return; }
+  if(btn){ btn.disabled = true; btn.innerHTML = `<span class="spin"></span>`; }
+  try {
+    const j = await api("playlistItems?part=snippet,contentDetails", { method: "POST", body: JSON.stringify({ snippet: { playlistId: plId, resourceId: { kind: "youtube#video", videoId: id } } }) });
+    items.push(j); note("✓ נוסף לפלייליסט"); render();
+  } catch(e){ if(btn){ btn.disabled = false; btn.textContent = "הוסף לפלייליסט"; } }
+}
+
+const ytId = u => { const m = String(u).match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(u.trim()) ? u.trim() : ""); };
+
+$("#connect").addEventListener("click", connect);
+$("#pl").addEventListener("change", pickPlaylist);
+$("#reload").addEventListener("click", pickPlaylist);
+$("#songs").addEventListener("click", e => { const b = e.target.closest("[data-add]"); if(b) addVideo(b.dataset.add, b); });
+$("#manualAdd").addEventListener("click", () => { const id = ytId($("#manual").value); if(!id){ note(""); showErr("זה לא נראה כמו קישור יוטיוב."); return; } showErr(""); addVideo(id, $("#manualAdd")).then(() => { $("#manualAdd").disabled = false; $("#manualAdd").textContent = "הוסף"; $("#manual").value = ""; }); });
+
+if(token){ uiConnected(true); loadPlaylists(); }
+</script>
+</body>
+</html>

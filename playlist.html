@@ -71,6 +71,7 @@ label{display:block;font-size:13.5px;color:var(--muted);margin:0 0 6px}
 </div>
 
 <div id="listWrap" class="hidden">
+  <div class="box" id="sumBox"><div class="small"><span class="spin"></span> סופר צפיות…</div></div>
   <div class="stats" id="stats"></div>
   <div id="songs"></div>
   <div class="box">
@@ -147,7 +148,7 @@ async function loadPlaylists(){
     let all = [], page = "";
     do { const j = await api(`playlists?part=snippet,contentDetails&mine=true&maxResults=50${page ? "&pageToken=" + page : ""}`); all = all.concat(j.items || []); page = j.nextPageToken; } while(page);
     if(!all.length){ sel.innerHTML = `<option value="">אין פלייליסטים בחשבון הזה</option>`; showErr("לא נמצאו פלייליסטים. אולי התחברת עם חשבון אחר מזה של הערוץ? נסה להתחבר שוב עם avishy407."); return; }
-    const last = store.get("yt_pl");
+    const last = store.get("yt_pl") || "PLb97_IJzxvLCDyJVz9yZza8r4Qo5L_lVw";
     sel.innerHTML = all.map(p => `<option value="${p.id}" ${p.id === last ? "selected" : ""}>${esc(p.snippet.title)} (${p.contentDetails.itemCount})</option>`).join("");
     if(!last || !all.some(p => p.id === last)){
       const guess = all.find(p => /הפק|תופים|drum|ניגנתי|productions|work/i.test(p.snippet.title)); if(guess) sel.value = guess.id; }
@@ -164,7 +165,27 @@ async function pickPlaylist(){
   } catch(e){ return; }
   $("#plInfo").textContent = `בפלייליסט יש ${items.length} סרטונים.`;
   $("#listWrap").classList.remove("hidden");
-  render();
+  render(); summary();
+}
+
+// totals: how many videos, how many views altogether, and the full list by views
+async function summary(){
+  const box = $("#sumBox"); box.innerHTML = `<div class="small"><span class="spin"></span> סופר צפיות…</div>`;
+  const ids = [...new Set(items.map(i => i.contentDetails.videoId))]; let vids = [];
+  try { for(let k = 0; k < ids.length; k += 50){ const j = await api(`videos?part=snippet,statistics&id=${ids.slice(k, k + 50).join(",")}`); vids = vids.concat(j.items || []); } }
+  catch(e){ box.innerHTML = `<div class="small">לא הצלחתי לספור צפיות.</div>`; return; }
+  const total = vids.reduce((a, v) => a + (+v.statistics?.viewCount || 0), 0), gone = ids.length - vids.length;
+  const fmt = n => n.toLocaleString("he-IL");
+  vids.sort((a, b) => (+b.statistics?.viewCount || 0) - (+a.statistics?.viewCount || 0));
+  box.innerHTML = `<div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px">
+      <div><div style="font-size:1.7rem;font-weight:800;color:var(--lime)">${fmt(items.length)}</div><div class="small">סרטונים בפלייליסט</div></div>
+      <div><div style="font-size:1.7rem;font-weight:800;color:var(--lime)">${fmt(total)}</div><div class="small">צפיות ביחד</div></div></div>
+    ${gone > 0 ? `<div class="small" style="margin-bottom:6px">⚠️ ${gone} סרטונים בפלייליסט כבר לא זמינים ביוטיוב (נמחקו או פרטיים).</div>` : ""}
+    <details><summary class="small" style="cursor:pointer;color:var(--lime)">כל הסרטונים לפי צפיות ▾</summary>
+      <ol style="margin:8px 18px 0 0;font-size:13.5px;line-height:1.55">${vids.map(v => `<li><a href="https://youtu.be/${esc(v.id)}" target="_blank" rel="noopener" style="color:var(--ink)">${esc(v.snippet.title)}</a> <span class="small">· ${fmt(+v.statistics?.viewCount || 0)}</span></li>`).join("")}</ol></details>
+    <button class="btn btn--ghost btn--sm" id="copyList" style="margin-top:10px">העתקת הרשימה (כדי לשלוח ל-Claude)</button>`;
+  $("#copyList").addEventListener("click", () => { const txt = `${items.length} סרטונים, ${total} צפיות\n` + vids.map(v => `${v.snippet.title} | ${v.snippet.channelTitle} | ${v.statistics?.viewCount || 0} | ${v.id}`).join("\n");
+    navigator.clipboard.writeText(txt).then(() => note("✓ הרשימה הועתקה – הדבק אותה בשיחה עם Claude"), () => showErr("ההעתקה לא הצליחה")); });
 }
 
 function inPlaylist(s){

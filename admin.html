@@ -239,7 +239,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 13,
+  layoutV: 14,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -248,6 +248,7 @@ window.SITE_DEFAULTS = {
     { url: "https://youtu.be/1ui0jm29em4", title: "אבישי רוזן – חמש דקות (קליפ רשמי)", show: true },
     { url: "https://youtu.be/mvIhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
     { url: "https://youtu.be/9kgGM_m-i9I", title: "", show: true },
+    { url: "https://youtu.be/qGAhDaOMN2s", title: "", show: true },
     { url: "https://youtu.be/i3dohlGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true }
   ],
   sources: [
@@ -334,6 +335,14 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 14) { // one more selected production (Avishai asked)
+    const pr = Array.isArray(d.productions) ? d.productions.slice() : [];
+    if (!pr.some(p => p && /qGAhDaOMN2s/.test(p.url || ""))) {
+      const at = pr.findIndex(p => p && /9kgGM_m-i9I/.test(p.url || ""));
+      pr.splice(at >= 0 ? at + 1 : pr.length, 0, { url: "https://youtu.be/qGAhDaOMN2s", title: "", show: true });
+    }
+    d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 14);
   }
   if (saved && (saved.layoutV || 0) < 12) { d.heroIntroEnd = 0; d.layoutV = Math.max(d.layoutV || 0, 12); } // the new opening video lives on the site
   if (saved && (saved.layoutV || 0) < 2) {

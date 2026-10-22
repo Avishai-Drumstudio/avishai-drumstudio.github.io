@@ -1527,7 +1527,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 12,
+  layoutV: 13,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1535,7 +1535,7 @@ window.SITE_DEFAULTS = {
     { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/1ui0jm29em4", title: "אבישי רוזן – חמש דקות (קליפ רשמי)", show: true },
     { url: "https://youtu.be/mvIhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
-    { url: "https://youtu.be/dnbj0Vzzb-w", title: "אהבת תורה – להקת מזמור שיר", show: true },
+    { url: "https://youtu.be/9kgGM_m-i9I", title: "", show: true },
     { url: "https://youtu.be/i3dohlGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true }
   ],
   sources: [
@@ -1615,6 +1615,14 @@ window.mergeContent = function (saved) {
     const o = (d.order || []).filter(k => k !== "covers"), at = o.indexOf("process"), s = o.indexOf("sources");
     o.splice(at >= 0 ? at + 1 : (s >= 0 ? s : o.length), 0, "covers"); d.order = o; d.layoutV = 11;
   }
+  if (saved && (saved.layoutV || 0) < 13) { // swap the "אהבת תורה" production for the new one (Avishai asked)
+    const NEW = "https://youtu.be/9kgGM_m-i9I", pr = Array.isArray(d.productions) ? d.productions.slice() : [];
+    if (!pr.some(p => p && /9kgGM_m-i9I/.test(p.url || ""))) {
+      const at = pr.findIndex(p => p && /dnbj0Vzzb-w/.test(p.url || ""));
+      if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
+    }
+    d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
   if (saved && (saved.layoutV || 0) < 12) { d.heroIntroEnd = 0; d.layoutV = Math.max(d.layoutV || 0, 12); } // the new opening video lives on the site
   if (saved && (saved.layoutV || 0) < 2) {
     const D = window.SITE_DEFAULTS;
@@ -1689,6 +1697,10 @@ window.mergeContent = function (saved) {
         <span class="reel__play" aria-hidden="true">${icon('i-play')}</span>
         <span class="reel__info"><b>${esc(v.title)}</b><small>לחצו לצפייה</small></span>
       </div>`; }).join("");
+    // a production saved without a title: fetch its YouTube title
+    list.forEach((v,i) => { if(String(v.title||"").trim()) return; const id = ytId(v.url); if(!id) return;
+      fetch(`https://noembed.com/embed?url=${encodeURIComponent("https://www.youtube.com/watch?v=" + id)}`).then(r => r.json()).then(j => { if(!j || !j.title) return;
+        v.title = j.title; const it = track.querySelector(`[data-i="${i}"]`); if(!it) return; it.setAttribute("aria-label", j.title); const b = it.querySelector(".reel__info b"); if(b) b.textContent = j.title; }).catch(() => {}); });
     dots.innerHTML = list.map(() => "<i></i>").join("");
     const items = [...track.children], ds = [...dots.children];
     let active = -1, raf = 0;

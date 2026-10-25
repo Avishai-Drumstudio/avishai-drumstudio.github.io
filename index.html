@@ -1189,6 +1189,14 @@ html,body{max-width:100%;overflow-x:hidden}
 .gcard__img img,.gear-peek__c img{filter:brightness(1.09) contrast(1.12) saturate(.95);
   -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;
   mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect}
+/* gear v3: white tile + photos pushed to pure white, then ONE tint laid over the whole tile —
+   photo and tile get the exact same colour, so no inner boxes on any photo */
+.gcard__img,.gear-peek__c{background:#fff!important;isolation:isolate}
+.gcard__img img,.gear-peek__c img{mix-blend-mode:normal!important;filter:brightness(1.1) contrast(1.2) saturate(.95)!important}
+.gcard__img::before,.gear-peek__c::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(120% 95% at 50% 28%,#f4f7f5 0%,#dfe7e3 55%,#c6d2cd 100%);mix-blend-mode:multiply}
+.gcard__img::after{z-index:0}
+.gcard__img img{z-index:1}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>

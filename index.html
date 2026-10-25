@@ -1185,6 +1185,10 @@ html,body{max-width:100%;overflow-x:hidden}
 .gcard__name{font-size:15px}
 .gear-peek__c{background:radial-gradient(120% 90% at 50% 30%,#eef2f0 0%,#dde5e1 55%,#c9d4cf 100%)}
 .gear-peek__c img{mix-blend-mode:multiply;padding:10px}
+/* off-white photo backgrounds: push them to pure white so they vanish, and fade the photo edges */
+.gcard__img img,.gear-peek__c img{filter:brightness(1.09) contrast(1.12) saturate(.95);
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent),linear-gradient(to bottom,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>

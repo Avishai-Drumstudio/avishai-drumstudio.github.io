@@ -1174,6 +1174,18 @@ html,body{max-width:100%;overflow-x:hidden}
 .hero:not(.is-yt) .hero__media{transform:none!important}
 @media (max-aspect-ratio:1/1){ .hero:not(.is-yt) .scrollcue{display:none!important} }
 
+/* gear photos: one calm, uniform "studio shelf" look — the white product backgrounds melt into it */
+.gcard__img{background:radial-gradient(120% 90% at 50% 30%,#eef2f0 0%,#dde5e1 55%,#c9d4cf 100%)}
+.gcard__img::after{content:"";position:absolute;left:18%;right:18%;bottom:9%;height:7%;border-radius:50%;background:radial-gradient(closest-side,rgba(15,30,26,.28),transparent);filter:blur(3px);pointer-events:none}
+.gcard__img img{position:relative;z-index:1;width:78%;height:78%;mix-blend-mode:multiply;filter:saturate(.92) contrast(1.03)}
+.gcard__img svg{color:#9fb0aa}
+.gcard{border-color:rgba(255,255,255,.07)}
+.gcard__go{display:none}
+.gcard__body{padding:12px 14px 14px}
+.gcard__name{font-size:15px}
+.gear-peek__c{background:radial-gradient(120% 90% at 50% 30%,#eef2f0 0%,#dde5e1 55%,#c9d4cf 100%)}
+.gear-peek__c img{mix-blend-mode:multiply;padding:10px}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>

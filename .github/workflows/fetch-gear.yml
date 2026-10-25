@@ -1,0 +1,46 @@
+name: fetch gear photos
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/fetch-gear.txt']
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: download gear photos from the saved site content
+        run: |
+          mkdir -p assets/gear-src
+          curl -sL "https://script.google.com/macros/s/AKfycbxGFMxWOnvCFgnJFxp0vZVyt5WpYdAO99KQPjjErYWwMFeBilOqNeCzeXX8AW1YJ2Aqvg/exec?action=get" -o /tmp/content.json || true
+          python3 - <<'PY'
+          import json, re, hashlib, urllib.request, os
+          urls = set()
+          try:
+              d = json.load(open('/tmp/content.json'))
+              txt = json.dumps(d)
+              urls |= set(re.findall(r'https://base44\.app/[^"\\]+', txt))
+          except Exception as e:
+              print('content read failed', e)
+          urls |= set(re.findall(r'https://base44\.app/[^"\\]+', open('index.html', encoding='utf-8').read()))
+          m = {}
+          for u in sorted(urls):
+              ext = os.path.splitext(u.split('?')[0])[1].lower() or '.jpg'
+              name = hashlib.md5(u.encode()).hexdigest()[:10] + ext
+              try:
+                  req = urllib.request.Request(u, headers={'User-Agent': 'Mozilla/5.0'})
+                  open('assets/gear-src/' + name, 'wb').write(urllib.request.urlopen(req, timeout=60).read())
+                  m[u] = name
+              except Exception as e:
+                  print('fail', u, e)
+          json.dump(m, open('assets/gear-src/map.json', 'w'), indent=1)
+          print(len(m), 'downloaded')
+          PY
+      - name: commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add assets/gear-src
+          git commit -m "Fetch gear photos (raw, for processing)" || exit 0
+          git push

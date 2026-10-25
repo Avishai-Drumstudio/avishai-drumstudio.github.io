@@ -1201,6 +1201,11 @@ html,body{max-width:100%;overflow-x:hidden}
 .gcard__img::before,.gear-peek__c::before{mix-blend-mode:normal!important;
   background:radial-gradient(120% 95% at 50% 28%,rgba(18,48,40,0) 0%,rgba(18,48,40,.08) 55%,rgba(18,48,40,.2) 100%)!important}
 
+/* baked gear tiles: the photo already IS the designed tile — show it plainly, edge to edge */
+.gcard__img.is-baked,.gear-peek__c.is-baked{background:#dfe7e3!important}
+.gcard__img.is-baked::before,.gcard__img.is-baked::after,.gear-peek__c.is-baked::before{display:none!important}
+.gcard__img.is-baked img,.gear-peek__c.is-baked img{width:100%!important;height:100%!important;object-fit:cover;padding:0!important;filter:none!important;-webkit-mask-image:none!important;mask-image:none!important;mix-blend-mode:normal!important}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1698,6 +1703,8 @@ window.mergeContent = function (saved) {
     const m = s.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/);
     return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(s) ? s : "");
   };
+  // gear photos cleaned up and placed on one uniform studio tile (made from the original product shots)
+  const GEAR_MAP = {"https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3063bcfa4_IMG_8097.jpeg":"assets/gear/7c9e82c9fd.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3edea3952_image.png":"assets/gear/c4371ec2be.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3f0778a59_IMG_8122.jpeg":"assets/gear/02f48413b9.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg":"assets/gear/52202702f9.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/40b8c99b4_IMG_8103.jpeg":"assets/gear/ca56fb5d09.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/528481e05_IMG_8125.jpeg":"assets/gear/8d9df6ca91.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/586af5b12_image.png":"assets/gear/6f9b6031f4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/59a6e307f_image.png":"assets/gear/b2505a770b.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/7e3813ffb_image.png":"assets/gear/1c42c3e50c.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/87cabe3a2_IMG_8121.jpeg":"assets/gear/df3661349d.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/885386856_IMG_8116.jpeg":"assets/gear/1fcb3c57f5.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/903783247_image.png":"assets/gear/afa9133bba.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a10c19e67_image.png":"assets/gear/897e4da3f5.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a6b75f1fb_IMG_8134.jpeg":"assets/gear/2858230857.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ad89ebef7_IMG_8117.jpeg":"assets/gear/f6732bc158.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bc8a0e938_image.png":"assets/gear/33ee342ca8.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg":"assets/gear/6fb7b6512a.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/cace07592_image.png":"assets/gear/f90e176886.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/d6c1cd271_thomann-image.jpg":"assets/gear/226516085d.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ea1af205d_image.png":"assets/gear/eeca685210.webp"};
   const embedUrl = (id, extra="") => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1${extra}`;
   const thumbFix = "if(this.naturalWidth<=120){this.remove()}";
 
@@ -1862,7 +1869,7 @@ window.mergeContent = function (saved) {
       const seen = new Set(), pick = [];
       pics.forEach(g => { if(pick.length < 5 && !seen.has(g.category)){ seen.add(g.category); pick.push(g); } });
       pics.forEach(g => { if(pick.length < 5 && !pick.includes(g)) pick.push(g); });
-      if(peek){ peek.innerHTML = pick.map((g,i) => `<span class="gear-peek__c" style="--i:${i};--n:${pick.length}"><img src="${esc(g.img)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>`).join("");
+      if(peek){ peek.innerHTML = pick.map((g,i) => `<span class="gear-peek__c${GEAR_MAP[g.img] ? " is-baked" : ""}" style="--i:${i};--n:${pick.length}"><img src="${esc(GEAR_MAP[g.img] || g.img)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>`).join("");
         peek.hidden = !pick.length; peek.addEventListener("click", () => b.click()); }
       b.addEventListener("click", () => { const open = !w.classList.contains("is-open"); w.classList.toggle("is-open", open); b.classList.toggle("is-open", open);
         b.parentElement.classList.toggle("is-open", open); b.setAttribute("aria-expanded", open); b.firstChild.textContent = open ? "סגירת רשימת הציוד" : "לרשימת הציוד המלאה"; }); })();
@@ -2326,7 +2333,8 @@ window.mergeContent = function (saved) {
         </div>
         <div class="gearrail" id="rail${ci}">
           ${S.gear.filter(g => g.category === c).map(it => {
-            const inner = `<div class="gcard__img">${real(it.img) ? `<img src="${esc(it.img)}" alt="${esc(it.name)}" loading="lazy" onerror="this.outerHTML=this.parentNode.dataset.ph||''">` : ph}</div>
+            const baked = GEAR_MAP[it.img];
+            const inner = `<div class="gcard__img${baked ? " is-baked" : ""}">${real(it.img) ? `<img src="${esc(baked || it.img)}" alt="${esc(it.name)}" loading="lazy" onerror="this.outerHTML=this.parentNode.dataset.ph||''">` : ph}</div>
               <div class="gcard__body"><span class="gcard__role">${esc(it.role)}</span><span class="gcard__name">${esc(it.name)}</span>${real(it.url) ? `<span class="gcard__go">לצפייה במוצר ←</span>` : ``}</div>`;
             return real(it.url) ? `<a class="gcard" href="${esc(it.url)}" target="_blank" rel="noopener">${inner}</a>` : `<div class="gcard">${inner}</div>`;
           }).join("")}

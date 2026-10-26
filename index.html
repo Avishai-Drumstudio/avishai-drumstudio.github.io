@@ -1299,7 +1299,7 @@ html,body{max-width:100%;overflow-x:hidden}
     <div class="wrap about">
       <figure class="about__media" data-reveal>
         <div class="about__card">
-          <img id="aboutImg" alt="אבישי ישר" loading="lazy" onerror="this.remove()">
+          <img id="aboutImg" alt="אבישי ישר" loading="eager" decoding="async" onerror="this.remove()">
           <span class="about__tape" aria-hidden="true">DRUMS · AVISHAI</span>
         </div>
         <div class="fader" id="aboutFader" aria-hidden="true">
@@ -1725,6 +1725,8 @@ window.mergeContent = function (saved) {
   };
   // gear photos cleaned up and placed on one uniform studio tile (made from the original product shots)
   const GEAR_MAP = {"https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3063bcfa4_IMG_8097.jpeg":"assets/gear/7c9e82c9fd-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3edea3952_image.png":"assets/gear/c4371ec2be-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3f0778a59_IMG_8122.jpeg":"assets/gear/02f48413b9-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg":"assets/gear/52202702f9-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/40b8c99b4_IMG_8103.jpeg":"assets/gear/ca56fb5d09-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/528481e05_IMG_8125.jpeg":"assets/gear/8d9df6ca91-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/586af5b12_image.png":"assets/gear/6f9b6031f4-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/59a6e307f_image.png":"assets/gear/b2505a770b-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/7e3813ffb_image.png":"assets/gear/1c42c3e50c-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/87cabe3a2_IMG_8121.jpeg":"assets/gear/df3661349d-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/885386856_IMG_8116.jpeg":"assets/gear/1fcb3c57f5-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/903783247_image.png":"assets/gear/afa9133bba-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a10c19e67_image.png":"assets/gear/897e4da3f5-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a6b75f1fb_IMG_8134.jpeg":"assets/gear/2858230857-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ad89ebef7_IMG_8117.jpeg":"assets/gear/f6732bc158-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bc8a0e938_image.png":"assets/gear/33ee342ca8-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg":"assets/gear/6fb7b6512a-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/cace07592_image.png":"assets/gear/f90e176886-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/d6c1cd271_thomann-image.jpg":"assets/gear/226516085d-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ea1af205d_image.png":"assets/gear/eeca685210-v4.webp"};
+  // warm the browser cache with every gear photo right away, so nothing pops in later
+  setTimeout(() => { try { Object.values(GEAR_MAP).forEach(u => { const i = new Image(); i.decoding = "async"; i.src = u; }); } catch(e){} }, 400);
   const embedUrl = (id, extra="") => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1${extra}`;
   const thumbFix = "if(this.naturalWidth<=120){this.remove()}";
 
@@ -1756,7 +1758,7 @@ window.mergeContent = function (saved) {
     track.innerHTML = list.map((v,i) => { const id = ytId(v.url); return `
       <div class="reel__item" role="button" tabindex="0" data-i="${i}" data-id="${esc(id)}" aria-label="${esc(v.title)}">
         <span class="reel__fb" aria-hidden="true"><i>AY</i></span>
-        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="${i < 3 ? "eager" : "lazy"}" onerror="this.remove()" onload="${thumbFix}">
+        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="eager" onerror="this.remove()" onload="${thumbFix}">
         <span class="reel__play" aria-hidden="true">${icon('i-play')}</span>
         <span class="reel__info"><b>${esc(v.title)}</b><small>לחצו לצפייה</small></span>
       </div>`; }).join("");
@@ -1826,7 +1828,7 @@ window.mergeContent = function (saved) {
     return `<article class="card" data-reveal>
       <div class="video zoom" data-id="${esc(id)}">
         <span class="video__fb" aria-hidden="true">${esc(v.title)}</span>
-        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()" onload="${thumbFix}">
+        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="eager" decoding="async" onerror="this.remove()" onload="${thumbFix}">
         <button type="button" aria-label="נגן: ${esc(v.title)}"><span class="play">${icon('i-play')}</span></button>
       </div>
       <div class="card__body">
@@ -1868,7 +1870,7 @@ window.mergeContent = function (saved) {
       const sec = document.createElement("section");
       sec.className = "section"; sec.id = "c_" + c.id;
       sec.innerHTML = `<div class="wrap"><div class="custom__box${real(c.image) ? " has-img" : ""}" data-reveal>
-        ${real(c.image) ? `<div class="custom__img"><img src="${esc(c.image)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></div>` : ""}
+        ${real(c.image) ? `<div class="custom__img"><img src="${esc(c.image)}" alt="" loading="eager" decoding="async" onerror="this.parentNode.remove()"></div>` : ""}
         <div class="custom__txt">
           ${c.eyebrow ? `<span class="eyebrow">${esc(c.eyebrow)}</span>` : ""}
           ${c.title ? `<h2 data-split>${esc(c.title)}</h2>` : ""}
@@ -1889,7 +1891,7 @@ window.mergeContent = function (saved) {
       const seen = new Set(), pick = [];
       pics.forEach(g => { if(pick.length < 5 && !seen.has(g.category)){ seen.add(g.category); pick.push(g); } });
       pics.forEach(g => { if(pick.length < 5 && !pick.includes(g)) pick.push(g); });
-      if(peek){ peek.innerHTML = pick.map((g,i) => `<span class="gear-peek__c${GEAR_MAP[g.img] ? " is-baked" : ""}" style="--i:${i};--n:${pick.length}"><img src="${esc(GEAR_MAP[g.img] || g.img)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></span>`).join("");
+      if(peek){ peek.innerHTML = pick.map((g,i) => `<span class="gear-peek__c${GEAR_MAP[g.img] ? " is-baked" : ""}" style="--i:${i};--n:${pick.length}"><img src="${esc(GEAR_MAP[g.img] || g.img)}" alt="" loading="eager" decoding="async" onerror="this.parentNode.remove()"></span>`).join("");
         peek.hidden = !pick.length; peek.addEventListener("click", () => b.click()); }
       b.addEventListener("click", () => { const open = !w.classList.contains("is-open"); w.classList.toggle("is-open", open); b.classList.toggle("is-open", open);
         b.parentElement.classList.toggle("is-open", open); b.setAttribute("aria-expanded", open); b.firstChild.textContent = open ? "סגירת רשימת הציוד" : "לרשימת הציוד המלאה"; }); })();
@@ -2127,7 +2129,7 @@ window.mergeContent = function (saved) {
       ring.innerHTML = covers.map((cv,i) => `<div class="c3__card" data-i="${i}" role="button" tabindex="0" aria-label="קאבר ${esc(cv.c.style || "")}">
           <div class="c3__float" style="animation-delay:${(-i * .7).toFixed(1)}s">
             <div class="c3__media">${cv.prev ? `<video src="${esc(cv.prev)}" ${cv.thumb ? `poster="${esc(cv.thumb)}"` : ""} muted loop playsinline autoplay preload="auto"></video>`
-              : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy">` : ""}</div>
+              : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="eager" decoding="async">` : ""}</div>
             <span class="c3__glare" aria-hidden="true"></span>
             <span class="c3__tag">${esc(cv.c.style || cv.c.title || "")}</span>
             <span class="c3__play" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-play"/></svg></span>
@@ -2224,7 +2226,7 @@ window.mergeContent = function (saved) {
     if(ytId(S.studioVideo)){ const sid = ytId(S.studioVideo);
       // vertical studio clip: full-screen tall card (shorts thumbnail is vertical too)
       $("#studioVideo").innerHTML = `<div class="video video--tall" data-id="${esc(sid)}">
-        <img src="https://i.ytimg.com/vi/${esc(sid)}/oardefault.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${esc(sid)}/hqdefault.jpg'">
+        <img src="https://i.ytimg.com/vi/${esc(sid)}/oardefault.jpg" alt="" loading="eager" decoding="async" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${esc(sid)}/hqdefault.jpg'">
         <button type="button" aria-label="נגן: ${esc(S.studioTitle || "")}"><span class="play">${icon('i-play')}</span></button>
         ${S.studioTitle ? `<span class="video__cap">${esc(S.studioTitle)}</span>` : ""}
       </div>`; }
@@ -2352,7 +2354,7 @@ window.mergeContent = function (saved) {
         <div class="gearrail" id="rail${ci}">
           ${S.gear.filter(g => g.category === c).map(it => {
             const baked = GEAR_MAP[it.img];
-            const inner = `<div class="gcard__img${baked ? " is-baked" : ""}">${real(it.img) ? `<img src="${esc(baked || it.img)}" alt="${esc(it.name)}" loading="lazy" onerror="this.outerHTML=this.parentNode.dataset.ph||''">` : ph}</div>
+            const inner = `<div class="gcard__img${baked ? " is-baked" : ""}">${real(it.img) ? `<img src="${esc(baked || it.img)}" alt="${esc(it.name)}" loading="eager" decoding="async" onerror="this.outerHTML=this.parentNode.dataset.ph||''">` : ph}</div>
               <div class="gcard__body"><span class="gcard__role">${esc(it.role)}</span><span class="gcard__name">${esc(it.name)}</span>${real(it.url) ? `<span class="gcard__go">לצפייה במוצר ←</span>` : ``}</div>`;
             return real(it.url) ? `<a class="gcard" href="${esc(it.url)}" target="_blank" rel="noopener">${inner}</a>` : `<div class="gcard">${inner}</div>`;
           }).join("")}
@@ -2372,7 +2374,7 @@ window.mergeContent = function (saved) {
       let qi = 0;
       const card = q => { const k = qi++ % quotes.length;
         return `<figure class="quote wq">
-          <div class="wq__hd"><span class="wq__back" aria-hidden="true">›</span><span class="wq__av" aria-hidden="true">${q.photo ? `<img src="${esc(q.photo)}" alt="" loading="lazy">` : esc((q.name||"?").trim().charAt(0))}</span>
+          <div class="wq__hd"><span class="wq__back" aria-hidden="true">›</span><span class="wq__av" aria-hidden="true">${q.photo ? `<img src="${esc(q.photo)}" alt="" loading="eager" decoding="async">` : esc((q.name||"?").trim().charAt(0))}</span>
             <span class="wq__nm"><b>${esc(q.name)}</b><small>${q.role ? esc(q.role) : "מפיק"}</small></span></div>
           <div class="wq__body">
             <p class="wq__in">${esc(q.text).replace(/\*([^*]+)\*/g, "<b>$1</b>")}<em class="wq__t">${times[k % times.length]}</em></p>

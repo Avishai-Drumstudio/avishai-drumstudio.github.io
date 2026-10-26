@@ -13,5 +13,3 @@ window.STUDIO_OWNERS = ['avishy407@gmail.com', 'yasharulpan@gmail.com'];
 window.GOOGLE_CLIENT_ID = '196522008239-2ncgd0fmjbmla2j6lteranivnso2q139.apps.googleusercontent.com';
 // חיבור ליומן בהפניה (בלי חלונות קופצים). הכתובת https://avishai-drumstudio.github.io/studio/ רשומה ב-Authorized redirect URIs
 window.GCAL_REDIRECT = true;
-// גיליון "Studio Manager – מזכירה" בדרייב של yasharulpan (לשוניות: אירועים · בקשות מהמזכירה)
-window.SM_SHEET_ID = '17kzVTPQ9-XUDaNyMEeFrpB0UEYv66DFhmF-h1fhsz7o';

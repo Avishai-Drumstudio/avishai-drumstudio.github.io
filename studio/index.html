@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261021002811';
+window.STUDIO_VERSION = '20261026195643';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -194,7 +194,7 @@ window.STUDIO_VERSION = '20261021002811';
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script defer src="firebase-config.js?v=3"></script>
+<script defer src="firebase-config.js?v=4"></script>
 <style>
 #gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;
   background:radial-gradient(60% 45% at 75% 15%,rgba(245,158,60,.22),transparent 70%),radial-gradient(55% 40% at 15% 85%,rgba(46,211,195,.10),transparent 70%),#0d0b09;color:#fff;font-family:Rubik,system-ui,sans-serif;text-align:center}
@@ -278,6 +278,8 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
 
   /* ===== יומן גוגל: חיבור נפרד (אפשר לבחור כל חשבון גוגל) + קריאות ישירות ל-Calendar API ===== */
   var GTOK_KEY = 'studio-gcal-token', gTok = null;
+  var GSCOPE = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets'; // יומן + גיליון המזכירה
+  window.__gToken = function () { return tokOk() && gTok.sc >= 2 ? gTok.t : null; };
   try { gTok = JSON.parse(localStorage.getItem(GTOK_KEY) || 'null'); } catch (e) {}
   function tokOk() { return gTok && gTok.t && gTok.exp > Date.now() + 60000; }
   function calPrompt(show) {
@@ -313,7 +315,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   // חייב לרוץ ישר מתוך לחיצה (אחרת הדפדפן חוסם את החלון של גוגל). מתנתק רק בהחלפת משתמש.
   var renewing = null;
   window.__gcalEnsure = function () {
-    if (bridge() || tokOk()) return Promise.resolve(true);
+    if (bridge() || (tokOk() && gTok.sc >= 2)) return Promise.resolve(true);
     if (window.GCAL_REDIRECT) { try { localStorage.setItem('studio-gcal-resume', '1'); } catch (e) {} return gcalRedirect(!!rememberedCal()); }
     if (renewing) return renewing;
     var g = window.__gcalConnect(); if (!g) { calPrompt(true); return Promise.resolve(false); }
@@ -324,7 +326,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
 
   // חיבור ליומן דרך Google Identity Services (חלון של גוגל עצמו — עובד טוב גם באייפון). דורש GOOGLE_CLIENT_ID.
   function saveTok(t, email) {
-    gTok = { t: t, exp: Date.now() + 55 * 60000, email: email || '' };
+    gTok = { t: t, exp: Date.now() + 55 * 60000, email: email || '', sc: 2 };
     try { localStorage.setItem('studio-gcal-email', gTok.email); localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {}
     calPrompt(false); if (!quietSave) toastMsg('יומן גוגל חובר' + (gTok.email ? ' (' + gTok.email + ')' : '') + ' ✓ — אפשר לסנכרן');
     try { window.dispatchEvent(new Event('gcal-token')); } catch (e) {}
@@ -333,7 +335,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   var gisClient = null;
   function gisInit() {
     if (gisClient || !window.GOOGLE_CLIENT_ID || !(window.google && google.accounts && google.accounts.oauth2)) return gisClient;
-    gisClient = google.accounts.oauth2.initTokenClient({ client_id: window.GOOGLE_CLIENT_ID, scope: 'https://www.googleapis.com/auth/calendar', callback: function () {} });
+    gisClient = google.accounts.oauth2.initTokenClient({ client_id: window.GOOGLE_CLIENT_ID, scope: GSCOPE, callback: function () {} });
     return gisClient;
   }
   document.addEventListener('DOMContentLoaded', function () {
@@ -361,7 +363,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   function gcalRedirect(silent) {
     var hint = (gTok && gTok.email) || rememberedCal(), st = Math.random().toString(36).slice(2);
     try { localStorage.setItem('studio-gcal-st', st); } catch (e) {}
-    var q = { client_id: window.GOOGLE_CLIENT_ID, redirect_uri: REDIR, response_type: 'token', scope: 'https://www.googleapis.com/auth/calendar', include_granted_scopes: 'true', state: st + (silent ? '.s' : '.i') };
+    var q = { client_id: window.GOOGLE_CLIENT_ID, redirect_uri: REDIR, response_type: 'token', scope: GSCOPE, include_granted_scopes: 'true', state: st + (silent ? '.s' : '.i') };
     if (hint) q.login_hint = hint;
     if (silent) q.prompt = 'none'; else if (!hint) q.prompt = 'select_account';
     location.assign('https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams(q).toString());
@@ -373,12 +375,12 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     if (gcalBusy) return gcalBusy;
     var g = gisConnect(); if (g) return g;
     var app2 = firebase.apps.find(function (a) { return a.name === 'gcal'; }) || firebase.initializeApp(window.FIREBASE_CONFIG, 'gcal');
-    var p = new firebase.auth.GoogleAuthProvider(); p.addScope('https://www.googleapis.com/auth/calendar');
+    var p = new firebase.auth.GoogleAuthProvider(); p.addScope('https://www.googleapis.com/auth/calendar'); p.addScope('https://www.googleapis.com/auth/spreadsheets');
     var hint = (gTok && gTok.email) || (function () { try { return localStorage.getItem('studio-gcal-email') || ''; } catch (e) { return ''; } })();
     p.setCustomParameters(hint ? { login_hint: hint } : { prompt: 'select_account' });
     gcalBusy = app2.auth().signInWithPopup(p).then(function (r) {
       var t = r && r.credential && r.credential.accessToken; if (!t) throw new Error('no token');
-      gTok = { t: t, exp: Date.now() + 55 * 60000, email: (r.user && r.user.email) || '' };
+      gTok = { t: t, exp: Date.now() + 55 * 60000, email: (r.user && r.user.email) || '', sc: 2 };
       try { localStorage.setItem('studio-gcal-email', gTok.email); } catch (e) {}
       try { localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {}
       calPrompt(false); toastMsg('יומן גוגל חובר (' + gTok.email + ') ✓ — אפשר לסנכרן');
@@ -399,7 +401,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
     var tok = p.get('access_token');
     if (tok) {
       var exp = (Number(p.get('expires_in')) || 3600) * 1000, email = rememberedCal();
-      gTok = { t: tok, exp: Date.now() + exp - 5 * 60000, email: email };
+      gTok = { t: tok, exp: Date.now() + exp - 5 * 60000, email: email, sc: /spreadsheets/.test(p.get('scope') || 'spreadsheets') ? 2 : 1 };
       try { localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {}
       if (!email) fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=owner&maxResults=50', { headers: { Authorization: 'Bearer ' + tok } })
         .then(function (r) { return r.json(); }).then(function (j) { var pr = (j.items || []).find(function (x) { return x.primary; }); if (pr) { gTok.email = pr.id; try { localStorage.setItem('studio-gcal-email', pr.id); localStorage.setItem(GTOK_KEY, JSON.stringify(gTok)); } catch (e) {} } }).catch(function () {});
@@ -1929,6 +1931,136 @@ function MarkPaid({ gig, gigs = [], preSel = [], preset, onConfirm, onInvoice, o
 
 const docTapAction = (g, k, onPay, onDoc) => { const t = docTarget(g, k), st = docState(g, k); return (st !== 'done' && t !== 'inv' && !g.paidDate) ? onPay(t) : onDoc(t); };
 
+/* ===== מסמכים (קבלות / חשבוניות) — מספר המסמך הוא המפתח, מסמך אחד יכול לכסות כמה אירועים ===== */
+const DOC_KINDS = ['קבלה', 'חשבונית מס', 'חשבונית מס/קבלה'];
+const docKindOf = t => /חשבונית/.test(t || '') && /קבלה/.test(t || '') ? 'חשבונית מס/קבלה' : /חשבונית/.test(t || '') ? 'חשבונית מס' : 'קבלה';
+const upsertDocRec = (cfg, rec) => { const list = ((cfg || {}).docs || []).slice(), n = String(rec.number || '').trim(); if (!n) return cfg;
+  const i = list.findIndex(x => String(x.number) === n);
+  const merged = Object.assign({}, i >= 0 ? list[i] : {}, Object.fromEntries(Object.entries(rec).filter(([k, v]) => v !== undefined && v !== '' && k !== 'gigIds')), { number: n,
+    gigIds: Array.from(new Set(((i >= 0 ? list[i].gigIds : []) || []).concat(rec.gigIds || []))) });
+  if (i >= 0) list[i] = merged; else list.push(merged);
+  return Object.assign({}, cfg, { docs: list }); };
+/* מסמכי האירוע: רשומות מסמכים + מספרים שרשומים על האירוע עצמו */
+const docsForGig = (g, cfg) => { const out = ((cfg || {}).docs || []).filter(d => (d.gigIds || []).includes(g.id));
+  const add = (number, type, date) => { if (number && !out.some(d => String(d.number) === String(number))) out.push({ number: String(number), type, date: date || '', gigIds: [g.id], derived: true }); };
+  if (g.docIssued && g.docNumber) add(g.docNumber, isComb(g) ? 'חשבונית מס/קבלה' : 'קבלה', g.docDate || g.paidDate);
+  if (g.invIssued && g.invNumber) add(g.invNumber, 'חשבונית מס', g.invDate);
+  return out; };
+/* שדות האירוע לפי סוג המסמך */
+const gigPatchForDoc = (g, type, number, date) => { const k = docKindOf(type);
+  return k === 'חשבונית מס' ? { invIssued: true, invNumber: number, invDate: date, docMode: isComb(g) ? 'split' : modeOf(g) }
+    : k === 'קבלה' ? { docIssued: true, docNumber: number, docDate: date, docMode: hasInv(g) ? 'split' : 'receipt' }
+    : { docIssued: true, docNumber: number, docDate: date, docMode: 'combined', invIssued: false }; };
+
+/* ===== גיליון "Studio Manager – מזכירה" (Google Sheets) — חיבור דו־כיווני ===== */
+const SH = { ev: 'אירועים', rq: 'בקשות מהמזכירה' };
+const EV_HEAD = ['id', 'תאריך', 'שעה', 'לקוח', 'מקום', 'מחיר', 'מע"מ', 'מחליף', 'תאריך תשלום', 'מספר חשבונית', 'מספר קבלה', 'סוג', 'סה"כ לגבייה'];
+const RQ_HEAD = ['מזהה בקשה', 'פעולה', 'id אירוע', 'שדה', 'ערך', 'פרטים (JSON)', 'סטטוס', 'תאריך ביצוע', 'הערה'];
+const RQ_HELP = ['דוגמה-1', 'הוספת אירוע', '', '', '', '{"תאריך":"2026-12-01","שעה":"20:00","לקוח":"סעדה","מקום":"חדרה","מחיר":1400,"סוג":"חתונה"}', 'בוצע', '', 'שורת דוגמה — פעולות: הוספת אירוע · עדכון שדה · סימון תשלום · צירוף מסמך'];
+const VAT_TXT = { none: 'ללא', plus: '+ מע"מ', incl: 'כולל' };
+const shEnc = r => encodeURIComponent(r);
+async function sheetsCall(method, path, body) {
+  const t = window.__gToken && window.__gToken(), id = window.SM_SHEET_ID;
+  if (!id) throw { code: 'no_sheet' }; if (!t) throw { code: 'no_token' };
+  const r = await fetch('https://sheets.googleapis.com/v4/spreadsheets/' + id + path, { method, headers: { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  if (!r.ok) { const x = await r.text(); throw { code: /SERVICE_DISABLED|has not been used|is disabled/i.test(x) ? 'sheets_disabled' : (r.status === 401 || r.status === 403) ? 'sheets_auth' : 'sheets_err', message: x.slice(0, 300) }; }
+  return r.status === 204 ? {} : r.json();
+}
+async function sheetEnsureTabs() {
+  const meta = await sheetsCall('GET', '?fields=sheets.properties');
+  const props = (meta.sheets || []).map(x => x.properties), names = props.map(p => p.title), req = [];
+  if (!names.includes(SH.ev)) { const other = props.find(p => p.title !== SH.rq);
+    if (props.length === 1 && other) req.push({ updateSheetProperties: { properties: { sheetId: other.sheetId, title: SH.ev, rightToLeft: true }, fields: 'title,rightToLeft' } });
+    else req.push({ addSheet: { properties: { title: SH.ev, rightToLeft: true } } }); }
+  const newRq = !names.includes(SH.rq); if (newRq) req.push({ addSheet: { properties: { title: SH.rq, rightToLeft: true } } });
+  if (req.length) await sheetsCall('POST', ':batchUpdate', { requests: req });
+  if (newRq) await sheetsCall('PUT', '/values/' + shEnc(SH.rq + '!A1') + '?valueInputOption=RAW', { values: [RQ_HEAD, RQ_HELP] });
+}
+const sheetEventRows = (gigs, subs) => [EV_HEAD].concat(gigs.slice().sort((a, b) => a.date.localeCompare(b.date) || (a.start || '').localeCompare(b.start || '')).map(g => {
+  const sub = g.subId && subs.find(x => x.id === g.subId);
+  return [g.id, g.date || '', g.start || '', g.client || '', g.venue || '', Number(g.fee) || 0, VAT_TXT[g.vat || 'none'] || '', sub ? sub.name : g.needSub ? 'צריך מחליף' : '',
+    g.paidDate || '', g.invIssued || isComb(g) ? (isComb(g) ? g.docNumber || '' : g.invNumber || '') : '', g.docIssued ? g.docNumber || '' : '', g.type || '', Math.round(amt(g) * 100) / 100];
+}));
+async function sheetWriteEvents(gigs, subs) {
+  const rows = sheetEventRows(gigs, subs);
+  await sheetsCall('POST', '/values/' + shEnc(SH.ev + '!A:Z') + ':clear', {});
+  await sheetsCall('PUT', '/values/' + shEnc(SH.ev + '!A1') + '?valueInputOption=RAW', { values: rows });
+  return rows.length - 1;
+}
+/* בקשות: מילון שדות בעברית → שדות באפליקציה */
+const RQ_FIELDS = { 'תאריך': 'date', 'שעה': 'start', 'התחלה': 'start', 'סיום': 'end', 'הגעה': 'loadIn', 'לקוח': 'client', 'מקום': 'venue', 'כתובת': 'address', 'מחיר': 'fee', 'סכום': 'fee', 'מע"מ': 'vat', 'מע״מ': 'vat', 'מעמ': 'vat',
+  'מחליף': 'sub', 'תאריך תשלום': 'paidDate', 'אמצעי תשלום': 'method', 'מספר חשבונית': 'invNumber', 'מספר קבלה': 'docNumber', 'סוג': 'type', 'שם': 'title', 'כותרת': 'title', 'הערות': 'notes', 'ציוד': 'equipment',
+  'תוספת מרחק': 'travelFee', 'איש קשר': 'contactName', 'טלפון': 'phone', 'טלפון איש קשר': 'contactPhone', 'לתשלום עד': 'dueDate' };
+const rqKey = k => RQ_FIELDS[String(k || '').trim()] || String(k || '').trim();
+const rqVat = v => /כולל|incl/i.test(v) ? 'incl' : /\+|פלוס|plus|עם/i.test(v) ? 'plus' : 'none';
+const rqDate = v => { v = String(v || '').trim(); let m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return m[1] + '-' + pad(+m[2]) + '-' + pad(+m[3]);
+  m = v.match(/^(\d{1,2})[./](\d{1,2})[./](\d{2,4})$/); if (m) return (m[3].length === 2 ? '20' + m[3] : m[3]) + '-' + pad(+m[2]) + '-' + pad(+m[1]); return v; };
+function rqApplyField(d, g, key, val) {
+  if (key === 'sub') { const n = cleanName(val); if (!n) return Object.assign({}, g, { subId: '' });
+    let s0 = d.subs.find(x => sameName(x.name, n)); if (!s0) { s0 = { id: uid(), name: n, phone: '', notes: '' }; d.subs = d.subs.concat([s0]); } return Object.assign({}, g, { subId: s0.id, needSub: false }); }
+  if (key === 'vat') return Object.assign({}, g, { vat: rqVat(val), vatRate: g.vatRate !== undefined && g.vatRate !== '' ? g.vatRate : CFG.vatRate });
+  if (['fee', 'travelFee', 'otHours', 'otRate', 'subFee'].includes(key)) return Object.assign({}, g, { [key]: Number(String(val).replace(/[^\d.]/g, '')) || 0 });
+  if (['date', 'paidDate', 'dueDate', 'invDate', 'docDate'].includes(key)) return Object.assign({}, g, { [key]: rqDate(val) });
+  if (key === 'docNumber') return Object.assign({}, g, val ? { docNumber: String(val), docIssued: true } : { docNumber: '' });
+  if (key === 'invNumber') return Object.assign({}, g, val ? { invNumber: String(val), invIssued: true } : { invNumber: '' });
+  if (key === 'client' || key === 'venue' || key === 'contactName') return Object.assign({}, g, { [key]: cleanName(val) });
+  return Object.assign({}, g, { [key]: val });
+}
+/* מבצע בקשות על עותק של הנתונים. מחזיר { data, results:[{row, status, note}] } */
+function rqApplyAll(d0, rows, doneIds) {
+  let d = Object.assign({}, d0, { gigs: d0.gigs.slice(), subs: d0.subs.slice(), clients: d0.clients.slice(), config: Object.assign({}, d0.config) });
+  const results = [], today = todayISO(), done = new Set(doneIds || []);
+  rows.forEach((r, i) => {
+    const [rid, act0, ids0, field, value, det0, status] = r.map(x => x === undefined || x === null ? '' : String(x));
+    const id = rid.trim(); if (!id || /^בוצע/.test(status.trim())) return;
+    if (done.has(id)) { results.push({ row: i, status: 'בוצע', note: 'כבר בוצע קודם' }); return; }
+    let det = {}; if (det0.trim()) { try { det = JSON.parse(det0); } catch (e) { results.push({ row: i, status: 'שגיאה', note: 'פרטים לא בפורמט JSON' }); return; } }
+    const detK = {}; Object.keys(det).forEach(k => { detK[rqKey(k)] = det[k]; });
+    const act = act0.trim(), ids = ids0.split(/[,;\s]+/).map(x => x.trim()).filter(Boolean);
+    const byId = x => d.gigs.find(g => g.id === x);
+    try {
+      if (/הוספ|חדש|add|new/i.test(act)) {
+        const date = rqDate(detK.date || value || '');
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw 'חסר תאריך תקין (YYYY-MM-DD)';
+        let g = blankGig(date); Object.keys(detK).forEach(k => { g = rqApplyField(d, g, k, detK[k]); });
+        if (field.trim()) g = rqApplyField(d, g, rqKey(field), value);
+        g.title = g.title || ''; g.client = cleanName(g.client);
+        const cl = d.clients.find(c => sameName(c.name, g.client)); // ברירות המחדל של הלקוח (מחיר בסיס, מע"מ)
+        if (cl) { if (detK.fee === undefined && !g.subId) { const r = clientRate(cl, g.date); if (r) g.fee = r; } if (detK.vat === undefined && cl.vat && cl.vat !== 'none') { g.vat = cl.vat; g.vatRate = CFG.vatRate; } }
+        if (!g.title) g.title = autoTitle(g);
+        d.gigs = d.gigs.concat([g]); d.clients = upsertClient(d.clients, g);
+        results.push({ row: i, status: 'בוצע', note: 'נוסף אירוע id ' + g.id, id: g.id });
+      } else if (/עדכ|שינוי|update|edit/i.test(act)) {
+        if (!ids.length) throw 'חסר id אירוע'; const k = rqKey(field); if (!k && !Object.keys(detK).length) throw 'חסר שדה';
+        ids.forEach(x => { let g = byId(x); if (!g) throw 'לא נמצא אירוע ' + x; if (k) g = rqApplyField(d, g, k, value); Object.keys(detK).forEach(kk => { g = rqApplyField(d, g, kk, detK[kk]); }); d.gigs = d.gigs.map(y => y.id === x ? g : y); });
+        results.push({ row: i, status: 'בוצע', note: 'עודכן' + (ids.length > 1 ? ' (' + ids.length + ' אירועים)' : '') });
+      } else if (/תשלום|שולם|paid|pay/i.test(act)) {
+        if (!ids.length) throw 'חסר id אירוע';
+        const date = rqDate(value || detK.paidDate || today), method = detK.method || '', num = String(detK.docNumber || detK.number || detK['מספר'] || '').trim();
+        ids.forEach(x => { const g = byId(x); if (!g) throw 'לא נמצא אירוע ' + x; });
+        d.gigs = d.gigs.map(g => !ids.includes(g.id) ? g : Object.assign({}, g, { paidDate: date }, method ? { method } : {}, num ? gigPatchForDoc(g, detK.type || 'קבלה', num, date) : {}));
+        if (num) d.config = upsertDocRec(d.config, { number: num, type: docKindOf(detK.type || 'קבלה'), date, amount: detK.amount !== undefined ? Number(detK.amount) : undefined, url: detK.url || detK.pdf || '', gigIds: ids });
+        results.push({ row: i, status: 'בוצע', note: 'סומן כשולם' + (num ? ' · קבלה ' + num : '') });
+      } else if (/מסמך|צירוף|קבלה|חשבונית|doc/i.test(act)) {
+        if (!ids.length) throw 'חסר id אירוע'; const num = String(detK.number || detK['מספר'] || detK.docNumber || detK.invNumber || value || '').trim(); if (!num) throw 'חסר מספר מסמך';
+        const type = docKindOf(detK.type || (/חשבונית/.test(act) ? act : 'קבלה')), date = rqDate(detK.date || today);
+        ids.forEach(x => { if (!byId(x)) throw 'לא נמצא אירוע ' + x; });
+        d.gigs = d.gigs.map(g => ids.includes(g.id) ? Object.assign({}, g, gigPatchForDoc(g, type, num, date)) : g);
+        const amount = detK.amount !== undefined && detK.amount !== '' ? Number(detK.amount) : d.gigs.filter(g => ids.includes(g.id)).reduce((a, g) => a + amt(g), 0);
+        d.config = upsertDocRec(d.config, { number: num, type, date, amount, url: detK.url || detK.pdf || detK['קישור'] || '', gigIds: ids });
+        results.push({ row: i, status: 'בוצע', note: type + ' ' + num + ' שויך ל־' + ids.length + ' אירועים' });
+      } else throw 'פעולה לא מוכרת: ' + act;
+      done.add(id);
+    } catch (e) { results.push({ row: i, status: 'שגיאה', note: String(e && e.message || e) }); }
+  });
+  return { data: d, results, doneIds: Array.from(done).slice(-500) };
+}
+async function sheetReadRequests() { const j = await sheetsCall('GET', '/values/' + shEnc(SH.rq + '!A2:I2000')); return j.values || []; }
+async function sheetWriteResults(results) {
+  if (!results.length) return; const stamp = new Date().toLocaleString('he-IL');
+  await sheetsCall('POST', '/values:batchUpdate', { valueInputOption: 'RAW', data: results.map(r => ({ range: SH.rq + '!G' + (r.row + 2) + ':I' + (r.row + 2), values: [[r.status, stamp, r.note || '']] })) });
+}
+
 function PayPanel({ gig, onPay, onDoc, onUnpay }) {
   const st = payStatus(gig), late = st === 'באיחור' ? daysBetween(gig.dueDate, todayISO()) : 0;
   if (!Number(gig.fee)) return html`<section className="mt-4 rounded-3xl glass-soft p-4 text-sm text-muted">💰 אין סכום לאירוע הזה. אפשר להוסיף סכום שסוכם בעריכה.</section>`;
@@ -1950,7 +2082,33 @@ function PayPanel({ gig, onPay, onDoc, onUnpay }) {
   </section>`;
 }
 
-function GigDetails({ gig, sub, admin, book = [], update, hasSync, onEdit, onPayKind, onDoc, onUnpay, onAdmin, onDelete, onClose }) {
+function DocsPanel({ gig, docs, gigs, onAdd }) {
+  const [add, setAdd] = useState(null), [sel, setSel] = useState([]);
+  const others = useMemo(() => sameClientOthers(gig, gigs, () => true), [gig.id]);
+  const start = () => { setSel([]); setAdd({ type: hasInv(gig) || gig.paidDate ? 'קבלה' : 'חשבונית מס/קבלה', number: '', date: gig.paidDate || todayISO(), amount: '', url: '' }); };
+  const total = amt(gig) + others.filter(x => sel.includes(x.id)).reduce((a, x) => a + amt(x), 0);
+  return html`<div className="mt-4 rounded-3xl glass-soft p-4">
+    <div className="flex items-center gap-2"><b className="flex-1">📎 מסמכים</b>${!add && html`<button type="button" onClick=${start} className="text-sm font-semibold grad-text">+ מסמך</button>`}</div>
+    ${docs.length === 0 && !add && html`<p className="mt-1 text-sm text-muted">עוד אין מסמכים לאירוע הזה.</p>`}
+    ${docs.length > 0 && html`<ul className="mt-2 divide-y divide-[var(--glass-line)]">${docs.map(d => html`<li key=${d.number} className="flex items-center gap-2 py-2 text-sm">
+      <span aria-hidden="true">${/חשבונית/.test(d.type) && /קבלה/.test(d.type) ? '📑' : /חשבונית/.test(d.type) ? '📄' : '🧾'}</span>
+      <span className="min-w-0 flex-1"><b>${d.type} #${d.number}</b><span className="block text-xs text-muted">${d.date ? fmtDate(d.date) : ''}${d.amount ? ' · ' + money(d.amount) : ''}${(d.gigIds || []).length > 1 ? ' · מכסה ' + d.gigIds.length + ' אירועים' : ''}</span></span>
+      ${d.url ? html`<a href=${d.url} target="_blank" rel="noopener" className="shrink-0 rounded-full grad px-3 py-1 text-xs font-bold">PDF</a>` : html`<span className="shrink-0 text-xs text-muted">אין PDF</span>`}</li>`)}</ul>`}
+    ${add && html`<div className="mt-3 space-y-2">
+      <div className="flex gap-1.5">${DOC_KINDS.map(k => html`<button type="button" key=${k} onClick=${() => setAdd(Object.assign({}, add, { type: k }))} className=${'flex-1 rounded-full px-2 py-1.5 text-xs font-semibold ' + (add.type === k ? 'grad' : 'glass-soft')}>${k}</button>`)}</div>
+      <div className="grid grid-cols-2 gap-2">
+        <${Label} text="מספר מסמך"><input className="field" inputMode="numeric" value=${add.number} onChange=${e => setAdd(Object.assign({}, add, { number: e.target.value }))} /><//>
+        <${Label} text="תאריך"><input type="date" className="field" value=${add.date} onChange=${e => setAdd(Object.assign({}, add, { date: e.target.value }))} /><//>
+        <${Label} text="סכום"><input type="number" inputMode="decimal" className="field" value=${add.amount} placeholder=${String(Math.round(total))} onChange=${e => setAdd(Object.assign({}, add, { amount: e.target.value }))} /><//>
+        <${Label} text="קישור ל-PDF בדרייב"><input className="field ltr" dir="ltr" value=${add.url} placeholder="https://drive.google.com/…" onChange=${e => setAdd(Object.assign({}, add, { url: e.target.value }))} /><//>
+      </div>
+      <${MultiPick} list=${others} sel=${sel} setSel=${setSel} what=${'מסמך אחד'} />
+      <div className="flex gap-2"><${Btn} kind="grad" disabled=${!add.number.trim()} onClick=${() => { onAdd({ type: add.type, number: add.number.trim(), date: add.date, amount: add.amount !== '' ? Number(add.amount) : Math.round(total * 100) / 100, url: add.url.trim(), gigIds: [gig.id].concat(sel) }); setAdd(null); }}>שמירה<//><${Btn} onClick=${() => setAdd(null)}>ביטול<//></div>
+    </div>`}
+  </div>`;
+}
+
+function GigDetails({ gig, sub, admin, book = [], update, hasSync, docs = [], gigs = [], onAddDoc, onEdit, onPayKind, onDoc, onUnpay, onAdmin, onDelete, onClose }) {
   const row = (k, v) => v ? html`<div className="grid grid-cols-[6.5rem_1fr] gap-3 py-2.5 border-b border-[var(--glass-line)] last:border-0"><dt className="text-sm text-muted">${k}</dt><dd className="text-sm whitespace-pre-wrap">${v}</dd></div>` : null;
   const dig = p => (p || '').replace(/\D/g, '').replace(/^972/, '0');
   const samePhone = !!dig(gig.phone) && dig(gig.phone) === dig(gig.contactPhone);
@@ -1964,6 +2122,7 @@ function GigDetails({ gig, sub, admin, book = [], update, hasSync, onEdit, onPay
       <p className="mt-3 text-2xl font-bold">${fmtDay(gig.date)} · <span className="ltr">${gig.start || '—'}${gig.end ? '–' + gig.end : ''}</span></p>
       ${admin ? html`<${PayPanel} gig=${gig} onPay=${onPayKind} onDoc=${onDoc} onUnpay=${onUnpay} />` : html`
         <button onClick=${onAdmin} className="mt-4 flex w-full items-center gap-2 rounded-3xl glass-soft p-4 text-right text-sm hover:bg-[var(--glass-2)]"><span aria-hidden="true">🔒</span><span className="flex-1"><b>תשלום ומסמכים</b><span className="block text-muted">כניסה לניהול כדי לראות ולעדכן</span></span><span className="text-muted">‹</span></button>`}
+      ${admin && html`<${DocsPanel} gig=${gig} docs=${docs} gigs=${gigs} onAdd=${onAddDoc} />`}
       <dl className="mt-3">
         ${row('הגעה', gig.loadIn)}
         ${row('לקוח', [gig.client, gig.phone, gig.email].filter(Boolean).join('\n'))}
@@ -2750,6 +2909,20 @@ function BridgeSetup({ data, setConfig, toast }) {
   </div>`;
 }
 
+function SheetStatus() {
+  const [, tick] = useState(0);
+  const st = window.__sheetState || {};
+  useEffect(() => { const h = setInterval(() => tick(x => x + 1), 1500); return () => clearInterval(h); }, []);
+  const url = 'https://docs.google.com/spreadsheets/d/' + window.SM_SHEET_ID + '/edit';
+  return html`<div className="space-y-2 text-sm">
+    <p className="text-muted">האפליקציה כותבת לגיליון את כל האירועים בכל שינוי, וקוראת את לשונית "בקשות מהמזכירה" בכל פתיחה ובכל סנכרון — מבצעת אותן וכותבת "בוצע". עובד כשהחיבור לגוגל פעיל (לחיצה על 📅 סנכרון מחדשת אותו).</p>
+    <p>${st.status === 'ok' ? html`<span className="text-ok font-bold">● מחובר</span> · עודכן ${new Date(st.last).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}` : st.status === 'working' ? '⏳ מעדכן…' : st.status === 'error' ? html`<span className="text-bad font-bold">● ${st.error}</span>` : html`<span className="text-warn font-bold">● ממתין לחיבור לגוגל — לחץ 📅 סנכרון</span>`}</p>
+    ${st.status === 'error' && /Sheets API/.test(st.error) && html`<a className="underline font-bold" href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?project=studio-manager-7eb85" target="_blank" rel="noopener">להפעלת Google Sheets API ←</a>`}
+    <div className="flex flex-wrap gap-2"><a href=${url} target="_blank" rel="noopener" className="rounded-full glass-soft px-3 py-2 text-sm font-semibold">פתיחת הגיליון</a>
+      <${Btn} onClick=${() => window.__gcalEnsure && window.__gcalEnsure().then(ok => ok && window.__sheetCycle && window.__sheetCycle(true))}>🔄 עדכון עכשיו<//></div>
+  </div>`;
+}
+
 function Settings({ data, book = [], setBook, gsync, freshData, setData, setConfig, renameType, mode, lastSync, theme, setTheme, backup, toast }) {
   const fileRef = useRef(null);
   const [open, setOpen] = useState('look');
@@ -2891,6 +3064,7 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
         <${CloudBackups} toast=${toast} />
       <//>
 
+      ${window.SM_SHEET_ID && html`<${Section} icon="📋" title="גיליון המזכירה" sub="Studio Manager – מזכירה · אירועים ובקשות" open=${open === 'sheet'} onToggle=${() => tog('sheet')}><${SheetStatus} /><//>`}
       <${Section} icon="📅" title="יומן גוגל" sub=${gsync.ok ? (gsync.pending ? gsync.pending + ' שינויים ממתינים לסנכרון' : 'מסונכרן') : 'הוספת אירועים ליומן'} open=${open === 'gcal'} onToggle=${() => tog('gcal')}>
         ${gsync.ok ? html`
           <p className="text-sm text-muted">כל האירועים מהחודש האחרון והלאה נכנסים ליומן גוגל שלך עם שעה, מקום, לקוח וציוד (בלי סכומים). שינוי או מחיקה כאן מתעדכנים שם בלחיצה על סנכרון.</p>
@@ -3260,6 +3434,42 @@ function App() {
   const [gCals, setGCals] = useState([]);
   useEffect(() => { let alive = true; getMcp().then(m => { if (alive) setMcpOk(!!m); }); return () => { alive = false; }; }, []);
   const dataRef = useRef(data); dataRef.current = data;
+  /* מסמך (קבלה/חשבונית) לכמה אירועים — נשמר לפי מספר המסמך */
+  const addDoc = rec => setData(d => Object.assign({}, d, { config: upsertDocRec(d.config, rec), gigs: d.gigs.map(g => (rec.gigIds || []).includes(g.id) ? Object.assign({}, g, gigPatchForDoc(g, rec.type, rec.number, rec.date)) : g) }));
+  /* ===== גיליון המזכירה ===== */
+  const [sheet, setSheet] = useState({ status: '', last: 0, error: '' });
+  const sheetBusy = useRef(false), sheetHash = useRef('');
+  const sheetCycle = async (withRequests = true) => {
+    if (!window.SM_SHEET_ID || !(window.__gToken && window.__gToken()) || sheetBusy.current) return;
+    sheetBusy.current = true; setSheet(x => Object.assign({}, x, { status: 'working', error: '' }));
+    try {
+      await sheetEnsureTabs();
+      let d = dataRef.current, applied = 0;
+      if (withRequests) {
+        const rows = await sheetReadRequests();
+        const r = rqApplyAll(d, rows, (d.config || {}).rqDone);
+        if (r.results.length) {
+          applied = r.results.filter(x => x.status === 'בוצע' && x.note !== 'כבר בוצע קודם').length;
+          if (applied) { d = Object.assign({}, r.data, { config: Object.assign({}, r.data.config, { rqDone: r.doneIds }) }); setData(d); dataRef.current = d; }
+          await sheetWriteResults(r.results);
+          if (applied) setToast('📋 בוצעו ' + applied + ' בקשות מהמזכירה');
+        }
+      }
+      const h = JSON.stringify(sheetEventRows(d.gigs, d.subs));
+      if (h !== sheetHash.current) { await sheetWriteEvents(d.gigs, d.subs); sheetHash.current = h; }
+      setSheet({ status: 'ok', last: Date.now(), error: '' });
+    } catch (e) {
+      setSheet({ status: 'error', last: Date.now(), error: e && e.code === 'sheets_disabled' ? 'צריך להפעיל את Google Sheets API בפרויקט (פעם אחת).' : e && e.code === 'sheets_auth' ? 'אין הרשאה לגיליון — לחץ סנכרון וחבר מחדש את yasharulpan.' : 'הגיליון לא זמין כרגע' + (e && e.message ? ' (' + String(e.message).slice(0, 80) + ')' : '') });
+    } finally { sheetBusy.current = false; }
+  };
+  window.__sheetCycle = sheetCycle;
+  window.__sheetState = sheet;
+  /* בפתיחה (אחרי שהנתונים נטענו) ובכל פעם שיש חיבור לגוגל: קורא בקשות + כותב אירועים */
+  const [gTokN, setGTokN] = useState(0);
+  useEffect(() => { const f = () => setGTokN(x => x + 1); window.addEventListener('gcal-token', f); return () => window.removeEventListener('gcal-token', f); }, []);
+  useEffect(() => { if (mode === 'account' && lastSync) sheetCycle(true); }, [mode, !!lastSync, gTokN]);
+  /* בכל שינוי — כותב את לשונית האירועים (כשיש חיבור פעיל) */
+  useEffect(() => { if (mode !== 'account' || !lastSync) return; const h = setTimeout(() => sheetCycle(false), 4000); return () => clearTimeout(h); }, [data.gigs, data.subs]);
   const setGsync = patch => setData(d => Object.assign({}, d, { gsync: Object.assign({}, d.gsync || {}, typeof patch === 'function' ? patch(d.gsync || {}) : patch) }));
   const loadCalendars = async () => {
     const m = await getMcp(); if (!m) return;
@@ -3281,6 +3491,7 @@ function App() {
     const ens = window.__gcalEnsure ? window.__gcalEnsure() : null; // מחדש חיבור ליומן בשקט, ישר מהלחיצה
     if (ens && !(await ens)) { syncAfterConnect.current = true; setToast('לחץ על "חיבור" למטה — והסנכרון ימשיך לבד'); return; }
     syncAfterConnect.current = false;
+    setTimeout(() => window.__sheetCycle && window.__sheetCycle(true), 0);
     const m = await getMcp(); if (!m) { setToast('סנכרון ליומן גוגל לא זמין בתצוגה הזו'); return; }
     const tasks = syncPlan(dataRef.current, full === true);
     if (!tasks.length) { setGsync({ last: Date.now() }); setToast('יומן גוגל כבר מעודכן ✓'); return; }
@@ -3625,7 +3836,7 @@ function App() {
       </nav>
 
 
-      ${open && !editing && !paying && !invoicing && !login && html`<${GigDetails} gig=${open} book=${book} sub=${subs.find(s => s.id === open.subId)} admin=${unlocked} update=${update} hasSync=${!!mcpOk}
+      ${open && !editing && !paying && !invoicing && !login && html`<${GigDetails} gig=${open} gigs=${gigs} docs=${docsForGig(open, data.config)} onAddDoc=${addDoc} book=${book} sub=${subs.find(s => s.id === open.subId)} admin=${unlocked} update=${update} hasSync=${!!mcpOk}
         onClose=${() => setOpenId(null)} onEdit=${() => setEditing(Object.assign({}, open))}
         onPayKind=${k => { setPayPreset(k); setPayId(open.id); }} onDoc=${k => setDocReq({ id: open.id, kind: k })}
         onUnpay=${() => undoPaid(open)} onAdmin=${openAdmin}
@@ -3636,12 +3847,14 @@ function App() {
         onInvoice=${(num, date, extra = []) => { const all = [paying].concat(gigs.filter(x => extra.includes(x.id)));
           const prevs = all.map(x => [x.id, { invIssued: !!x.invIssued, invNumber: x.invNumber || '', invDate: x.invDate || '', docMode: modeOf(x) }]);
           all.forEach(x => update(x.id, { invIssued: true, invNumber: num, invDate: date, docMode: isComb(x) ? 'split' : modeOf(x) })); setPayId(null); setPayPreset(null);
+          if (num) setData(d => Object.assign({}, d, { config: upsertDocRec(d.config, { number: num, type: 'חשבונית מס', date, amount: Math.round(all.reduce((a, x) => a + amt(x), 0) * 100) / 100, gigIds: all.map(x => x.id) }) }));
           setToast({ msg: '📄 חשבונית מס סומנה כהופקה' + (num ? ' · #' + num : '') + (all.length > 1 ? ' · ' + all.length + ' אירועים' : ''), undo: () => { prevs.forEach(([id, p]) => update(id, p)); setToast('הסימון בוטל'); } }); }}
         onConfirm=${(method, date, receipt, newMode, extra = [], kind) => { const all = [paying].concat(gigs.filter(x => extra.includes(x.id)));
           const prevs = all.map(x => [x.id, { paidDate: x.paidDate || '', method: x.method || '', docNumber: x.docNumber || '', docIssued: !!x.docIssued, docMode: modeOf(x) }]);
           all.forEach((x, i) => { const nm = i === 0 ? newMode : newMode ? (kind === 'comb' ? 'combined' : hasInv(x) ? 'split' : 'receipt') : null;
             update(x.id, Object.assign({ paidDate: date, method }, nm ? { docMode: nm, docNeeded: nm !== 'none' } : {}, receipt ? { docNumber: receipt, docIssued: true } : {})); });
           setPayId(null); setPayPreset(null); setPaySel([]);
+          if (receipt) setData(d => Object.assign({}, d, { config: upsertDocRec(d.config, { number: receipt, type: kind === 'comb' ? 'חשבונית מס/קבלה' : 'קבלה', date, amount: Math.round(all.reduce((a, x) => a + amt(x), 0) * 100) / 100, gigIds: all.map(x => x.id) }) }));
           if (!prevs[0][1].paidDate) setTimeout(() => celebrate('paid'), 120);
           setToast({ msg: money(all.reduce((a, x) => a + amt(x), 0)) + ' התקבלו ב' + method + (receipt ? ' · קבלה ' + receipt : '') + (all.length > 1 ? ' · ' + all.length + ' אירועים' : ''), undo: () => { prevs.forEach(([id, p]) => update(id, p)); setToast('הרישום בוטל'); } }); }} />`}
       ${docGig && html`<${DocSheet} gig=${docGig} gigs=${gigs} kind=${docReq.kind} onClose=${() => setDocReq(null)}
@@ -3651,7 +3864,8 @@ function App() {
           const patchOf = g => k === 'inv' ? { invIssued: true, invNumber: num, invDate: date, docMode: isComb(g) ? 'split' : modeOf(g) }
             : k === 'rec' ? { docIssued: true, docNumber: num, docDate: date, docMode: hasInv(g) ? 'split' : 'receipt' }
             : { docIssued: true, docNumber: num, docDate: date, docMode: 'combined', invIssued: false };
-          all.forEach(g => update(g.id, patchOf(g))); setDocReq(null); setToast(DOCS[k].name + ' סומנה כהופקה' + (num ? ' · #' + num : '') + (all.length > 1 ? ' · ' + all.length + ' אירועים' : ''));
+          all.forEach(g => update(g.id, patchOf(g))); setDocReq(null);
+          if (num) setData(d => Object.assign({}, d, { config: upsertDocRec(d.config, { number: num, type: k === 'inv' ? 'חשבונית מס' : k === 'rec' ? 'קבלה' : 'חשבונית מס/קבלה', date, amount: Math.round(all.reduce((a, x) => a + amt(x), 0) * 100) / 100, gigIds: all.map(x => x.id) }) })); setToast(DOCS[k].name + ' סומנה כהופקה' + (num ? ' · #' + num : '') + (all.length > 1 ? ' · ' + all.length + ' אירועים' : ''));
         }} />`}
       ${lockOn && appLocked && html`<${AppLock} admin=${data.admin} pin=${(data.config || {}).pin} onOk=${() => appUnlocked(data.admin.hash)} onSetPin=${pin => setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { pin }) }))} />`}
       ${login && html`<${AdminLogin} adminData=${data.admin} mode=${login} onSuccess=${onLoggedIn} onSetPassword=${onSetPassword} onClose=${() => setLogin(null)} />`}

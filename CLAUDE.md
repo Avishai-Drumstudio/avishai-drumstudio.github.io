@@ -40,3 +40,12 @@ so he asks for a change in chat and expects it live on the site (push to `main` 
 
 ## Commits
 End commit messages with the attribution lines the session gives you.
+
+## Secretary sheet (Google Sheets, two-way)
+- Sheet "Studio Manager – מזכירה" in yasharulpan's Drive, id in `window.SM_SHEET_ID` (firebase-config.js). Uses the same Google token
+  as the calendar (scope calendar + spreadsheets, `window.__gToken()`); Google Sheets API must be enabled in project studio-manager-7eb85.
+- Tab "אירועים": rewritten from the app on every change (when a token is active). Tab "בקשות מהמזכירה": read on open / sync;
+  columns A–I = מזהה בקשה, פעולה, id אירוע, שדה, ערך, פרטים (JSON), סטטוס, תאריך ביצוע, הערה. Actions: הוספת אירוע · עדכון שדה ·
+  סימון תשלום · צירוף מסמך (see `rqApplyAll`). Executed request ids are kept in `config.rqDone` so a row never runs twice.
+- Documents: `config.docs` = [{number (key), type, date, amount, url, gigIds}] — one document can cover several events; panel "📎 מסמכים" in event details.
+

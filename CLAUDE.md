@@ -40,3 +40,14 @@ so he asks for a change in chat and expects it live on the site (push to `main` 
 
 ## Commits
 End commit messages with the attribution lines the session gives you.
+
+## Secretary sheet (Google Sheets, two-way, approval-based)
+- Sheet "Studio Manager – מזכירה" in yasharulpan's Drive, id `window.SM_SHEET_ID` (firebase-config.js).
+- Separate Google token, scope `spreadsheets` only (`window.__sheetAuth()` redirect with state `sh…`, stored in `studio-sheet-tok`) —
+  never touches the calendar token/scope. Google Sheets API must be enabled in project studio-manager-7eb85.
+- Runs only on app open (after cloud load) and on the "📋 סנכרון מזכירה" button — never in the background.
+- Tab "נתונים": rewritten each sync, one row per gig (`SM_HEAD`). Tab "בקשות": A–G = id בקשה, פעולה (הוספה/עדכון/מחיקה), id אירוע,
+  שדה (a "נתונים" header name), ערך, הערה, סטטוס; app writes H–I (date, reply) and the new id into C on add. Several rows with the same
+  request id = one request. Pending (status empty/ממתין) are shown in `SecretaryInbox`; only on approval: cloud backup
+  (`__studioBackups.snap`, slots backup-pre-0..9) → `rqApply` → status בוצע / נדחה. Executed ids kept in `config.rqDone`.
+- New gig fields: `dress` (קוד לבוש), `production` (הפקה), `setlist` (רשימת שירים).

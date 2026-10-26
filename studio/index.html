@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link rel="preconnect" href="https://www.gstatic.com"><link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=e182ab29">
+<link rel="stylesheet" href="app.css?v=cd171ace">
 <style>
 :root {
   --bg: #140d2b; --glow-pct: 100%;
@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261026214141';
+window.STUDIO_VERSION = '20261027000353';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -194,7 +194,7 @@ window.STUDIO_VERSION = '20261026214141';
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script defer src="firebase-config.js?v=5"></script>
+<script defer src="firebase-config.js?v=6"></script>
 <style>
 #gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;
   background:radial-gradient(60% 45% at 75% 15%,rgba(245,158,60,.22),transparent 70%),radial-gradient(55% 40% at 15% 85%,rgba(46,211,195,.10),transparent 70%),#0d0b09;color:#fff;font-family:Rubik,system-ui,sans-serif;text-align:center}
@@ -408,6 +408,36 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
       setTimeout(function () { toastMsg('📅 יומן גוגל מחובר' + (resume ? ' — ממשיך לסנכרן…' : ' ✓')); }, 600);
     } else if (/\.s$/.test(st)) { gcalRedirect(false); }
     else { try { localStorage.removeItem('studio-gcal-resume'); } catch (e) {} setTimeout(function () { toastMsg('החיבור ליומן לא הושלם: ' + (p.get('error') || '')); }, 600); }
+  })();
+  /* ===== גיליון המזכירה: טוקן נפרד לגמרי מהיומן (הרשאת Sheets בלבד) — כך תקלה בגיליון לא נוגעת ביומן ===== */
+  var SHTOK_KEY = 'studio-sheet-tok', shTok = null;
+  try { shTok = JSON.parse(localStorage.getItem(SHTOK_KEY) || 'null'); } catch (e) {}
+  window.__sheetToken = function () { return shTok && shTok.t && shTok.exp > Date.now() ? shTok.t : null; };
+  window.__sheetDrop = function () { shTok = null; try { localStorage.removeItem(SHTOK_KEY); } catch (e) {} };
+  window.__sheetAuth = function () {
+    if (!window.GOOGLE_CLIENT_ID) return false;
+    var st = 'sh' + Math.random().toString(36).slice(2), hint = rememberedCal();
+    try { localStorage.setItem('studio-sheet-st', st); localStorage.setItem('studio-sheet-resume', '1'); } catch (e) {}
+    var q = { client_id: window.GOOGLE_CLIENT_ID, redirect_uri: REDIR, response_type: 'token', scope: 'https://www.googleapis.com/auth/spreadsheets', state: st };
+    if (hint) q.login_hint = hint; else q.prompt = 'select_account';
+    location.assign('https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams(q).toString());
+    return true;
+  };
+  (function sheetReturn() {
+    var h = location.hash || ''; if (h.indexOf('state=sh') < 0) return;
+    var p = new URLSearchParams(h.slice(1)), st = p.get('state') || '', mine = null;
+    try { mine = localStorage.getItem('studio-sheet-st'); localStorage.removeItem('studio-sheet-st'); } catch (e) {}
+    if (!mine || st !== mine) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    var tok = p.get('access_token');
+    if (tok) {
+      shTok = { t: tok, exp: Date.now() + (Number(p.get('expires_in')) || 3600) * 1000 - 5 * 60000 };
+      try { localStorage.setItem(SHTOK_KEY, JSON.stringify(shTok)); } catch (e) {}
+      window.__sheetAuthErr = '';
+    } else {
+      try { localStorage.removeItem('studio-sheet-resume'); } catch (e) {}
+      window.__sheetAuthErr = p.get('error') || 'unknown';
+    }
   })();
   function toastMsg(m) { var t = document.createElement('div'); t.textContent = m; t.style.cssText = 'position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:50%;transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:999px;background:#222;color:#fff;font:600 14px Rubik,system-ui,sans-serif;direction:rtl'; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 3500); }
   function gfetch(method, path, body) {
@@ -1011,9 +1041,20 @@ function useStore() {
     return () => clearTimeout(h);
   }, [data, mode]);
   window.__studioBackups = {
-    list: async () => { if (!colRef.current) return []; const r = await Promise.all(Array.from({ length: 14 }, (_, i) => colRef.current.doc('backup-' + i).get().catch(() => null)));
-      return r.map((x, i) => x && x.exists ? Object.assign({ slot: i }, x.data()) : null).filter(Boolean).sort((a, b) => b.at - a.at); },
-    restore: b => { const v = JSON.parse(b.json); setData(d => normalize(Object.assign({}, v, { gsync: d.gsync }))); }
+    list: async () => { if (!colRef.current) return []; const ids = Array.from({ length: 14 }, (_, i) => 'backup-' + i).concat(Array.from({ length: 10 }, (_, i) => 'backup-pre-' + i));
+      const r = await Promise.all(ids.map(id => colRef.current.doc(id).get().catch(() => null)));
+      return r.map((x, i) => x && x.exists ? Object.assign({ slot: ids[i] }, x.data()) : null).filter(Boolean).sort((a, b) => b.at - a.at); },
+    restore: b => { const v = JSON.parse(b.json); setData(d => normalize(Object.assign({}, v, { gsync: d.gsync }))); },
+    /* גיבוי מיידי לפני שינוי (למשל לפני ביצוע בקשות מהמזכירה) — 10 מגירות נפרדות מהגיבוי היומי */
+    snap: async (d, label) => {
+      const json = JSON.stringify({ gigs: d.gigs, subs: d.subs, clients: d.clients, config: d.config, admin: d.admin, gsync: d.gsync });
+      try { localStorage.setItem('studio-pre-change', json); } catch (e) {}
+      if (!colRef.current) { if (mode === 'account') throw new Error('no cloud'); return; }
+      if (json.length > 950000) throw new Error('too big');
+      let n = 0; try { n = Number(localStorage.getItem('studio-pre-n') || 0) || 0; } catch (e) {}
+      await colRef.current.doc('backup-pre-' + (n % 10)).set({ day: todayISO(), at: Date.now(), count: d.gigs.length, label: label || '', json });
+      try { localStorage.setItem('studio-pre-n', String(n + 1)); } catch (e) {}
+    }
   };
   return { data, setData, mode, saveState, lastSync };
 }
@@ -1027,7 +1068,7 @@ function CloudBackups({ toast }) {
     <span className="block text-xs text-muted">כל יום נשמר לבד עותק מלא של כל הנתונים, 14 ימים אחורה. אם משהו נמחק או השתבש — אפשר לחזור ליום קודם.</span>
     ${list === null ? html`<${Btn} className="mt-2" onClick=${load}>הצג גיבויים<//>` : list === 'loading' ? html`<p className="mt-2 text-muted">טוען…</p>` : list.length === 0 ? html`<p className="mt-2 text-muted">עוד אין גיבויים — הראשון יישמר היום.</p>` : html`
       <ul className="mt-2 divide-y divide-[var(--glass-line)]">${list.map(b => html`<li key=${b.slot} className="flex items-center gap-2 py-1.5">
-        <span className="flex-1">${fmtDate(b.day)} · ${b.count} אירועים</span>
+        <span className="flex-1">${fmtDate(b.day)}${b.label ? ' ' + new Date(b.at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) + ' · ' + b.label : ''} · ${b.count} אירועים</span>
         <${Btn} onClick=${() => ask('לחזור לגיבוי מ־' + fmtDate(b.day) + '? כל הנתונים יחזרו למצב של אותו יום.', { danger: true, ok: 'שחזור' }).then(ok => { if (ok) { window.__studioBackups.restore(b); toast('שוחזר הגיבוי מ־' + fmtDate(b.day)); } })}>שחזור<//></li>`)}</ul>`}
   </div>`;
 }
@@ -1670,7 +1711,7 @@ function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, i
     return Array.from(m.values());
   }, [clients, gigs]);
   const [g, setG] = useState(initial);
-  const hasExtra = !!(initial.end && !isNew) || !!(initial.loadIn || initial.address || initial.equipment || initial.notes);
+  const hasExtra = !!(initial.end && !isNew) || !!(initial.loadIn || initial.address || initial.equipment || initial.notes || initial.dress || initial.production || initial.setlist);
   const [more, setMore] = useState((!isNew || initial.fromQuick) && (hasExtra || (initial.fromQuick && !!initial.title)));
   const [bySub, setBySub] = useState(!!initial.subId || !!(initial.newSub && initial.newSub.name));
   const set = (k, v) => setG(p => Object.assign({}, p, { [k]: v }));
@@ -1816,6 +1857,11 @@ function GigForm({ initial: init0, subs, clients, gigs = [], book = [], admin, i
         </div>`}
         <${Label} text="טלפון של הלקוח / ההפקה"><input type="tel" className="field ltr text-right" value=${g.phone} onChange=${e => set('phone', e.target.value)} /><//>
         <${Label} text="ציוד והערות"><textarea rows="3" className="field" value=${g.equipment} onChange=${e => set('equipment', e.target.value)} placeholder="ערכה, מצלתיים, חניה, סאונדצ׳ק, לבוש…"></textarea><//>
+        <div className="grid grid-cols-2 gap-3">
+          <${Label} text="קוד לבוש"><input className="field" value=${g.dress || ''} onChange=${e => set('dress', e.target.value)} placeholder="שחור מלא…" /><//>
+          <${Label} text="הפקה"><input className="field" value=${g.production || ''} onChange=${e => set('production', e.target.value)} /><//>
+        </div>
+        <${Label} text="רשימת שירים"><input className="field" value=${g.setlist || ''} onChange=${e => set('setlist', e.target.value)} placeholder="קישור או שמות שירים" /><//>
         ${g.notes && html`<${Label} text="הערות"><textarea rows="2" className="field" value=${g.notes} onChange=${e => set('notes', e.target.value)}></textarea><//>`}
         ${admin && html`<div className="grid grid-cols-2 gap-3">
           <${Label} text="לתשלום עד"><input type="date" className="field" value=${g.dueDate} onChange=${e => set('dueDate', e.target.value)} /><//>
@@ -1929,6 +1975,175 @@ function MarkPaid({ gig, gigs = [], preSel = [], preset, onConfirm, onInvoice, o
 
 const docTapAction = (g, k, onPay, onDoc) => { const t = docTarget(g, k), st = docState(g, k); return (st !== 'done' && t !== 'inv' && !g.paidDate) ? onPay(t) : onDoc(t); };
 
+/* ===== גיליון "Studio Manager – מזכירה" (Google Sheets) =====
+   לשונית "נתונים": האפליקציה כותבת שורה לכל אירוע (כולל מצב התשלום והמסמכים).
+   לשונית "בקשות": המזכירה כותבת בקשות → האפליקציה מציגה לאישור → רק אחרי אישור מבצעת ומסמנת "בוצע" / "נדחה". */
+const SM_TAB = { data: 'נתונים', rq: 'בקשות' };
+const SM_HEAD = ['id', 'סוג', 'תאריך', 'שעת באלנס', 'שעת התחלה', 'מקום', 'לקוח/זוג', 'הפקה', 'מחיר', 'מע"מ', 'סטטוס תשלום', 'חשבונית/קבלה', 'קוד לבוש', 'ציוד', 'רשימת שירים', 'מחליף', 'הערות', 'עודכן בתאריך', 'שעת סיום', 'כתובת', 'סה"כ לגבייה', 'תאריך תשלום'];
+const RQ_HEAD = ['id בקשה', 'פעולה', 'id אירוע', 'שדה', 'ערך', 'הערה', 'סטטוס', 'טופל בתאריך', 'תשובת האפליקציה'];
+const RQ_HELP = ['דוגמה', 'הוספה / עדכון / מחיקה', 'בהוספה ריק — האפליקציה תכתוב כאן את ה-id', 'שם עמודה מלשונית "נתונים"', 'הערך החדש', 'הסבר קצר לאביחי', 'ממתין', '', 'לבקשה עם כמה שדות: כמה שורות עם אותו id בקשה'];
+const VAT_TXT = { none: 'ללא', plus: '+ מע"מ', incl: 'כולל מע"מ' };
+const docsText = g => [hasInv(g) && ('חשבונית מס' + (g.invNumber ? ' ' + g.invNumber : '')), hasRec(g) && ('קבלה' + (g.docNumber ? ' ' + g.docNumber : '')), hasComb(g) && ('חשבונית מס/קבלה' + (g.docNumber ? ' ' + g.docNumber : ''))].filter(Boolean).join(' · ');
+const smBaseRow = (g, subs) => { const sub = g.subId && subs.find(x => x.id === g.subId);
+  return [g.id, g.type || '', g.date || '', g.loadIn || '', g.start || '', g.venue || '', g.client || '', g.production || '', Number(g.fee) || 0, VAT_TXT[g.vat || 'none'] || '',
+    Number(g.fee) > 0 ? payStatus(g) : 'ללא תשלום', docsText(g), g.dress || '', g.equipment || '', g.setlist || '', sub ? sub.name : g.needSub ? 'צריך מחליף' : '', g.notes || '', '',
+    g.end || '', g.address || '', Number(g.fee) > 0 ? Math.round(amt(g) * 100) / 100 : 0, g.paidDate || '']; };
+/* "עודכן בתאריך": נשמר לפי חתימה של כל שורה — משתנה רק כשמשהו באירוע השתנה */
+const SM_STAMP_KEY = 'studio-sheet-stamps';
+function smRows(gigs, subs) {
+  let st = {}; try { st = JSON.parse(localStorage.getItem(SM_STAMP_KEY) || '{}') || {}; } catch (e) {}
+  const now = new Date().toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' }), next = {};
+  const rows = gigs.slice().sort((a, b) => a.date.localeCompare(b.date) || (a.start || '').localeCompare(b.start || '')).map(g => {
+    const r = smBaseRow(g, subs), h = JSON.stringify(r), o = st[g.id];
+    next[g.id] = o && o[0] === h ? o : [h, now]; r[17] = next[g.id][1]; return r; });
+  return { rows: [SM_HEAD].concat(rows), stamps: next };
+}
+async function smCall(method, path, body) {
+  const t = window.__sheetToken && window.__sheetToken(), id = window.SM_SHEET_ID;
+  if (!id) throw { code: 'no_sheet' }; if (!t) throw { code: 'no_token' };
+  let r; try { r = await fetch('https://sheets.googleapis.com/v4/spreadsheets/' + id + path, { method, headers: { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }); }
+  catch (e) { throw { code: 'offline' }; }
+  if (!r.ok) { const x = await r.text();
+    if (r.status === 401) { window.__sheetDrop && window.__sheetDrop(); throw { code: 'no_token' }; }
+    throw { code: /SERVICE_DISABLED|has not been used|is disabled/i.test(x) ? 'disabled' : r.status === 403 ? 'forbidden' : r.status === 404 ? 'not_found' : 'err', message: x.slice(0, 300) }; }
+  return r.status === 204 ? {} : r.json();
+}
+const SM_ERR = { no_sheet: 'לא הוגדר גיליון.', no_token: 'צריך לאשר לאפליקציה גישה לגיליון — לחץ "סנכרון מזכירה".', offline: 'אין אינטרנט כרגע — נסה שוב.',
+  disabled: 'Google Sheets API כבוי בפרויקט של גוגל — צריך להפעיל אותו פעם אחת.', forbidden: 'לחשבון שאישרת אין גישה לגיליון — צריך לאשר עם yasharulpan@gmail.com.',
+  not_found: 'הגיליון לא נמצא (אולי נמחק או הועבר).', err: 'גוגל החזיר שגיאה.' };
+const smErrText = e => (SM_ERR[e && e.code] || 'הסנכרון נכשל.') + (e && e.code === 'err' && e.message ? ' (' + String(e.message).replace(/\s+/g, ' ').slice(0, 90) + ')' : '');
+async function smEnsureTabs() {
+  const meta = await smCall('GET', '?fields=sheets.properties');
+  const props = (meta.sheets || []).map(x => x.properties), names = props.map(p => p.title), req = [];
+  if (!names.includes(SM_TAB.data)) { const other = props.find(p => p.title !== SM_TAB.rq);
+    if (props.length === 1 && other && /^(גיליון|Sheet)\s*1$/.test(other.title)) req.push({ updateSheetProperties: { properties: { sheetId: other.sheetId, title: SM_TAB.data, rightToLeft: true }, fields: 'title,rightToLeft' } });
+    else req.push({ addSheet: { properties: { title: SM_TAB.data, rightToLeft: true } } }); }
+  if (!names.includes(SM_TAB.rq)) req.push({ addSheet: { properties: { title: SM_TAB.rq, rightToLeft: true } } });
+  if (req.length) await smCall('POST', ':batchUpdate', { requests: req });
+  const a1 = await smCall('GET', '/values/' + encodeURIComponent(SM_TAB.rq + '!A1:I2'));
+  if (!(a1.values && a1.values[0] && a1.values[0][0])) await smCall('PUT', '/values/' + encodeURIComponent(SM_TAB.rq + '!A1') + '?valueInputOption=RAW', { values: [RQ_HEAD, RQ_HELP] });
+}
+async function smWriteData(rows) {
+  await smCall('POST', '/values/' + encodeURIComponent(SM_TAB.data + '!A:Z') + ':clear', {});
+  await smCall('PUT', '/values/' + encodeURIComponent(SM_TAB.data + '!A1') + '?valueInputOption=RAW', { values: rows });
+}
+async function smReadRequests() { const j = await smCall('GET', '/values/' + encodeURIComponent(SM_TAB.rq + '!A2:I3000')); return j.values || []; }
+/* כותב סטטוס לכל שורה של הבקשה: G=סטטוס, H=תאריך, I=תשובה. בהוספה — גם את ה-id החדש בעמודה C */
+async function smMark(list) {
+  if (!list.length) return; const stamp = new Date().toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' }), data = [];
+  list.forEach(x => x.rows.forEach(i => { const n = i + 2;
+    if (x.newId) data.push({ range: SM_TAB.rq + '!C' + n, values: [[x.newId]] });
+    data.push({ range: SM_TAB.rq + '!G' + n + ':I' + n, values: [[x.status, stamp, x.note || '']] }); }));
+  await smCall('POST', '/values:batchUpdate', { valueInputOption: 'RAW', data });
+}
+/* שמות השדות (כמו בכותרות לשונית "נתונים", ועוד כמה כינויים) → שדות באפליקציה */
+const RQ_FIELDS = { 'סוג': 'type', 'תאריך': 'date', 'שעת באלנס': 'loadIn', 'באלנס': 'loadIn', 'הגעה': 'loadIn', 'שעת התחלה': 'start', 'התחלה': 'start', 'שעה': 'start', 'שעת סיום': 'end', 'סיום': 'end',
+  'מקום': 'venue', 'אולם': 'venue', 'כתובת': 'address', 'לקוח/זוג': 'client', 'לקוח': 'client', 'זוג': 'client', 'הפקה': 'production', 'מחיר': 'fee', 'סכום': 'fee', 'מע"מ': 'vat', 'מע״מ': 'vat', 'מעמ': 'vat',
+  'סטטוס תשלום': 'pay', 'תשלום': 'pay', 'תאריך תשלום': 'paidDate', 'אמצעי תשלום': 'method', 'חשבונית/קבלה': 'doc', 'קבלה': 'doc', 'חשבונית': 'doc', 'קוד לבוש': 'dress', 'לבוש': 'dress', 'ציוד': 'equipment',
+  'רשימת שירים': 'setlist', 'שירים': 'setlist', 'מחליף': 'sub', 'הערות': 'notes', 'כותרת': 'title', 'שם': 'title', 'איש קשר': 'contactName', 'טלפון איש קשר': 'contactPhone', 'טלפון': 'phone', 'תוספת מרחק': 'travelFee', 'לתשלום עד': 'dueDate' };
+const RQ_LABEL = {}; Object.keys(RQ_FIELDS).forEach(k => { if (!RQ_LABEL[RQ_FIELDS[k]]) RQ_LABEL[RQ_FIELDS[k]] = k; });
+const rqKey = k => { k = String(k || '').trim().replace(/[״”]/g, '"'); return RQ_FIELDS[k] || ''; };
+const rqVat = v => /כולל|incl/i.test(v) ? 'incl' : /\+|פלוס|plus|עם/i.test(v) ? 'plus' : 'none';
+const rqDate = v => { v = String(v || '').trim(); let m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return m[1] + '-' + pad(+m[2]) + '-' + pad(+m[3]);
+  m = v.match(/^(\d{1,2})[./](\d{1,2})[./](\d{2,4})$/); if (m) return (m[3].length === 2 ? '20' + m[3] : m[3]) + '-' + pad(+m[2]) + '-' + pad(+m[1]); return ''; };
+const rqTime = v => { const m = String(v || '').trim().match(/^(\d{1,2})[:.](\d{2})$/); return m ? pad(+m[1]) + ':' + m[2] : ''; };
+const rqType = v => { v = String(v || '').trim(); const root = v.replace(/(ות|ים|ה)$/, ''); const t = TYPES.find(t => t.id === v) || TYPES.find(t => root && t.id.replace(/(ות|ים|ה)$/, '') === root); return t ? t.id : v; };
+const rqDoc = v => { v = String(v || '').trim(); const num = (v.match(/\d[\d-]*/) || [''])[0]; return { type: /חשבונית/.test(v) && /קבלה/.test(v) ? 'comb' : /חשבונית/.test(v) ? 'inv' : /קבלה/.test(v) ? 'rec' : '', num }; };
+/* בדיקת ערך + החלה על אירוע. זורק טקסט שגיאה ברור אם הערך לא תקין */
+function rqSet(ctx, g, key, val) {
+  val = val === undefined || val === null ? '' : String(val).trim();
+  if (key === 'date' || key === 'dueDate') { const d = rqDate(val); if (!d) throw 'תאריך לא תקין: "' + val + '" (צריך YYYY-MM-DD)'; return Object.assign({}, g, { [key]: d }); }
+  if (key === 'paidDate') { const d = val ? rqDate(val) : ''; if (val && !d) throw 'תאריך תשלום לא תקין: "' + val + '"'; return Object.assign({}, g, { paidDate: d }); }
+  if (key === 'loadIn' || key === 'start' || key === 'end') { const t = val ? rqTime(val) : ''; if (val && !t) throw 'שעה לא תקינה: "' + val + '" (צריך HH:MM)'; return Object.assign({}, g, { [key]: t }); }
+  if (key === 'fee' || key === 'travelFee') { const n = Number(val.replace(/[^\d.]/g, '')); if (val && !isFinite(n)) throw 'סכום לא תקין: "' + val + '"'; return Object.assign({}, g, { [key]: n || 0 }); }
+  if (key === 'vat') return Object.assign({}, g, { vat: rqVat(val), vatRate: g.vatRate !== undefined && g.vatRate !== '' ? g.vatRate : CFG.vatRate });
+  if (key === 'type') return Object.assign({}, g, { type: rqType(val) || g.type });
+  if (key === 'pay') { if (/^לא|ממתין|בוטל|עתידי/.test(val) || !val) return Object.assign({}, g, { paidDate: '' });
+    const d = rqDate(val) || todayISO(); return Object.assign({}, g, { paidDate: d }); }
+  if (key === 'doc') { const x = rqDoc(val); if (!val) return Object.assign({}, g, { invIssued: false, invNumber: '', docIssued: false, docNumber: '' });
+    const k = x.type || (isComb(g) ? 'comb' : g.paidDate ? 'rec' : 'inv'), d = todayISO();
+    return Object.assign({}, g, k === 'inv' ? { invIssued: true, invNumber: x.num, invDate: d, docMode: isComb(g) ? 'split' : modeOf(g) }
+      : k === 'rec' ? { docIssued: true, docNumber: x.num, docDate: d, docMode: hasInv(g) ? 'split' : (modeOf(g) === 'none' ? 'receipt' : modeOf(g) === 'combined' ? 'split' : modeOf(g)) }
+      : { docIssued: true, docNumber: x.num, docDate: d, docMode: 'combined', invIssued: false }); }
+  if (key === 'sub') { const n = cleanName(val); if (!n) return Object.assign({}, g, { subId: '', needSub: false });
+    if (/צריך|למצוא/.test(n)) return Object.assign({}, g, { subId: '', needSub: true });
+    let s0 = ctx.subs.find(x => sameName(x.name, n)); if (!s0) { s0 = { id: uid(), name: n, phone: '', notes: '' }; ctx.subs = ctx.subs.concat([s0]); }
+    return Object.assign({}, g, { subId: s0.id, needSub: false }); }
+  if (key === 'client' || key === 'venue' || key === 'contactName') return Object.assign({}, g, { [key]: cleanName(val) });
+  return Object.assign({}, g, { [key]: val });
+}
+const rqShow = (key, g, subs) => { if (!g) return ''; if (key === 'pay') return Number(g.fee) > 0 ? payStatus(g) : ''; if (key === 'doc') return docsText(g); if (key === 'vat') return VAT_TXT[g.vat || 'none'];
+  if (key === 'sub') { const s = g.subId && subs.find(x => x.id === g.subId); return s ? s.name : g.needSub ? 'צריך מחליף' : ''; } return g[key] === undefined || g[key] === null ? '' : String(g[key]); };
+/* קורא את שורות הבקשות ומקבץ לפי id בקשה. מחזיר רק ממתינות (סטטוס ריק / "ממתין") */
+function rqParse(rows, data) {
+  const map = new Map();
+  rows.forEach((r, i) => { const c = Array.from({ length: 9 }, (_, j) => r[j] === undefined || r[j] === null ? '' : String(r[j]).trim());
+    const [rid, act, gid, field, value, note, status] = c;
+    if (!rid || rid === 'דוגמה' || (status && !/^ממתין/.test(status))) return;
+    if (!map.has(rid)) map.set(rid, { id: rid, act: '', gid: '', items: [], notes: [], rows: [] });
+    const q = map.get(rid); q.rows.push(i); if (act && !q.act) q.act = act; if (gid && !q.gid) q.gid = gid; if (note) q.notes.push(note);
+    if (field) q.items.push([field, value]);
+    else if (/^\s*\{/.test(value)) { try { const o = JSON.parse(value); Object.keys(o).forEach(k => q.items.push([k, o[k]])); } catch (e) { q.bad = 'ערך בפורמט JSON לא תקין'; } } });
+  const done = new Set(((data.config || {}).rqDone) || []);
+  return Array.from(map.values()).map(q => {
+    const kind = /מחיק|מחק|delete|remove/i.test(q.act) ? 'del' : /הוספ|חדש|add|new/i.test(q.act) ? 'add' : /עדכ|שינוי|שנה|update|edit/i.test(q.act) ? 'upd' : '';
+    const ids = q.gid.split(/[,;\s]+/).filter(Boolean), gigs = ids.map(x => data.gigs.find(g => g.id === x));
+    const out = Object.assign({}, q, { kind, ids, gigs, note: q.notes.join(' · '), done: done.has(q.id) });
+    if (q.bad) out.err = q.bad;
+    else if (!kind) out.err = 'פעולה לא מוכרת: "' + q.act + '" (הוספה / עדכון / מחיקה)';
+    else if (kind !== 'add' && !ids.length) out.err = 'חסר id אירוע';
+    else if (kind !== 'add' && gigs.some(g => !g)) out.err = 'לא נמצא אירוע עם id ' + ids.find((x, j) => !gigs[j]);
+    else if (kind !== 'del' && !q.items.length) out.err = 'אין שדות לשנות';
+    else { const unk = q.items.find(([f]) => !rqKey(f)); if (unk) out.err = 'שדה לא מוכר: "' + unk[0] + '"'; }
+    if (!out.err) { try { out.preview = rqApply(data, out, true); } catch (e) { out.err = String(e); } }
+    return out;
+  });
+}
+/* מבצע בקשה אחת על עותק של הנתונים. dry = רק בדיקה (בלי לשנות) */
+function rqApply(d0, q, dry) {
+  const ctx = { subs: d0.subs.slice() }; let gigs = d0.gigs.slice(), clients = d0.clients, newId = '', changes = [];
+  if (q.kind === 'add') {
+    const dateItem = q.items.find(([f]) => rqKey(f) === 'date'); if (!dateItem) throw 'בהוספה חובה שדה "תאריך"';
+    let g = blankGig(rqDate(dateItem[1]) || todayISO()); const keys = q.items.map(([f]) => rqKey(f));
+    q.items.forEach(([f, v]) => { g = rqSet(ctx, g, rqKey(f), v); });
+    g.dueDate = keys.includes('dueDate') ? g.dueDate : addDays(g.date, Number(CFG.dueDays) || 0);
+    const cl = d0.clients.find(c => sameName(c.name, g.client)); // ברירות המחדל של הלקוח (מחיר בסיס, מע"מ) אם לא נכתבו
+    if (cl) { if (!keys.includes('fee') && !g.subId) { const r = clientRate(cl, g.date); if (r) g.fee = r; } if (!keys.includes('vat') && cl.vat && cl.vat !== 'none') { g.vat = cl.vat; g.vatRate = CFG.vatRate; } }
+    g.title = autoTitle(Object.assign({}, g, { title: '' })); g.fromSecretary = q.id; newId = g.id;
+    changes = q.items.map(([f, v]) => [RQ_LABEL[rqKey(f)] || f, '', String(v)]);
+    gigs = gigs.concat([g]); clients = upsertClient(clients, g);
+  } else if (q.kind === 'del') {
+    changes = q.ids.map(x => { const g = gigs.find(y => y.id === x); return ['מחיקה', autoTitle(g) + ' · ' + fmtDate(g.date), '']; });
+    gigs = gigs.filter(g => !q.ids.includes(g.id));
+  } else {
+    q.ids.forEach(x => { let g = gigs.find(y => y.id === x); const before = g;
+      q.items.forEach(([f, v]) => { const k = rqKey(f); g = rqSet(ctx, g, k, v); if (x === q.ids[0]) changes.push([RQ_LABEL[k] || f, rqShow(k, before, d0.subs), rqShow(k, g, ctx.subs)]); });
+      gigs = gigs.map(y => y.id === x ? g : y); });
+  }
+  if (dry) return { changes, title: q.kind === 'add' ? null : q.ids.map(x => { const g = d0.gigs.find(y => y.id === x); return autoTitle(g) + ' · ' + fmtDate(g.date); }) };
+  return { data: Object.assign({}, d0, { gigs, subs: ctx.subs, clients }), newId };
+}
+
+function SecretaryInbox({ list, busy, onDecide, onClose }) {
+  const [sel, setSel] = useState(null);
+  const ok = list.filter(q => !q.err);
+  const kindTxt = { add: '➕ אירוע חדש', upd: '✏️ עדכון', del: '🗑 מחיקה' };
+  return html`<${Modal} title="📋 בקשות מהמזכירה" onClose=${onClose} wide>
+    ${list.length === 0 ? html`<${Empty}>אין בקשות ממתינות.<//>` : html`
+      <p className="text-sm text-muted">שום דבר לא משתנה בלי אישור שלך. לפני כל ביצוע נשמר גיבוי.</p>
+      <ul className="mt-3 space-y-3">${list.map(q => html`<li key=${q.id} className=${'rounded-2xl glass-soft p-3 ' + (q.err ? 'ring-1 ring-[var(--bad)]' : '')}>
+        <div className="flex items-center gap-2"><b className="flex-1">${kindTxt[q.kind] || q.act || 'בקשה'}${q.preview && q.preview.title ? ' · ' + q.preview.title.join(', ') : ''}</b><span className="text-[11px] text-muted ltr">${q.id}</span></div>
+        ${q.note && html`<p className="mt-1 text-sm">💬 ${q.note}</p>`}
+        ${q.err ? html`<p className="mt-1 text-sm text-bad">⚠️ ${q.err}</p>` : html`<ul className="mt-2 space-y-1 text-sm">${q.preview.changes.map((c, i) => html`<li key=${i}><span className="text-muted">${c[0]}:</span> ${c[1] ? html`<s className="text-muted">${c[1]}</s> ← ` : ''}<b>${c[2] || (q.kind === 'del' ? c[1] : '—')}</b></li>`)}</ul>`}
+        <div className="mt-3 flex gap-2">
+          ${!q.err && html`<${Btn} kind="grad" disabled=${busy} onClick=${() => onDecide([q], true)}>✓ אישור<//>`}
+          <${Btn} disabled=${busy} onClick=${() => onDecide([q], false)}>✗ דחייה<//>
+        </div></li>`)}</ul>
+      ${ok.length > 1 && html`<div className="mt-4"><${Btn} kind="grad" disabled=${busy} onClick=${() => onDecide(ok, true)}>✓ לאשר את כל ${ok.length} הבקשות התקינות<//></div>`}`}
+    ${busy && html`<p className="mt-3 text-sm text-muted">מבצע…</p>`}
+  <//>`;
+}
+
 function PayPanel({ gig, onPay, onDoc, onUnpay }) {
   const st = payStatus(gig), late = st === 'באיחור' ? daysBetween(gig.dueDate, todayISO()) : 0;
   if (!Number(gig.fee)) return html`<section className="mt-4 rounded-3xl glass-soft p-4 text-sm text-muted">💰 אין סכום לאירוע הזה. אפשר להוסיף סכום שסוכם בעריכה.</section>`;
@@ -1970,7 +2185,10 @@ function GigDetails({ gig, sub, admin, book = [], update, hasSync, onEdit, onPay
         ${!samePerson && row('איש קשר', personLabel(gig.contactName, gig.contactPhone, book))}
         ${row('מקום', [gig.venue, gig.address].filter(Boolean).join('\n'))}
         ${row('מחליף', sub ? sub.name + (admin && Number(gig.subFee) ? ' · ' + money(gig.subFee) : '') : null)}
-        ${row('ציוד', gig.equipment)}
+        ${row('הפקה', gig.production)}
+        ${row('קוד לבוש', gig.dress)}
+                ${row('ציוד', gig.equipment)}
+        ${row('רשימת שירים', gig.setlist && /^https?:\/\//.test(gig.setlist.trim()) ? html`<a href=${gig.setlist.trim()} target="_blank" rel="noopener" className="underline">פתיחת הרשימה ↗</a>` : gig.setlist)}
         ${row('הערות', gig.notes)}
       </dl>
       <div className="mt-5 flex flex-wrap gap-2">
@@ -2750,7 +2968,7 @@ function BridgeSetup({ data, setConfig, toast }) {
   </div>`;
 }
 
-function Settings({ data, book = [], setBook, gsync, freshData, setData, setConfig, renameType, mode, lastSync, theme, setTheme, backup, toast }) {
+function Settings({ data, book = [], setBook, gsync, freshData, setData, setConfig, renameType, mode, lastSync, theme, setTheme, backup, toast, sec, onSecSync, onSecOpen }) {
   const fileRef = useRef(null);
   const [open, setOpen] = useState('look');
   const cfg = mergeCfg(data.config);
@@ -2891,6 +3109,17 @@ function Settings({ data, book = [], setBook, gsync, freshData, setData, setConf
         <${CloudBackups} toast=${toast} />
       <//>
 
+      ${window.SM_SHEET_ID && sec && html`<${Section} icon="📋" title="המזכירה (גיליון גוגל)" sub=${sec.list.length ? sec.list.length + ' בקשות מחכות לאישור' : sec.status === 'error' ? 'הסנכרון נכשל' : sec.status === 'need' ? 'צריך לאשר גישה' : sec.at ? 'מסונכרן' : 'חיבור למזכירה'} open=${open === 'sec'} onToggle=${() => tog('sec')}>
+        <p className="text-sm text-muted">האפליקציה כותבת את כל האירועים ללשונית "נתונים". המזכירה כותבת בקשות בלשונית "בקשות", ושום דבר לא משתנה בלי האישור שלך. לפני כל ביצוע נשמר גיבוי. הסנכרון רץ בפתיחת האפליקציה ובכפתור, ולא ברקע.</p>
+        ${sec.status === 'error' && html`<p className="mt-2 rounded-2xl glass-soft p-3 text-sm text-bad">⚠️ ${sec.error}</p>`}
+        ${sec.status === 'need' && html`<p className="mt-2 text-sm">צריך לאשר פעם אחת גישה לגיליון: לחץ "סנכרון מזכירה" ובחר את החשבון yasharulpan@gmail.com.</p>`}
+        ${sec.at > 0 && sec.status === 'ok' && html`<p className="mt-2 text-sm">✓ סונכרן לאחרונה ב־${new Date(sec.at).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}</p>`}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <${Btn} kind="grad" disabled=${sec.status === 'working'} onClick=${onSecSync}>${sec.status === 'working' ? '⏳ מסנכרן…' : '📋 סנכרון מזכירה'}<//>
+          ${sec.list.length > 0 && html`<${Btn} onClick=${onSecOpen}>בקשות ממתינות (${sec.list.length})<//>`}
+          <${LinkBtn} href=${'https://docs.google.com/spreadsheets/d/' + window.SM_SHEET_ID + '/edit'}>פתיחת הגיליון<//>
+        </div>
+      <//>`}
       <${Section} icon="📅" title="יומן גוגל" sub=${gsync.ok ? (gsync.pending ? gsync.pending + ' שינויים ממתינים לסנכרון' : 'מסונכרן') : 'הוספת אירועים ליומן'} open=${open === 'gcal'} onToggle=${() => tog('gcal')}>
         ${gsync.ok ? html`
           <p className="text-sm text-muted">כל האירועים מהחודש האחרון והלאה נכנסים ליומן גוגל שלך עם שעה, מקום, לקוח וציוד (בלי סכומים). שינוי או מחיקה כאן מתעדכנים שם בלחיצה על סנכרון.</p>
@@ -3260,6 +3489,62 @@ function App() {
   const [gCals, setGCals] = useState([]);
   useEffect(() => { let alive = true; getMcp().then(m => { if (alive) setMcpOk(!!m); }); return () => { alive = false; }; }, []);
   const dataRef = useRef(data); dataRef.current = data;
+  /* ===== גיליון המזכירה — רק בפתיחה ובכפתור "סנכרון מזכירה" (לא ברקע) ===== */
+  const [sec, setSec] = useState({ status: '', at: 0, error: '', list: [] });
+  const [inboxOpen, setInboxOpen] = useState(false), [secBusy, setSecBusy] = useState(false);
+  const smLock = useRef(false);
+  const secWriteData = async d => { const { rows, stamps } = smRows(d.gigs, d.subs); await smWriteData(rows); try { localStorage.setItem(SM_STAMP_KEY, JSON.stringify(stamps)); } catch (e) {} };
+  const secSync = async manual => {
+    if (!window.SM_SHEET_ID || smLock.current) return;
+    if (!(window.__sheetToken && window.__sheetToken())) {
+      if (manual) { if (!(window.__sheetAuth && window.__sheetAuth())) setSec(s => Object.assign({}, s, { status: 'error', error: 'חסר חיבור לגוגל באפליקציה.' })); }
+      else setSec(s => Object.assign({}, s, { status: 'need' }));
+      return;
+    }
+    smLock.current = true; setSec(s => Object.assign({}, s, { status: 'working', error: '' }));
+    try {
+      await smEnsureTabs();
+      const d = dataRef.current, list = rqParse(await smReadRequests(), d);
+      const stale = list.filter(q => q.done); // כבר בוצעו בעבר אבל הגיליון לא סומן (למשל נפל האינטרנט באמצע)
+      if (stale.length) await smMark(stale.map(q => ({ rows: q.rows, status: 'בוצע', note: 'בוצע קודם' })));
+      const pend = list.filter(q => !q.done);
+      await secWriteData(d);
+      setSec({ status: 'ok', at: Date.now(), error: '', list: pend });
+      if (pend.length && manual) setInboxOpen(true);
+      else if (manual) setToast('📋 המזכירה מעודכנת · אין בקשות חדשות');
+    } catch (e) {
+      if (e && e.code === 'no_token' && manual) { smLock.current = false; window.__sheetAuth && window.__sheetAuth(); return; }
+      setSec(s => Object.assign({}, s, { status: e && e.code === 'no_token' ? 'need' : 'error', at: Date.now(), error: smErrText(e) }));
+      if (manual) setToast('⚠️ סנכרון המזכירה נכשל: ' + smErrText(e));
+    } finally { smLock.current = false; }
+  };
+  const secDecide = async (qs, approve) => {
+    if (secBusy) return; setSecBusy(true);
+    try {
+      let d = dataRef.current, results = [], doneIds = [];
+      if (approve) {
+        try { await window.__studioBackups.snap(d, 'לפני בקשות מהמזכירה'); }
+        catch (e) { setToast('⚠️ הגיבוי לפני השינוי נכשל — לא בוצע כלום. נסה שוב.'); return; }
+        qs.forEach(q => { try { const r = rqApply(d, q); d = r.data; doneIds.push(q.id); results.push({ rows: q.rows, status: 'בוצע', note: r.newId ? 'נוסף אירוע' : 'בוצע', newId: r.newId }); }
+          catch (e) { results.push({ rows: q.rows, status: 'נדחה', note: 'שגיאה: ' + e }); } });
+        if (doneIds.length) { d = Object.assign({}, d, { config: Object.assign({}, d.config, { rqDone: (((d.config || {}).rqDone) || []).concat(doneIds).slice(-500) }) }); dataRef.current = d; setData(d); }
+      } else results = qs.map(q => ({ rows: q.rows, status: 'נדחה', note: 'נדחה על ידי אביחי' }));
+      setSec(s => Object.assign({}, s, { list: s.list.filter(x => !qs.some(y => y.id === x.id)) }));
+      try { await smMark(results); await secWriteData(d); }
+      catch (e) { setToast('⚠️ ' + (approve ? 'בוצע באפליקציה, אבל ' : '') + 'הגיליון לא עודכן: ' + smErrText(e)); return; }
+      const ok = results.filter(r => r.status === 'בוצע').length, bad = results.length - ok;
+      setToast(approve ? '📋 בוצעו ' + ok + ' בקשות' + (bad ? ' · ' + bad + ' נכשלו' : '') + ' · נשמר גיבוי' : '📋 נדחו ' + results.length + ' בקשות');
+      if (approve && ok) setTimeout(() => celebrate('gig'), 120);
+    } finally { setSecBusy(false); }
+  };
+  /* בפתיחה: אחרי שהנתונים נטענו. אחרי חזרה מאישור גוגל — ממשיך לבד */
+  useEffect(() => {
+    if (!lastSync) return;
+    let resume = false; try { resume = localStorage.getItem('studio-sheet-resume') === '1'; localStorage.removeItem('studio-sheet-resume'); } catch (e) {}
+    if (window.__sheetAuthErr) { const er = window.__sheetAuthErr; window.__sheetAuthErr = '';
+      setSec(s => Object.assign({}, s, { status: 'error', at: Date.now(), error: er === 'access_denied' ? 'לא אושרה גישה לגיליון.' : 'גוגל לא אישר את החיבור לגיליון (' + er + ').' })); return; }
+    secSync(resume);
+  }, [!!lastSync]);
   const setGsync = patch => setData(d => Object.assign({}, d, { gsync: Object.assign({}, d.gsync || {}, typeof patch === 'function' ? patch(d.gsync || {}) : patch) }));
   const loadCalendars = async () => {
     const m = await getMcp(); if (!m) return;
@@ -3574,6 +3859,12 @@ function App() {
               ${today.length > 1 && html`<span className="shrink-0 rounded-full grad px-1.5 text-[10px] font-bold">${today.length}</span>`}
             </button>`;
           })()}
+          ${tab === 'calendar' && window.SM_SHEET_ID && html`<div className="mb-3 flex items-center gap-2">
+            ${sec.list.length > 0 ? html`<button onClick=${() => setInboxOpen(true)} className="flex min-w-0 flex-1 items-center gap-2 rounded-full grad px-3 py-1.5 text-right text-xs font-bold">📋 ${sec.list.length} בקשות מהמזכירה מחכות לאישור ‹</button>`
+              : sec.status === 'error' ? html`<button onClick=${() => secSync(true)} className="min-w-0 flex-1 truncate rounded-full glass-soft px-3 py-1.5 text-right text-xs text-bad">⚠️ ${sec.error}</button>`
+              : html`<span className="min-w-0 flex-1"></span>`}
+            <button onClick=${() => secSync(true)} disabled=${sec.status === 'working'} className="shrink-0 rounded-full glass-soft px-3 py-1.5 text-xs font-semibold">${sec.status === 'working' ? '⏳ מסנכרן…' : '📋 סנכרון מזכירה'}</button>
+          </div>`}
           ${tab === 'calendar' && (() => { const t0 = todayISO(), due = unlocked ? todos.filter(x => !x.done && x.date <= t0) : [];
             const preps = []; gigs.forEach(g => prepOf(g).forEach((x, i) => { if (x.date === t0 && !x.done) preps.push({ g, x, i }); }));
             const doneSession = (g, i) => update(g.id, { prep: Object.assign({}, g.prep, { sessions: g.prep.sessions.map((s, j) => j === i ? Object.assign({}, s, { done: true }) : s) }) });
@@ -3603,7 +3894,7 @@ function App() {
           ${tab === 'admin' && html`<${AdminDashboard} gigs=${gigs} onOpen=${setOpenId} onPay=${setPayId} onLock=${lock} onFaceId=${enableFaceId} faceIdOn=${!!(data.admin && (data.admin.passkeys || []).length)} onChangePw=${() => setLogin('change')} go=${setTab} />`}
           ${tab === 'payments' && html`<${Payments} gigs=${gigs} onOpen=${setOpenId} onPay=${id => { setPaySel([]); setPayId(id); }} onPayMany=${ids => { setPaySel(ids.slice(1)); setPayId(ids[0]); }} onInvoice=${setInvId} update=${update} />`}
           ${tab === 'tax' && html`<${Tax} gigs=${gigs} update=${update} onUnpay=${undoPaid} onOpen=${setOpenId} onDoc=${(id, kind) => setDocReq({ id, kind })} onPay=${(id, kind) => { setPayPreset(kind); setPayId(id); }} exportCsv=${exportCsv} />`}
-          ${tab === 'settings' && html`<${Settings} data=${data} book=${book} setBook=${setBook} gsync=${gsyncApi} freshData=${freshData} setConfig=${setConfig} renameType=${renameType} setData=${replaceData} mode=${mode} lastSync=${lastSync} theme=${theme} setTheme=${setTheme} backup=${backup} toast=${setToast} />`}</div>`}`}
+          ${tab === 'settings' && html`<${Settings} data=${data} book=${book} setBook=${setBook} gsync=${gsyncApi} freshData=${freshData} setConfig=${setConfig} renameType=${renameType} setData=${replaceData} mode=${mode} lastSync=${lastSync} theme=${theme} setTheme=${setTheme} backup=${backup} toast=${setToast} sec=${sec} onSecSync=${() => secSync(true)} onSecOpen=${() => setInboxOpen(true)} />`}</div>`}`}
       </main>
 
       <nav aria-label="ניווט" className="fixed inset-x-0 bottom-0 z-40 px-2 sm:px-3" style=${{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}>
@@ -3655,6 +3946,7 @@ function App() {
         }} />`}
       ${lockOn && appLocked && html`<${AppLock} admin=${data.admin} pin=${(data.config || {}).pin} onOk=${() => appUnlocked(data.admin.hash)} onSetPin=${pin => setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { pin }) }))} />`}
       ${login && html`<${AdminLogin} adminData=${data.admin} mode=${login} onSuccess=${onLoggedIn} onSetPassword=${onSetPassword} onClose=${() => setLogin(null)} />`}
+      ${inboxOpen && html`<${SecretaryInbox} list=${sec.list} busy=${secBusy} onDecide=${secDecide} onClose=${() => setInboxOpen(false)} />`}
       ${histOpen && html`<${Modal} title="מכונת הזמן — חזרה אחורה" onClose=${() => setHistOpen(false)}>
         <p className="text-sm text-muted">כל מה ששינית מאז שפתחת את האפליקציה. אפשר לבטל את הפעולה האחרונה, או לחזור לכל נקודה קודמת.</p>
         ${history.length === 0 ? html`<div className="mt-4 rounded-2xl glass-soft p-4 text-sm">

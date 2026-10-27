@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261027000353';
+window.STUDIO_VERSION = '20261027100952';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -2042,7 +2042,7 @@ const RQ_FIELDS = { 'סוג': 'type', 'תאריך': 'date', 'שעת באלנס':
   'סטטוס תשלום': 'pay', 'תשלום': 'pay', 'תאריך תשלום': 'paidDate', 'אמצעי תשלום': 'method', 'חשבונית/קבלה': 'doc', 'קבלה': 'doc', 'חשבונית': 'doc', 'קוד לבוש': 'dress', 'לבוש': 'dress', 'ציוד': 'equipment',
   'רשימת שירים': 'setlist', 'שירים': 'setlist', 'מחליף': 'sub', 'הערות': 'notes', 'כותרת': 'title', 'שם': 'title', 'איש קשר': 'contactName', 'טלפון איש קשר': 'contactPhone', 'טלפון': 'phone', 'תוספת מרחק': 'travelFee', 'לתשלום עד': 'dueDate' };
 const RQ_LABEL = {}; Object.keys(RQ_FIELDS).forEach(k => { if (!RQ_LABEL[RQ_FIELDS[k]]) RQ_LABEL[RQ_FIELDS[k]] = k; });
-const rqKey = k => { k = String(k || '').trim().replace(/[״”]/g, '"'); return RQ_FIELDS[k] || ''; };
+const rqKey = k => { k = String(k || '').trim().replace(/^['’]\s*/, '').replace(/[״”]/g, '"'); return RQ_FIELDS[k] || ''; };
 const rqVat = v => /כולל|incl/i.test(v) ? 'incl' : /\+|פלוס|plus|עם/i.test(v) ? 'plus' : 'none';
 const rqDate = v => { v = String(v || '').trim(); let m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return m[1] + '-' + pad(+m[2]) + '-' + pad(+m[3]);
   m = v.match(/^(\d{1,2})[./](\d{1,2})[./](\d{2,4})$/); if (m) return (m[3].length === 2 ? '20' + m[3] : m[3]) + '-' + pad(+m[2]) + '-' + pad(+m[1]); return ''; };
@@ -2051,7 +2051,7 @@ const rqType = v => { v = String(v || '').trim(); const root = v.replace(/(ות|
 const rqDoc = v => { v = String(v || '').trim(); const num = (v.match(/\d[\d-]*/) || [''])[0]; return { type: /חשבונית/.test(v) && /קבלה/.test(v) ? 'comb' : /חשבונית/.test(v) ? 'inv' : /קבלה/.test(v) ? 'rec' : '', num }; };
 /* בדיקת ערך + החלה על אירוע. זורק טקסט שגיאה ברור אם הערך לא תקין */
 function rqSet(ctx, g, key, val) {
-  val = val === undefined || val === null ? '' : String(val).trim();
+  val = val === undefined || val === null ? '' : String(val).trim().replace(/^['’]\s*/, '');
   if (key === 'date' || key === 'dueDate') { const d = rqDate(val); if (!d) throw 'תאריך לא תקין: "' + val + '" (צריך YYYY-MM-DD)'; return Object.assign({}, g, { [key]: d }); }
   if (key === 'paidDate') { const d = val ? rqDate(val) : ''; if (val && !d) throw 'תאריך תשלום לא תקין: "' + val + '"'; return Object.assign({}, g, { paidDate: d }); }
   if (key === 'loadIn' || key === 'start' || key === 'end') { const t = val ? rqTime(val) : ''; if (val && !t) throw 'שעה לא תקינה: "' + val + '" (צריך HH:MM)'; return Object.assign({}, g, { [key]: t }); }
@@ -2077,7 +2077,7 @@ const rqShow = (key, g, subs) => { if (!g) return ''; if (key === 'pay') return 
 /* קורא את שורות הבקשות ומקבץ לפי id בקשה. מחזיר רק ממתינות (סטטוס ריק / "ממתין") */
 function rqParse(rows, data) {
   const map = new Map();
-  rows.forEach((r, i) => { const c = Array.from({ length: 9 }, (_, j) => r[j] === undefined || r[j] === null ? '' : String(r[j]).trim());
+  rows.forEach((r, i) => { const c = Array.from({ length: 9 }, (_, j) => r[j] === undefined || r[j] === null ? '' : String(r[j]).trim().replace(/^['’]\s*/, ''));
     const [rid, act, gid, field, value, note, status] = c;
     if (!rid || rid === 'דוגמה' || (status && !/^ממתין/.test(status))) return;
     if (!map.has(rid)) map.set(rid, { id: rid, act: '', gid: '', items: [], notes: [], rows: [] });
@@ -2120,27 +2120,35 @@ function rqApply(d0, q, dry) {
       q.items.forEach(([f, v]) => { const k = rqKey(f); g = rqSet(ctx, g, k, v); if (x === q.ids[0]) changes.push([RQ_LABEL[k] || f, rqShow(k, before, d0.subs), rqShow(k, g, ctx.subs)]); });
       gigs = gigs.map(y => y.id === x ? g : y); });
   }
-  if (dry) return { changes, title: q.kind === 'add' ? null : q.ids.map(x => { const g = d0.gigs.find(y => y.id === x); return autoTitle(g) + ' · ' + fmtDate(g.date); }) };
+  if (dry) return { changes, gig: newId ? gigs[gigs.length - 1] : null, title: q.kind === 'add' ? null : q.ids.map(x => { const g = d0.gigs.find(y => y.id === x); return autoTitle(g) + ' · ' + fmtDate(g.date); }) };
   return { data: Object.assign({}, d0, { gigs, subs: ctx.subs, clients }), newId };
 }
 
-function SecretaryInbox({ list, busy, onDecide, onClose }) {
-  const [sel, setSel] = useState(null);
+const shortDate = iso => { const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? (+m[3]) + '.' + (+m[2]) + '.' + m[1].slice(2) : ''; };
+const gigLine = g => [g.type, [cleanName(g.client), cleanName(g.venue)].filter(Boolean).join(', ')].filter(Boolean).join(' – ');
+const feeLine = g => Number(g.fee) > 0 ? NF0.format(Number(g.fee)) + (g.vat === 'plus' ? ' + מע"מ' : g.vat === 'incl' ? ' כולל מע"מ' : '') : '';
+/* שורה קצרה לכל בקשה, למשל: "הוספה: 10.1.27 חתונה – אהבתי ה, ג׳ויה מיה, 1,400 + מע"מ" */
+function rqSummary(q, data) {
+  if (q.err) return (q.kind === 'add' ? 'הוספה' : q.kind === 'del' ? 'מחיקה' : 'עדכון') + ': ⚠️ ' + q.err;
+  if (q.kind === 'add') { const g = q.preview.gig; return 'הוספה: ' + [shortDate(g.date), gigLine(g)].filter(Boolean).join(' ') + (feeLine(g) ? ', ' + feeLine(g) : ''); }
+  const gs = q.ids.map(x => data.gigs.find(g => g.id === x)).filter(Boolean), who = gs.map(g => shortDate(g.date) + ' ' + gigLine(g)).join(' · ');
+  if (q.kind === 'del') return 'מחיקה: ' + who;
+  return 'עדכון: ' + who + ' — ' + q.preview.changes.map(c => c[0] + ' ' + (c[2] || 'ריק')).join(', ');
+}
+
+function SecretaryInbox({ list, data, busy, onDecide, onClose }) {
   const ok = list.filter(q => !q.err);
-  const kindTxt = { add: '➕ אירוע חדש', upd: '✏️ עדכון', del: '🗑 מחיקה' };
-  return html`<${Modal} title="📋 בקשות מהמזכירה" onClose=${onClose} wide>
+  return html`<${Modal} title=${'📋 המזכירה מבקשת (' + list.length + ')'} onClose=${onClose} wide>
     ${list.length === 0 ? html`<${Empty}>אין בקשות ממתינות.<//>` : html`
-      <p className="text-sm text-muted">שום דבר לא משתנה בלי אישור שלך. לפני כל ביצוע נשמר גיבוי.</p>
-      <ul className="mt-3 space-y-3">${list.map(q => html`<li key=${q.id} className=${'rounded-2xl glass-soft p-3 ' + (q.err ? 'ring-1 ring-[var(--bad)]' : '')}>
-        <div className="flex items-center gap-2"><b className="flex-1">${kindTxt[q.kind] || q.act || 'בקשה'}${q.preview && q.preview.title ? ' · ' + q.preview.title.join(', ') : ''}</b><span className="text-[11px] text-muted ltr">${q.id}</span></div>
-        ${q.note && html`<p className="mt-1 text-sm">💬 ${q.note}</p>`}
-        ${q.err ? html`<p className="mt-1 text-sm text-bad">⚠️ ${q.err}</p>` : html`<ul className="mt-2 space-y-1 text-sm">${q.preview.changes.map((c, i) => html`<li key=${i}><span className="text-muted">${c[0]}:</span> ${c[1] ? html`<s className="text-muted">${c[1]}</s> ← ` : ''}<b>${c[2] || (q.kind === 'del' ? c[1] : '—')}</b></li>`)}</ul>`}
-        <div className="mt-3 flex gap-2">
-          ${!q.err && html`<${Btn} kind="grad" disabled=${busy} onClick=${() => onDecide([q], true)}>✓ אישור<//>`}
+      ${ok.length > 0 && html`<button disabled=${busy} onClick=${() => onDecide(ok, true)} className="w-full rounded-3xl grad px-4 py-4 text-lg font-bold disabled:opacity-60">${busy ? '⏳ מבצע…' : '✓ אשר הכול' + (ok.length > 1 ? ' (' + ok.length + ')' : '')}</button>`}
+      <p className="mt-2 text-xs text-muted">שום דבר לא משתנה בלי אישור. לפני ביצוע נשמר גיבוי, ואחרי הביצוע הכול מתעדכן גם בגיליון וגם ביומן גוגל.</p>
+      <ul className="mt-3 space-y-2">${list.map(q => html`<li key=${q.id} className=${'rounded-2xl glass-soft p-3 ' + (q.err ? 'ring-1 ring-[var(--bad)]' : '')}>
+        <p className=${'text-sm font-semibold ' + (q.err ? 'text-bad' : '')}>${rqSummary(q, data)}</p>
+        ${q.note && html`<p className="mt-0.5 text-xs text-muted">💬 ${q.note}</p>`}
+        <div className="mt-2 flex gap-2">
+          ${!q.err && html`<${Btn} disabled=${busy} onClick=${() => onDecide([q], true)}>✓ אישור<//>`}
           <${Btn} disabled=${busy} onClick=${() => onDecide([q], false)}>✗ דחייה<//>
-        </div></li>`)}</ul>
-      ${ok.length > 1 && html`<div className="mt-4"><${Btn} kind="grad" disabled=${busy} onClick=${() => onDecide(ok, true)}>✓ לאשר את כל ${ok.length} הבקשות התקינות<//></div>`}`}
-    ${busy && html`<p className="mt-3 text-sm text-muted">מבצע…</p>`}
+        </div></li>`)}</ul>`}
   <//>`;
 }
 
@@ -3489,10 +3497,26 @@ function App() {
   const [gCals, setGCals] = useState([]);
   useEffect(() => { let alive = true; getMcp().then(m => { if (alive) setMcpOk(!!m); }); return () => { alive = false; }; }, []);
   const dataRef = useRef(data); dataRef.current = data;
-  /* ===== גיליון המזכירה — רק בפתיחה ובכפתור "סנכרון מזכירה" (לא ברקע) ===== */
+  /* ===== גיליון המזכירה — סנכרון מלא בפתיחה ובכפתור; בדיקת בקשות כל 30 שניות כשהאפליקציה פתוחה ובכל חזרה אליה ===== */
   const [sec, setSec] = useState({ status: '', at: 0, error: '', list: [] });
   const [inboxOpen, setInboxOpen] = useState(false), [secBusy, setSecBusy] = useState(false);
-  const smLock = useRef(false);
+  const smLock = useRef(false), smSeen = useRef(new Set());
+  /* חלון הבקשות קופץ לבד רק כשיש בקשה שעוד לא הוצגה (אם סגרת — לא יקפוץ שוב על אותן בקשות) */
+  const smShowNew = pend => { const fresh = pend.filter(q => !smSeen.current.has(q.id)); pend.forEach(q => smSeen.current.add(q.id)); if (fresh.length) setInboxOpen(true); };
+  const secPoll = async () => {
+    if (!window.SM_SHEET_ID || smLock.current || secBusyRef.current || !(window.__sheetToken && window.__sheetToken())) {
+      if (window.SM_SHEET_ID && !(window.__sheetToken && window.__sheetToken())) setSec(s => s.status === 'need' || s.status === 'working' ? s : Object.assign({}, s, { status: 'need' }));
+      return; }
+    smLock.current = true;
+    try {
+      const d = dataRef.current, list = rqParse(await smReadRequests(), d);
+      const stale = list.filter(q => q.done); if (stale.length) await smMark(stale.map(q => ({ rows: q.rows, status: 'בוצע', note: 'בוצע קודם' })));
+      const pend = list.filter(q => !q.done);
+      setSec(s => Object.assign({}, s, { status: 'ok', at: Date.now(), error: '', list: pend })); smShowNew(pend);
+    } catch (e) { setSec(s => Object.assign({}, s, { status: e && e.code === 'no_token' ? 'need' : 'error', at: Date.now(), error: smErrText(e) })); }
+    finally { smLock.current = false; }
+  };
+  const secBusyRef = useRef(false); secBusyRef.current = secBusy;
   const secWriteData = async d => { const { rows, stamps } = smRows(d.gigs, d.subs); await smWriteData(rows); try { localStorage.setItem(SM_STAMP_KEY, JSON.stringify(stamps)); } catch (e) {} };
   const secSync = async manual => {
     if (!window.SM_SHEET_ID || smLock.current) return;
@@ -3510,7 +3534,8 @@ function App() {
       const pend = list.filter(q => !q.done);
       await secWriteData(d);
       setSec({ status: 'ok', at: Date.now(), error: '', list: pend });
-      if (pend.length && manual) setInboxOpen(true);
+      if (pend.length && manual) { pend.forEach(q => smSeen.current.add(q.id)); setInboxOpen(true); }
+      else if (pend.length) smShowNew(pend);
       else if (manual) setToast('📋 המזכירה מעודכנת · אין בקשות חדשות');
     } catch (e) {
       if (e && e.code === 'no_token' && manual) { smLock.current = false; window.__sheetAuth && window.__sheetAuth(); return; }
@@ -3534,7 +3559,8 @@ function App() {
       catch (e) { setToast('⚠️ ' + (approve ? 'בוצע באפליקציה, אבל ' : '') + 'הגיליון לא עודכן: ' + smErrText(e)); return; }
       const ok = results.filter(r => r.status === 'בוצע').length, bad = results.length - ok;
       setToast(approve ? '📋 בוצעו ' + ok + ' בקשות' + (bad ? ' · ' + bad + ' נכשלו' : '') + ' · נשמר גיבוי' : '📋 נדחו ' + results.length + ' בקשות');
-      if (approve && ok) setTimeout(() => celebrate('gig'), 120);
+      if (approve && ok) { setTimeout(() => celebrate('gig'), 120); setTimeout(() => runSyncRef.current && runSyncRef.current(), 700); } // ישר גם ליומן גוגל
+      if (!sec.list.some(x => !qs.some(y => y.id === x.id))) setInboxOpen(false);
     } finally { setSecBusy(false); }
   };
   /* בפתיחה: אחרי שהנתונים נטענו. אחרי חזרה מאישור גוגל — ממשיך לבד */
@@ -3544,6 +3570,14 @@ function App() {
     if (window.__sheetAuthErr) { const er = window.__sheetAuthErr; window.__sheetAuthErr = '';
       setSec(s => Object.assign({}, s, { status: 'error', at: Date.now(), error: er === 'access_denied' ? 'לא אושרה גישה לגיליון.' : 'גוגל לא אישר את החיבור לגיליון (' + er + ').' })); return; }
     secSync(resume);
+  }, [!!lastSync]);
+  useEffect(() => {
+    if (!lastSync || !window.SM_SHEET_ID) return;
+    const vis = () => document.visibilityState === 'visible';
+    const h = setInterval(() => { if (vis()) secPoll(); }, 30000);
+    const onVis = () => { if (vis()) secPoll(); };
+    document.addEventListener('visibilitychange', onVis); window.addEventListener('focus', onVis);
+    return () => { clearInterval(h); document.removeEventListener('visibilitychange', onVis); window.removeEventListener('focus', onVis); };
   }, [!!lastSync]);
   const setGsync = patch => setData(d => Object.assign({}, d, { gsync: Object.assign({}, d.gsync || {}, typeof patch === 'function' ? patch(d.gsync || {}) : patch) }));
   const loadCalendars = async () => {
@@ -3862,6 +3896,7 @@ function App() {
           ${tab === 'calendar' && window.SM_SHEET_ID && html`<div className="mb-3 flex items-center gap-2">
             ${sec.list.length > 0 ? html`<button onClick=${() => setInboxOpen(true)} className="flex min-w-0 flex-1 items-center gap-2 rounded-full grad px-3 py-1.5 text-right text-xs font-bold">📋 ${sec.list.length} בקשות מהמזכירה מחכות לאישור ‹</button>`
               : sec.status === 'error' ? html`<button onClick=${() => secSync(true)} className="min-w-0 flex-1 truncate rounded-full glass-soft px-3 py-1.5 text-right text-xs text-bad">⚠️ ${sec.error}</button>`
+              : sec.status === 'need' && sec.at ? html`<button onClick=${() => secSync(true)} className="min-w-0 flex-1 truncate rounded-full glass-soft px-3 py-1.5 text-right text-xs text-warn">🔌 החיבור למזכירה פג — לחץ לחיבור מחדש</button>`
               : html`<span className="min-w-0 flex-1"></span>`}
             <button onClick=${() => secSync(true)} disabled=${sec.status === 'working'} className="shrink-0 rounded-full glass-soft px-3 py-1.5 text-xs font-semibold">${sec.status === 'working' ? '⏳ מסנכרן…' : '📋 סנכרון מזכירה'}</button>
           </div>`}
@@ -3946,7 +3981,7 @@ function App() {
         }} />`}
       ${lockOn && appLocked && html`<${AppLock} admin=${data.admin} pin=${(data.config || {}).pin} onOk=${() => appUnlocked(data.admin.hash)} onSetPin=${pin => setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { pin }) }))} />`}
       ${login && html`<${AdminLogin} adminData=${data.admin} mode=${login} onSuccess=${onLoggedIn} onSetPassword=${onSetPassword} onClose=${() => setLogin(null)} />`}
-      ${inboxOpen && html`<${SecretaryInbox} list=${sec.list} busy=${secBusy} onDecide=${secDecide} onClose=${() => setInboxOpen(false)} />`}
+      ${inboxOpen && html`<${SecretaryInbox} list=${sec.list} data=${data} busy=${secBusy} onDecide=${secDecide} onClose=${() => setInboxOpen(false)} />`}
       ${histOpen && html`<${Modal} title="מכונת הזמן — חזרה אחורה" onClose=${() => setHistOpen(false)}>
         <p className="text-sm text-muted">כל מה ששינית מאז שפתחת את האפליקציה. אפשר לבטל את הפעולה האחרונה, או לחזור לכל נקודה קודמת.</p>
         ${history.length === 0 ? html`<div className="mt-4 rounded-2xl glass-soft p-4 text-sm">

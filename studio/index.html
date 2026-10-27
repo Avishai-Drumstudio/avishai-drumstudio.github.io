@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com"><link rel="preconnect" href="https://www.gstatic.com"><link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=cd171ace">
+<link rel="stylesheet" href="app.css?v=01a52c03">
 <style>
 :root {
   --bg: #140d2b; --glow-pct: 100%;
@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261027100952';
+window.STUDIO_VERSION = '20261027101352';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -3502,7 +3502,7 @@ function App() {
   const [inboxOpen, setInboxOpen] = useState(false), [secBusy, setSecBusy] = useState(false);
   const smLock = useRef(false), smSeen = useRef(new Set());
   /* חלון הבקשות קופץ לבד רק כשיש בקשה שעוד לא הוצגה (אם סגרת — לא יקפוץ שוב על אותן בקשות) */
-  const smShowNew = pend => { const fresh = pend.filter(q => !smSeen.current.has(q.id)); pend.forEach(q => smSeen.current.add(q.id)); if (fresh.length) setInboxOpen(true); };
+  const smShowNew = pend => { pend.forEach(q => smSeen.current.add(q.id)); }; // המספר על הכפתור מתעדכן; החלון נפתח בלחיצה
   const secPoll = async () => {
     if (!window.SM_SHEET_ID || smLock.current || secBusyRef.current || !(window.__sheetToken && window.__sheetToken())) {
       if (window.SM_SHEET_ID && !(window.__sheetToken && window.__sheetToken())) setSec(s => s.status === 'need' || s.status === 'working' ? s : Object.assign({}, s, { status: 'need' }));
@@ -3640,11 +3640,19 @@ function App() {
   const runFull = () => ask('להעביר ליומן גוגל את כל ההיסטוריה — ' + fullPending + ' אירועים? זה לוקח כמה דקות; השאר את האפליקציה פתוחה עד הסוף. מכאן והלאה הסנכרון הרגיל ימשיך לעדכן רק מהחודש האחרון.', { ok: 'התחל סנכרון מלא' }).then(ok => ok && runSync(true));
   const planNew = planNow.filter(t => t.op === 'create').length, planUpd = planNow.filter(t => t.op === 'update').length, planDel = planNow.filter(t => t.op === 'delete' && !t.keep).length;
   const gsyncApi = { planNew, planUpd, planDel, fullPending, runFull, ok: mcpOk, pending: gPending, running: gsRun.running, done: gsRun.done, total: gsRun.total, error: gsRun.error, run: runSync, calendars: gCals, loadCalendars, setCalendar };
-  const gsyncUI = mcpOk && gigs.length > 0 ? html`
-    <div className="mt-3 flex items-center gap-2 px-1">
-      <button onClick=${runSync} disabled=${gsRun.running} className=${'flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ' + (gPending ? 'grad' : 'glass-soft text-muted')}>
+  const smN = sec.list.length;
+  const smBtn = window.SM_SHEET_ID ? html`
+      <button onClick=${() => smN ? setInboxOpen(true) : secSync(true)} disabled=${sec.status === 'working'} aria-label=${smN ? smN + ' בקשות מהמזכירה מחכות' : 'סנכרון מזכירה'}
+        className=${'relative flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ' + (smN ? 'grad' : sec.status === 'error' ? 'glass-soft text-bad' : sec.status === 'need' && sec.at ? 'glass-soft text-warn' : 'glass-soft text-muted')}>
+        ${sec.status === 'working' ? '📋 מסנכרן…' : sec.status === 'error' && !smN ? '📋 מזכירה ⚠️' : sec.status === 'need' && sec.at && !smN ? '📋 מזכירה · לחיבור' : '📋 סנכרון מזכירה'}
+        ${smN > 0 && html`<span className="absolute -top-1.5 -left-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-bold leading-none text-white" style=${{ background: '#ef4444', boxShadow: '0 0 0 2px var(--bg, #fff)' }}>${smN}</span>`}
+      </button>` : null;
+  const gsyncUI = (mcpOk && gigs.length > 0) || smBtn ? html`
+    <div className="mt-3 flex flex-wrap items-center gap-2 px-1">
+      ${mcpOk && gigs.length > 0 && html`<button onClick=${runSync} disabled=${gsRun.running} className=${'flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ' + (gPending ? 'grad' : 'glass-soft text-muted')}>
         ${gsRun.running ? 'מסנכרן ליומן גוגל ' + gsRun.done + '/' + gsRun.total + '…' : gPending ? '📅 סנכרון ליומן גוגל · ' + gPending + ' שינויים' : '📅 יומן גוגל מעודכן ✓'}
-      </button>
+      </button>`}
+      ${smBtn}
     </div>` : null;
   const [confirmReq, setConfirmReq] = useState(null);
   const [quickOpen, setQuickOpen] = useState(false), [sampleOk, setSampleOk] = useState(false);
@@ -3893,13 +3901,6 @@ function App() {
               ${today.length > 1 && html`<span className="shrink-0 rounded-full grad px-1.5 text-[10px] font-bold">${today.length}</span>`}
             </button>`;
           })()}
-          ${tab === 'calendar' && window.SM_SHEET_ID && html`<div className="mb-3 flex items-center gap-2">
-            ${sec.list.length > 0 ? html`<button onClick=${() => setInboxOpen(true)} className="flex min-w-0 flex-1 items-center gap-2 rounded-full grad px-3 py-1.5 text-right text-xs font-bold">📋 ${sec.list.length} בקשות מהמזכירה מחכות לאישור ‹</button>`
-              : sec.status === 'error' ? html`<button onClick=${() => secSync(true)} className="min-w-0 flex-1 truncate rounded-full glass-soft px-3 py-1.5 text-right text-xs text-bad">⚠️ ${sec.error}</button>`
-              : sec.status === 'need' && sec.at ? html`<button onClick=${() => secSync(true)} className="min-w-0 flex-1 truncate rounded-full glass-soft px-3 py-1.5 text-right text-xs text-warn">🔌 החיבור למזכירה פג — לחץ לחיבור מחדש</button>`
-              : html`<span className="min-w-0 flex-1"></span>`}
-            <button onClick=${() => secSync(true)} disabled=${sec.status === 'working'} className="shrink-0 rounded-full glass-soft px-3 py-1.5 text-xs font-semibold">${sec.status === 'working' ? '⏳ מסנכרן…' : '📋 סנכרון מזכירה'}</button>
-          </div>`}
           ${tab === 'calendar' && (() => { const t0 = todayISO(), due = unlocked ? todos.filter(x => !x.done && x.date <= t0) : [];
             const preps = []; gigs.forEach(g => prepOf(g).forEach((x, i) => { if (x.date === t0 && !x.done) preps.push({ g, x, i }); }));
             const doneSession = (g, i) => update(g.id, { prep: Object.assign({}, g.prep, { sessions: g.prep.sessions.map((s, j) => j === i ? Object.assign({}, s, { done: true }) : s) }) });

@@ -45,7 +45,7 @@ End commit messages with the attribution lines the session gives you.
 - Sheet "Studio Manager – מזכירה" in yasharulpan's Drive, id `window.SM_SHEET_ID` (firebase-config.js).
 - Separate Google token, scope `spreadsheets` only (`window.__sheetAuth()` redirect with state `sh…`, stored in `studio-sheet-tok`) —
   never touches the calendar token/scope. Google Sheets API must be enabled in project studio-manager-7eb85.
-- Full sync (tabs + "נתונים" rewrite + requests) on app open and on the "📋 סנכרון מזכירה" button. Light poll of "בקשות" every 30s while
+- Full sync (tabs + "נתונים" rewrite + requests) on app open and on the "📋 סנכרון מזכירה" button. Light poll of "בקשות" every 10s while
   visible and on every return to the app (`secPoll`) → red count badge (unique pending request ids) on the "📋 סנכרון מזכירה" button,
   which sits next to the calendar sync button (`gsyncUI`); tapping it opens the approval popup (no auto-popup).
   Approve → execute, mark בוצע, rewrite "נתונים", then calendar sync (`runSyncRef`). Values may start with ' (stripped).

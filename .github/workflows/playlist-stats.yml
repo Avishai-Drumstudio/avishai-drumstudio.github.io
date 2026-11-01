@@ -1,0 +1,22 @@
+name: playlist stats
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/playlist-stats.txt']
+permissions:
+  contents: write
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -q yt-dlp
+      - name: read the playlist with view counts
+        run: |
+          mkdir -p .data
+          yt-dlp --ignore-errors --skip-download --print "%(view_count)s\t%(id)s\t%(title)s\t%(channel)s" \
+            "https://www.youtube.com/playlist?list=PLb97_IJzxvLCDyJVz9yZza8r4Qo5L_lVw" > .data/playlist.tsv 2> .data/playlist.err || true
+          wc -l .data/playlist.tsv
+      - run: |
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git add .data; git commit -m "Playlist stats" || exit 0; git push

@@ -1268,6 +1268,13 @@ html,body{max-width:100%;overflow-x:hidden}
 .is-en .reel__info{text-align:left}
 .is-en .reel__arrow svg,.is-en .gearcat__head button svg{transform:scaleX(-1)}
 .top .btn.js-wa{white-space:nowrap}
+/* English typography: a touch more air */
+.is-en .hero__sub{line-height:1.6}
+.is-en #aboutBody p{line-height:1.7}
+.is-en .step p{line-height:1.6}
+.is-en .wq__in{line-height:1.5!important}
+.is-en .eyebrow[data-hero]{letter-spacing:.04em}
+.is-en .top__start{margin-inline-end:8px}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1791,8 +1798,7 @@ window.mergeContent = function (saved) {
   };
   /* ---------------- language: Hebrew (default) / English ---------------- */
   const LANG = (() => { let q = ""; try { q = new URLSearchParams(location.search).get("lang") || ""; } catch(e){}
-    if(q === "en" || q === "he"){ try { localStorage.setItem("ay_lang", q); } catch(e){} return q; }
-    try { return localStorage.getItem("ay_lang") === "en" ? "en" : "he"; } catch(e){ return "he"; } })();
+    return q === "en" ? "en" : "he"; })(); // Hebrew on every new visit; English only via the EN switch or a ?lang=en link
   const EN = LANG === "en";
   const L = (he, en) => EN ? en : he;
   if(EN){ document.documentElement.lang = "en"; document.documentElement.dir = "ltr"; document.documentElement.classList.add("is-en"); }
@@ -1800,33 +1806,33 @@ window.mergeContent = function (saved) {
   const EN_TEXT = {
     eyebrow: "Session Drummer | Remote Recording",
     title: "Mix-Ready Drums, Straight to Your Production",
-    lead: "I record in my own studio and deliver clean, mix-ready tracks. From rock, pop and funk to Mediterranean and Hasidic music. Fast, precise, and a real time-saver for you.",
-    trust: "Studio and stage experience with Israel's leading artists and producers",
+    lead: "Recorded in my own studio, delivered as clean, mix-ready tracks. Rock, pop, funk, Mediterranean and Hasidic — fast, precise and easy to work with.",
+    trust: "Studio and stage experience with Israel's top artists and producers",
     waMessage: "Hi Avishai 👋\nI found you through your website.\n\nMy name: \nI'd like to check your availability for a drum session on: \nProject type: single / medley / album\nGenre: \n\nI'll send you a demo and a reference here. Thanks!",
     aboutTitle: "Avishai Yashar",
-    aboutText: "I'm 29, married, and a dad to a sweet little boy.\nI served in the IDF Military Rabbinate Band, and from there went on to perform in Israel and around the world with great, talented artists.\nI bring your production years of recording and live experience with Israel's leading artists and producers – singers like *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur* and *Aviv Alush*, and producers like *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and many more.\nAnd I bring the right feel to every genre: from rock, pop and funk to Mediterranean and Hasidic music.\n\nToday I record most of my sessions remotely: fast, precise, with clear communication and a smooth workflow – saving you, the producer, valuable time.\n\nIn our session we'll dial in the sound for your project, so the tracks arrive mix-ready: healthy, natural and completely clean.",
+    aboutText: "I'm 29, married, and a proud dad.\nI started out in the IDF Military Rabbinate Band and have since played stages in Israel and abroad alongside some of the country's finest artists.\nOver the years I've recorded and performed with leading Israeli singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur* and *Aviv Alush*, and worked with producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and many others.\nWhatever the genre — rock, pop, funk, Mediterranean or Hasidic — I bring the right feel to the track.\n\nThese days most of my sessions are remote: fast and precise, with clear communication throughout, so you save valuable time.\n\nTogether we'll dial in the sound for your project, and you'll get mix-ready tracks that are natural, balanced and clean.",
     hProcess: "How It Works",
     hProductions: "Songs I've Played On",
     hCovers: "Covers",
     pCovers: "",
     hSources: "Drum Stems",
-    pSources: "Raw drum tracks, straight out of the studio, before mixing.",
-    hStudio: "The Studio & Gear",
+    pSources: "Raw drum tracks straight from the studio — before any mixing.",
+    hStudio: "Studio & Gear",
     studioHl: "",
     hTestimonials: "What Producers Say",
     ctaTitle: "Got a song that needs drums?",
     ctaText: "Send me a demo and I'll get back to you with a quote.",
     steps: [
-      { title: "The Demo", text: "Send me the song – a demo or a playback – with the tempo and a reference for the sound you love." },
-      { title: "The Sound", text: "Together we choose the kit, the snare and the direction – a sound that fits your production perfectly." },
-      { title: "The Recording", text: "I send you a guide take for your notes, or we connect live on video and you hear the studio in real time – just like being in the room." },
-      { title: "The Stems", text: "Within 24 hours: clean, mix-ready tracks in the format that works for you. Up to 3 rounds of revisions included." }
+      { title: "The Demo", text: "Send me your song — a demo or playback — with the tempo and a reference for the sound you're after." },
+      { title: "The Sound", text: "We choose the kit, the snare and the overall direction together, so the drums fit your production perfectly." },
+      { title: "The Recording", text: "I send you a take for your notes, or we jump on a live video call so you hear the room in real time — just like being there." },
+      { title: "The Stems", text: "Within 24 hours you'll have clean, mix-ready stems in your preferred format. Up to 3 rounds of revisions included." }
     ],
     styles: { "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
     cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
     names: { "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
-    quotes: { "ישי וייס": "When I produce a song and look for musicians, the first thing I look for is people who play from the heart – and Avishai is exactly that. *An incredible drummer*, with playing and recordings on an international level, and there's something about the emotion he brings to a song that words just can't describe. I recommend him with all my heart ❤️" },
-    titles: { "XopiF8ylTAo": "The Jamshid Sisters – Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen – Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick – Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki – Nishar Rak Ga'agua" }
+    quotes: { "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },
+    titles: { "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
   };
   const toEN = S => { if(!EN) return S; const T = EN_TEXT, tr = (m, v) => (m[String(v || "").trim()] || v);
     ["eyebrow","title","lead","trust","waMessage","aboutTitle","aboutText","hProcess","hProductions","hCovers","pCovers","hSources","pSources","hStudio","studioHl","hTestimonials","ctaTitle","ctaText"].forEach(k => { S[k] = T[k]; });
@@ -1850,14 +1856,14 @@ window.mergeContent = function (saved) {
     const waTxt = (a, t) => { const n = [...a.childNodes].find(x => x.nodeType === 3 && x.textContent.trim()); if(n) n.textContent = t; };
     document.querySelectorAll(".top .js-wa").forEach(a => waTxt(a, "Let's Talk"));
     document.querySelectorAll("#heroCta .js-wa, .menu .js-wa, .cta .js-wa, #ctaSection .js-wa").forEach(a => waTxt(a, "Book a Session"));
-    document.querySelectorAll("#about .js-wa").forEach(a => waTxt(a, "Let's talk about your next production"));
+    document.querySelectorAll("#about .js-wa").forEach(a => waTxt(a, "Let's talk about your project"));
     set("#watchIntro span", "Watch the Video");
     set(".scrollcue span", "Explore"); set(".scrollcue", "Explore", "aria-label");
     set("#reel", "Selected Work", "aria-label"); set("#reel .head h2", "Selected Work");
     set("#reelPrev", "Previous", "aria-label"); set("#reelNext", "Next", "aria-label");
     set("#aboutImg", "Avishai Yashar", "alt"); set(".about__big", "About Me");
     set("#prodMore button", "Load more");
-    set("#gearMore span", "View the full gear list"); set("#gearPeek", "View the full gear list", "aria-label");
+    set("#gearMore span", "See full gear list"); set("#gearPeek", "See full gear list", "aria-label");
     set("#socials", "Social media", "aria-label");
     const y = document.getElementById("year"); if(y && y.parentNode) y.parentNode.lastChild.textContent = " All rights reserved";
     const ad = document.getElementById("adminLink"); if(ad) ad.hidden = true;
@@ -1870,10 +1876,9 @@ window.mergeContent = function (saved) {
   // the HE / EN switch in the top bar
   const langSwitch = () => { const host = document.querySelector(".top__in"); if(!host || document.getElementById("langSw")) return;
     const w = document.createElement("div"); w.className = "langsw"; w.id = "langSw"; w.setAttribute("role", "group"); w.setAttribute("aria-label", "Language");
-    w.innerHTML = `<a href="?lang=he" data-l="he" lang="he"${EN ? "" : ' aria-current="true"'}>HE</a><a href="?lang=en" data-l="en" lang="en"${EN ? ' aria-current="true"' : ""}>EN</a>`;
+    w.innerHTML = `<a href="./" data-l="he" lang="he"${EN ? "" : ' aria-current="true"'}>HE</a><a href="?lang=en" data-l="en" lang="en"${EN ? ' aria-current="true"' : ""}>EN</a>`;
     w.addEventListener("click", e => { const a = e.target.closest("a[data-l]"); if(!a) return; e.preventDefault(); if(a.dataset.l === LANG) return;
-      try { localStorage.setItem("ay_lang", a.dataset.l); } catch(err){}
-      const u = new URL(location.href); u.searchParams.set("lang", a.dataset.l); location.href = u.toString(); });
+            const u = new URL(location.href); if(a.dataset.l === "en") u.searchParams.set("lang", "en"); else u.searchParams.delete("lang"); location.href = u.toString(); });
     const cta = host.querySelector(":scope > .js-wa"); host.insertBefore(w, cta || null); };
   // gear photos cleaned up and placed on one uniform studio tile (made from the original product shots)
   const GEAR_MAP = {"https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3063bcfa4_IMG_8097.jpeg":"assets/gear/7c9e82c9fd-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3edea3952_image.png":"assets/gear/c4371ec2be-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3f0778a59_IMG_8122.jpeg":"assets/gear/02f48413b9-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg":"assets/gear/52202702f9-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/40b8c99b4_IMG_8103.jpeg":"assets/gear/ca56fb5d09-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/528481e05_IMG_8125.jpeg":"assets/gear/8d9df6ca91-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/586af5b12_image.png":"assets/gear/6f9b6031f4-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/59a6e307f_image.png":"assets/gear/b2505a770b-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/7e3813ffb_image.png":"assets/gear/1c42c3e50c-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/87cabe3a2_IMG_8121.jpeg":"assets/gear/df3661349d-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/885386856_IMG_8116.jpeg":"assets/gear/1fcb3c57f5-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/903783247_image.png":"assets/gear/afa9133bba-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a10c19e67_image.png":"assets/gear/897e4da3f5-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a6b75f1fb_IMG_8134.jpeg":"assets/gear/2858230857-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ad89ebef7_IMG_8117.jpeg":"assets/gear/f6732bc158-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bc8a0e938_image.png":"assets/gear/33ee342ca8-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg":"assets/gear/6fb7b6512a-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/cace07592_image.png":"assets/gear/f90e176886-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/d6c1cd271_thomann-image.jpg":"assets/gear/226516085d-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ea1af205d_image.png":"assets/gear/eeca685210-v4.webp"};
@@ -2048,7 +2053,7 @@ window.mergeContent = function (saved) {
       if(peek){ peek.innerHTML = pick.map((g,i) => `<span class="gear-peek__c${GEAR_MAP[g.img] ? " is-baked" : ""}" style="--i:${i};--n:${pick.length}"><img src="${esc(GEAR_MAP[g.img] || g.img)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></span>`).join("");
         peek.hidden = !pick.length; peek.addEventListener("click", () => b.click()); }
       b.addEventListener("click", () => { const open = !w.classList.contains("is-open"); w.classList.toggle("is-open", open); b.classList.toggle("is-open", open);
-        b.parentElement.classList.toggle("is-open", open); b.setAttribute("aria-expanded", open); b.firstChild.textContent = open ? L("סגירת רשימת הציוד","Hide the gear list") : L("לרשימת הציוד המלאה","View the full gear list"); }); })();
+        b.parentElement.classList.toggle("is-open", open); b.setAttribute("aria-expanded", open); b.firstChild.textContent = open ? L("סגירת רשימת הציוד","Hide gear list") : L("לרשימת הציוד המלאה","See full gear list"); }); })();
 
     // the page as a short journey: each main part gets a big chapter number behind its title, in page order
     (() => { const chapters = ["reel","process","sources","covers","about","studio"];
@@ -2090,9 +2095,9 @@ window.mergeContent = function (saved) {
       `<div class="sc sc--chat"><div class="ph wa"><span class="ph__isl"></span>
           <div class="wa__hd"><span class="wa__back">›</span><span class="wa__av"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><span class="wa__nm"><b>${L("המפיק","The Producer")} 🎧</b><small>${L("מחובר/ת","online")}</small></span></div>
           <div class="wa__body">
-            <div class="wa__m wa__in m1">${L("היי אבישי! יש לי שיר חדש 🎶","Hey Avishai! Got a new song for you 🎶")}<em>14:02</em></div>
+            <div class="wa__m wa__in m1">${L("היי אבישי! יש לי שיר חדש 🎶","Hey Avishai! I've got a new song 🎶")}<em>14:02</em></div>
             <div class="wa__m wa__in wa__au m2"><span class="wa__pl">▶</span><span class="wa__wv">${wave(22)}</span><em>0:42</em></div>
-            <div class="wa__m wa__out m3">${L("קיבלתי! מתחיל לעבוד 🥁","Got it! Starting now 🥁")}<em>14:03 <span class="wa__tk">✓✓</span></em></div>
+            <div class="wa__m wa__out m3">${L("קיבלתי! מתחיל לעבוד 🥁","Got it! On it 🥁")}<em>14:03 <span class="wa__tk">✓✓</span></em></div>
           </div>
           <div class="wa__ft"><span class="wa__inp">${L("הודעה","Message")}</span><span class="wa__mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg></span></div></div></div>`,
       `<div class="sc sc--snare"><svg class="sn" viewBox="-250 -70 900 400">
@@ -2109,7 +2114,7 @@ window.mergeContent = function (saved) {
           <span class="daw__ruler"></span>
           ${["Kick In","Kick Out","Snare Top","Snare Bottom","Hi-Hat","Tom 1","Tom 2","Floor","OH R","OH L","Room R","Room L"].map((t,k) => `<span class="daw__row" style="--k:${k};--hue:${Math.round(k * 28)}"><span class="daw__hd"><i></i><b>${t}</b><u>M</u><u>S</u></span><span class="daw__lane">${wave(90)}</span></span>`).join("")}
           <span class="daw__tp"><i></i><i class="play"></i><i class="rec"></i><b>00:00:24</b></span><span class="daw__head"></span></div>
-        <em class="sc__sent">${L("נשלח ✓","Sent ✓")} <small>${L("תוך 24 שעות","within 24 hours")}</small></em></div>`
+        <em class="sc__sent">${L("נשלח ✓","Sent ✓")} <small>${L("תוך 24 שעות","within 24 hrs")}</small></em></div>`
     ];
     $("#steps").insertAdjacentHTML("beforeend", (S.steps || []).filter(s => s.title).map((s,i) => `
       <li class="step${i < 4 ? " has-media" : ""}">
@@ -2400,14 +2405,14 @@ window.mergeContent = function (saved) {
         ${real(t.audio) ? `<div class="wave" role="slider" tabindex="0" aria-label="${L("מיקום בשיר","Position in")} ${esc(t.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${bars(t.name).map((h,j) => `<i style="height:${h}%;--d:${((j * 37) % 11) * -.07}s"></i>`).join("")}<b class="wave__head" aria-hidden="true"></b></div>
         <div class="skip" dir="ltr">
           <button type="button" data-skip="-10" aria-label="${L("10 שניות אחורה","Back 10 seconds")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 4 12l7 7M20 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>10</button>
-          <span class="skip__hint">${L("גררו על הגל כדי להעביר","Drag the waveform to scrub")}</span>
+          <span class="skip__hint">${L("גררו על הגל כדי להעביר","Drag to scrub")}</span>
           <button type="button" data-skip="10" aria-label="${L("10 שניות קדימה","Forward 10 seconds")}">10<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 5 7 7-7 7M4 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>` : ``}
         ${real(t.audio) && real(t.mix) ? `<div class="mixer">
           <div class="mixer__labels" aria-hidden="true"><b data-k="full">${L("כל ההפקה","Full mix")}</b><b data-k="drums" class="on">${L("רק תופים","Drums only")}</b></div>
           <input type="range" min="0" max="100" value="0" aria-label="${L("מעבר בין התופים לבד לבין ההפקה המלאה","Blend between drums only and the full mix")}">
         </div>` : ``}
-        ${real(t.drive) ? `<a class="btn btn--line" href="${esc(t.drive)}" target="_blank" rel="noopener">${icon('i-folder')}${L("לערוצים המלאים","Get the full stems")}</a>` : ``}
+        ${real(t.drive) ? `<a class="btn btn--line" href="${esc(t.drive)}" target="_blank" rel="noopener">${icon('i-folder')}${L("לערוצים המלאים","Download full stems")}</a>` : ``}
         </div></div>
       </article>`).join("");
     // a wallet-style stack: one source open, the rest tucked in behind — tap a card to pull it out

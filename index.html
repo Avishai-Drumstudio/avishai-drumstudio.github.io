@@ -1630,7 +1630,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 20,
+  layoutV: 21,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1676,7 +1676,8 @@ window.SITE_DEFAULTS = {
   ],
   custom: [],
   testimonials: [
-    { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true }
+    { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true },
+    { name: "יוני", role: "מפיק", photo: "assets/people/yoni.jpg", text: "הקלטתי אצל ישר כמה וכמה סשנים – מקרוב ומרחוק, בודדים וכפולים. אצלו זה אווירה, השקעה, תשומת לב והקשבה, ו*הסורסים הכי טובים שאפשר*. אף פעם לא מתאכזבים – אתם בידיים טובות 🥁", show: true }
   ],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
@@ -1725,6 +1726,11 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 21) { // testimonial: יוני
+    const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [];
+    if (!t.some(x => x && x.name === "יוני")) t.push(JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials.find(x => x.name === "יוני"))));
+    d.testimonials = t; d.layoutV = Math.max(d.layoutV || 0, 21);
   }
   if (saved && (saved.layoutV || 0) < 20) { // only the real testimonial stays (the first ones were samples)
     d.testimonials = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials)); d.layoutV = Math.max(d.layoutV || 0, 20);
@@ -1830,8 +1836,8 @@ window.mergeContent = function (saved) {
     ],
     styles: { "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
     cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
-    names: { "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
-    quotes: { "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },
+    names: { "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
+    quotes: { "יוני": "I've recorded quite a few sessions with Avishai — in person and remotely, single and double sessions. With him you get a great vibe, real dedication, attention to detail and someone who truly listens — plus *the best stems you can get*. Never once disappointed. You're in good hands 🥁", "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },
     titles: { "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
   };
   const toEN = S => { if(!EN) return S; const T = EN_TEXT, tr = (m, v) => (m[String(v || "").trim()] || v);

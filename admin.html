@@ -240,7 +240,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 20,
+  layoutV: 21,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -286,7 +286,8 @@ window.SITE_DEFAULTS = {
   ],
   custom: [],
   testimonials: [
-    { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true }
+    { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true },
+    { name: "יוני", role: "מפיק", photo: "assets/people/yoni.jpg", text: "הקלטתי אצל ישר כמה וכמה סשנים – מקרוב ומרחוק, בודדים וכפולים. אצלו זה אווירה, השקעה, תשומת לב והקשבה, ו*הסורסים הכי טובים שאפשר*. אף פעם לא מתאכזבים – אתם בידיים טובות 🥁", show: true }
   ],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
@@ -335,6 +336,11 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 21) { // testimonial: יוני
+    const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [];
+    if (!t.some(x => x && x.name === "יוני")) t.push(JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials.find(x => x.name === "יוני"))));
+    d.testimonials = t; d.layoutV = Math.max(d.layoutV || 0, 21);
   }
   if (saved && (saved.layoutV || 0) < 20) { // only the real testimonial stays (the first ones were samples)
     d.testimonials = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials)); d.layoutV = Math.max(d.layoutV || 0, 20);

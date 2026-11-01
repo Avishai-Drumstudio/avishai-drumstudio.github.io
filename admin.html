@@ -240,7 +240,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 19,
+  layoutV: 20,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -286,9 +286,7 @@ window.SITE_DEFAULTS = {
   ],
   custom: [],
   testimonials: [
-    { name: "נתן שלום", role: "", text: "הערוצים של אבישי *מדויקים ברמה אחרת*, והסורסים פשוט נשמעים מעולה. כיף לעבוד איתו – ממליץ בחום.", show: true },
-    { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true },
-    { name: "אבישי רוזן", role: "", text: "דינמי, מקליט מגוון סגנונות ותמיד זמין. *בן אדם זהב* – וכיף גדול לעבוד איתו.", show: true }
+    { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true }
   ],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
@@ -337,6 +335,9 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 20) { // only the real testimonial stays (the first ones were samples)
+    d.testimonials = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials)); d.layoutV = Math.max(d.layoutV || 0, 20);
   }
   if (saved && (saved.layoutV || 0) < 19) { // new testimonial (ישי וייס)
     const t = Array.isArray(d.testimonials) && d.testimonials.length ? d.testimonials.slice() : JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials));

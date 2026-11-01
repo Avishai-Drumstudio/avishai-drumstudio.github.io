@@ -1228,6 +1228,47 @@ html,body{max-width:100%;overflow-x:hidden}
 #aboutBody b.nm{font-weight:600;color:inherit}
 .c3__media img.c3__poster{z-index:0}.c3__media video{z-index:0;background:transparent}
 
+/* HE / EN switch */
+.langsw{display:flex;align-items:center;gap:2px;padding:3px;border-radius:999px;background:rgba(15,23,22,.55);border:1px solid rgba(237,228,211,.16);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);margin-inline:auto 10px;direction:ltr}
+.langsw a{font:700 11.5px/1 Rubik,system-ui,sans-serif;letter-spacing:.06em;color:var(--muted);text-decoration:none;padding:6px 8px;border-radius:999px;transition:background .25s,color .25s}
+.langsw a[aria-current="true"]{background:rgba(46,211,195,.18);color:#7FE7DC}
+@media (max-width:420px){.langsw{margin-inline:auto 6px}.langsw a{padding:6px 6px;font-size:11px}}
+
+/* ---------- English (LTR) adjustments ---------- */
+.is-en body{font-family:Rubik,system-ui,-apple-system,"Segoe UI",sans-serif}
+.is-en .brand__txt b,.is-en .brand__txt small{white-space:nowrap}
+.is-en .brand__txt small{text-align:left}
+.is-en .hero__content{text-align:left}
+.is-en #heroTitle .ln{white-space:normal}
+.is-en .hero h1{letter-spacing:-.025em}
+@media (max-width:760px){
+  .is-en .hero__content{text-align:left}
+  .is-en .hero h1{font-size:clamp(1.9rem,8.4vw,2.6rem);max-width:15ch}
+  .is-en .hero__sub{max-width:30ch}
+}
+.is-en .fact,.is-en .gcard__role,.is-en .gcard__name,.is-en .row__role,.is-en .row__name{text-align:left}
+.is-en .skip__hint,.is-en .studio__hl,.is-en .quote,.is-en .sc{direction:ltr}
+.is-en .c3__tag{right:auto;left:12px}
+.is-en .quote__mark{right:auto;left:18px}
+.is-en .about__text.has-chap .chap{right:auto;left:-6px}
+/* WhatsApp bubbles mirror for English */
+.is-en .wq__in{border-top-right-radius:10px;border-top-left-radius:0}
+.is-en .wq__out{border-top-left-radius:10px;border-top-right-radius:0}
+.is-en .wq__in::before{right:auto;left:-7px;border-right:7px solid transparent;border-left:0}
+.is-en .wq__out::before{left:auto;right:-7px;border-left:7px solid transparent;border-right:0}
+.is-en .wq__t{float:right;margin:8px 0 0 10px}
+.is-en .wq__back,.is-en .wa__back{transform:scaleX(-1)}
+@media (max-width:420px){ .is-en .top .btn.js-wa{padding:0 12px;font-size:14px} .is-en .brand__txt b{font-size:14px} .is-en .brand__txt small{font-size:10px} }
+@media (max-width:420px){
+  .langsw{padding:2px;margin-inline:auto 6px}.langsw a{padding:5px 6px;font-size:10.5px;letter-spacing:.04em}
+  .top .btn.js-wa{padding:0 12px;font-size:13.5px}
+  .brand__txt b{font-size:14.5px;white-space:nowrap}.brand__txt small{font-size:10px;white-space:nowrap}
+  .top__start{gap:6px}
+}
+.is-en .reel__info{text-align:left}
+.is-en .reel__arrow svg,.is-en .gearcat__head button svg{transform:scaleX(-1)}
+.top .btn.js-wa{white-space:nowrap}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1582,7 +1623,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 19,
+  layoutV: 20,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1628,9 +1669,7 @@ window.SITE_DEFAULTS = {
   ],
   custom: [],
   testimonials: [
-    { name: "נתן שלום", role: "", text: "הערוצים של אבישי *מדויקים ברמה אחרת*, והסורסים פשוט נשמעים מעולה. כיף לעבוד איתו – ממליץ בחום.", show: true },
-    { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true },
-    { name: "אבישי רוזן", role: "", text: "דינמי, מקליט מגוון סגנונות ותמיד זמין. *בן אדם זהב* – וכיף גדול לעבוד איתו.", show: true }
+    { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true }
   ],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
@@ -1679,6 +1718,9 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 20) { // only the real testimonial stays (the first ones were samples)
+    d.testimonials = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials)); d.layoutV = Math.max(d.layoutV || 0, 20);
   }
   if (saved && (saved.layoutV || 0) < 19) { // new testimonial (ישי וייס)
     const t = Array.isArray(d.testimonials) && d.testimonials.length ? d.testimonials.slice() : JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials));
@@ -1747,6 +1789,92 @@ window.mergeContent = function (saved) {
     const m = s.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([A-Za-z0-9_-]{11})/);
     return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(s) ? s : "");
   };
+  /* ---------------- language: Hebrew (default) / English ---------------- */
+  const LANG = (() => { let q = ""; try { q = new URLSearchParams(location.search).get("lang") || ""; } catch(e){}
+    if(q === "en" || q === "he"){ try { localStorage.setItem("ay_lang", q); } catch(e){} return q; }
+    try { return localStorage.getItem("ay_lang") === "en" ? "en" : "he"; } catch(e){ return "he"; } })();
+  const EN = LANG === "en";
+  const L = (he, en) => EN ? en : he;
+  if(EN){ document.documentElement.lang = "en"; document.documentElement.dir = "ltr"; document.documentElement.classList.add("is-en"); }
+  // the English page: the same content, written for producers abroad
+  const EN_TEXT = {
+    eyebrow: "Session Drummer | Remote Recording",
+    title: "Mix-Ready Drums, Straight to Your Production",
+    lead: "I record in my own studio and deliver clean, mix-ready tracks. From rock, pop and funk to Mediterranean and Hasidic music. Fast, precise, and a real time-saver for you.",
+    trust: "Studio and stage experience with Israel's leading artists and producers",
+    waMessage: "Hi Avishai 👋\nI found you through your website.\n\nMy name: \nI'd like to check your availability for a drum session on: \nProject type: single / medley / album\nGenre: \n\nI'll send you a demo and a reference here. Thanks!",
+    aboutTitle: "Avishai Yashar",
+    aboutText: "I'm 29, married, and a dad to a sweet little boy.\nI served in the IDF Military Rabbinate Band, and from there went on to perform in Israel and around the world with great, talented artists.\nI bring your production years of recording and live experience with Israel's leading artists and producers – singers like *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur* and *Aviv Alush*, and producers like *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and many more.\nAnd I bring the right feel to every genre: from rock, pop and funk to Mediterranean and Hasidic music.\n\nToday I record most of my sessions remotely: fast, precise, with clear communication and a smooth workflow – saving you, the producer, valuable time.\n\nIn our session we'll dial in the sound for your project, so the tracks arrive mix-ready: healthy, natural and completely clean.",
+    hProcess: "How It Works",
+    hProductions: "Songs I've Played On",
+    hCovers: "Covers",
+    pCovers: "",
+    hSources: "Drum Stems",
+    pSources: "Raw drum tracks, straight out of the studio, before mixing.",
+    hStudio: "The Studio & Gear",
+    studioHl: "",
+    hTestimonials: "What Producers Say",
+    ctaTitle: "Got a song that needs drums?",
+    ctaText: "Send me a demo and I'll get back to you with a quote.",
+    steps: [
+      { title: "The Demo", text: "Send me the song – a demo or a playback – with the tempo and a reference for the sound you love." },
+      { title: "The Sound", text: "Together we choose the kit, the snare and the direction – a sound that fits your production perfectly." },
+      { title: "The Recording", text: "I send you a guide take for your notes, or we connect live on video and you hear the studio in real time – just like being in the room." },
+      { title: "The Stems", text: "Within 24 hours: clean, mix-ready tracks in the format that works for you. Up to 3 rounds of revisions included." }
+    ],
+    styles: { "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
+    cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
+    names: { "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
+    quotes: { "ישי וייס": "When I produce a song and look for musicians, the first thing I look for is people who play from the heart – and Avishai is exactly that. *An incredible drummer*, with playing and recordings on an international level, and there's something about the emotion he brings to a song that words just can't describe. I recommend him with all my heart ❤️" },
+    titles: { "XopiF8ylTAo": "The Jamshid Sisters – Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen – Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick – Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki – Nishar Rak Ga'agua" }
+  };
+  const toEN = S => { if(!EN) return S; const T = EN_TEXT, tr = (m, v) => (m[String(v || "").trim()] || v);
+    ["eyebrow","title","lead","trust","waMessage","aboutTitle","aboutText","hProcess","hProductions","hCovers","pCovers","hSources","pSources","hStudio","studioHl","hTestimonials","ctaTitle","ctaText"].forEach(k => { S[k] = T[k]; });
+    S.steps = T.steps.map(s => ({...s}));
+    S.covers = (S.covers || []).map(c => ({...c, style: tr(T.styles, c.style), title: /[א-ת]/.test(c.title || "") ? "" : c.title}));
+    S.gear = (S.gear || []).map(g => ({...g, category: tr(T.cats, g.category || "כללי"), name: tr(T.names, g.name)}));
+    if(Array.isArray(S.gearCats)) S.gearCats = S.gearCats.map(c => ({...c, name: tr(T.cats, c.name)}));
+    S.sources = (S.sources || []).map(t => ({...t, name: tr(T.names, t.name)}));
+    S.testimonials = (S.testimonials || []).map(q => ({...q, text: T.quotes[q.name] || q.text, role: tr(T.names, q.role || "מפיק"), name: tr(T.names, q.name)}));
+    S.productions = (S.productions || []).map(p => { const id = ytId(p.url); return {...p, title: T.titles[id] || (/[א-ת]/.test(p.title || "") ? "" : p.title)}; });
+    S.marquee1 = "Rock, Pop, Funk, Mediterranean, Hasidic, Alternative";
+    S.custom = []; S.show = {...S.show, facts:false, marquee:false};
+    return S; };
+  // static texts of the page
+  const enStatic = () => { if(!EN) return;
+    document.title = "Avishai Yashar | Live & Studio Drums";
+    const set = (sel, txt, attr) => document.querySelectorAll(sel).forEach(el => { if(attr) el.setAttribute(attr, txt); else el.textContent = txt; });
+    set(".intro__s", "Drum Recording");
+    set("#menuBtn", "Menu", "aria-label"); set(".brand", "Avishai Yashar – back to top", "aria-label");
+    set(".brand__txt b", "Avishai Yashar");
+    const waTxt = (a, t) => { const n = [...a.childNodes].find(x => x.nodeType === 3 && x.textContent.trim()); if(n) n.textContent = t; };
+    document.querySelectorAll(".top .js-wa").forEach(a => waTxt(a, "Let's Talk"));
+    document.querySelectorAll("#heroCta .js-wa, .menu .js-wa, .cta .js-wa, #ctaSection .js-wa").forEach(a => waTxt(a, "Book a Session"));
+    document.querySelectorAll("#about .js-wa").forEach(a => waTxt(a, "Let's talk about your next production"));
+    set("#watchIntro span", "Watch the Video");
+    set(".scrollcue span", "Explore"); set(".scrollcue", "Explore", "aria-label");
+    set("#reel", "Selected Work", "aria-label"); set("#reel .head h2", "Selected Work");
+    set("#reelPrev", "Previous", "aria-label"); set("#reelNext", "Next", "aria-label");
+    set("#aboutImg", "Avishai Yashar", "alt"); set(".about__big", "About Me");
+    set("#prodMore button", "Load more");
+    set("#gearMore span", "View the full gear list"); set("#gearPeek", "View the full gear list", "aria-label");
+    set("#socials", "Social media", "aria-label");
+    const y = document.getElementById("year"); if(y && y.parentNode) y.parentNode.lastChild.textContent = " All rights reserved";
+    const ad = document.getElementById("adminLink"); if(ad) ad.hidden = true;
+    set("#fab", "Message me on WhatsApp", "aria-label");
+    set("#menu", "Site menu", "aria-label"); set("#menuClose", "Close menu", "aria-label");
+    set("#modal", "Video", "aria-label"); set("#modalClose", "Close", "aria-label");
+    set("#modalYt", "Video not playing? Watch it on YouTube");
+    set("#heroSnd", "Sound", "aria-label");
+  };
+  // the HE / EN switch in the top bar
+  const langSwitch = () => { const host = document.querySelector(".top__in"); if(!host || document.getElementById("langSw")) return;
+    const w = document.createElement("div"); w.className = "langsw"; w.id = "langSw"; w.setAttribute("role", "group"); w.setAttribute("aria-label", "Language");
+    w.innerHTML = `<a href="?lang=he" data-l="he" lang="he"${EN ? "" : ' aria-current="true"'}>HE</a><a href="?lang=en" data-l="en" lang="en"${EN ? ' aria-current="true"' : ""}>EN</a>`;
+    w.addEventListener("click", e => { const a = e.target.closest("a[data-l]"); if(!a) return; e.preventDefault(); if(a.dataset.l === LANG) return;
+      try { localStorage.setItem("ay_lang", a.dataset.l); } catch(err){}
+      const u = new URL(location.href); u.searchParams.set("lang", a.dataset.l); location.href = u.toString(); });
+    const cta = host.querySelector(":scope > .js-wa"); host.insertBefore(w, cta || null); };
   // gear photos cleaned up and placed on one uniform studio tile (made from the original product shots)
   const GEAR_MAP = {"https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3063bcfa4_IMG_8097.jpeg":"assets/gear/7c9e82c9fd-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3edea3952_image.png":"assets/gear/c4371ec2be-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3f0778a59_IMG_8122.jpeg":"assets/gear/02f48413b9-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg":"assets/gear/52202702f9-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/40b8c99b4_IMG_8103.jpeg":"assets/gear/ca56fb5d09-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/528481e05_IMG_8125.jpeg":"assets/gear/8d9df6ca91-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/586af5b12_image.png":"assets/gear/6f9b6031f4-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/59a6e307f_image.png":"assets/gear/b2505a770b-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/7e3813ffb_image.png":"assets/gear/1c42c3e50c-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/87cabe3a2_IMG_8121.jpeg":"assets/gear/df3661349d-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/885386856_IMG_8116.jpeg":"assets/gear/1fcb3c57f5-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/903783247_image.png":"assets/gear/afa9133bba-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a10c19e67_image.png":"assets/gear/897e4da3f5-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a6b75f1fb_IMG_8134.jpeg":"assets/gear/2858230857-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ad89ebef7_IMG_8117.jpeg":"assets/gear/f6732bc158-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bc8a0e938_image.png":"assets/gear/33ee342ca8-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg":"assets/gear/6fb7b6512a-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/cace07592_image.png":"assets/gear/f90e176886-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/d6c1cd271_thomann-image.jpg":"assets/gear/226516085d-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ea1af205d_image.png":"assets/gear/eeca685210-v4.webp"};
   // warm the browser cache with every gear photo right away, so nothing pops in later
@@ -1786,7 +1914,7 @@ window.mergeContent = function (saved) {
         <span class="reel__fb" aria-hidden="true"><i>AY</i></span>
         <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="eager" onerror="this.remove()" onload="${thumbFix}">
         <span class="reel__play" aria-hidden="true">${icon('i-play')}</span>
-        <span class="reel__info"><b>${esc(v.title)}</b><small>לחצו לצפייה</small></span>
+        <span class="reel__info"><b>${esc(v.title)}</b><small>${L("לחצו לצפייה","Tap to watch")}</small></span>
       </div>`; }).join("");
     // a production saved without a title: fetch its YouTube title
     list.forEach((v,i) => { if(String(v.title||"").trim()) return; const id = ytId(v.url); if(!id) return;
@@ -1855,7 +1983,7 @@ window.mergeContent = function (saved) {
       <div class="video zoom" data-id="${esc(id)}">
         <span class="video__fb" aria-hidden="true">${esc(v.title)}</span>
         <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" decoding="async" onerror="this.remove()" onload="${thumbFix}">
-        <button type="button" aria-label="נגן: ${esc(v.title)}"><span class="play">${icon('i-play')}</span></button>
+        <button type="button" aria-label="${L("נגן","Play")}: ${esc(v.title)}"><span class="play">${icon('i-play')}</span></button>
       </div>
       <div class="card__body">
         <h3 class="card__title">${esc(v.title)}</h3>
@@ -1901,7 +2029,7 @@ window.mergeContent = function (saved) {
           ${c.eyebrow ? `<span class="eyebrow">${esc(c.eyebrow)}</span>` : ""}
           ${c.title ? `<h2 data-split>${esc(c.title)}</h2>` : ""}
           ${paras ? `<div class="custom__body">${paras}</div>` : ""}
-          ${real(c.btnUrl) ? `<a class="btn btn--lime" href="${esc(c.btnUrl)}" target="_blank" rel="noopener">${esc(c.btnText || "לפרטים")}</a>` : ""}
+          ${real(c.btnUrl) ? `<a class="btn btn--lime" href="${esc(c.btnUrl)}" target="_blank" rel="noopener">${esc(c.btnText || L("לפרטים","Learn more"))}</a>` : ""}
         </div></div></div>`;
       main.appendChild(sec);
       ids["c_" + c.id] = sec.id;
@@ -1920,7 +2048,7 @@ window.mergeContent = function (saved) {
       if(peek){ peek.innerHTML = pick.map((g,i) => `<span class="gear-peek__c${GEAR_MAP[g.img] ? " is-baked" : ""}" style="--i:${i};--n:${pick.length}"><img src="${esc(GEAR_MAP[g.img] || g.img)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></span>`).join("");
         peek.hidden = !pick.length; peek.addEventListener("click", () => b.click()); }
       b.addEventListener("click", () => { const open = !w.classList.contains("is-open"); w.classList.toggle("is-open", open); b.classList.toggle("is-open", open);
-        b.parentElement.classList.toggle("is-open", open); b.setAttribute("aria-expanded", open); b.firstChild.textContent = open ? "סגירת רשימת הציוד" : "לרשימת הציוד המלאה"; }); })();
+        b.parentElement.classList.toggle("is-open", open); b.setAttribute("aria-expanded", open); b.firstChild.textContent = open ? L("סגירת רשימת הציוד","Hide the gear list") : L("לרשימת הציוד המלאה","View the full gear list"); }); })();
 
     // the page as a short journey: each main part gets a big chapter number behind its title, in page order
     (() => { const chapters = ["reel","process","sources","covers","about","studio"];
@@ -1937,7 +2065,7 @@ window.mergeContent = function (saved) {
     })();
 
     // menu: every visible section, in page order
-    const navNames = { reel:"הפקות נבחרות", about:"קצת עליי", marquee:"ז'אנרים", facts:"במה אני שונה", process:"איך זה עובד", covers:"קאברים", productions:"הפקות", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", cta:"יצירת קשר" };
+    const navNames = EN ? { reel:"Selected Work", about:"About Me", marquee:"Genres", facts:"Why Me", process:"How It Works", covers:"Covers", productions:"Productions", sources:"Drum Stems", studio:"The Studio & Gear", testimonials:"What Producers Say", cta:"Contact" } : { reel:"הפקות נבחרות", about:"קצת עליי", marquee:"ז'אנרים", facts:"במה אני שונה", process:"איך זה עובד", covers:"קאברים", productions:"הפקות", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", cta:"יצירת קשר" };
     $("#menuList").innerHTML = S.order.map(k => {
       const el = document.getElementById(ids[k]); if(!el || el.hidden) return "";
       let name = navNames[k];
@@ -1960,34 +2088,34 @@ window.mergeContent = function (saved) {
     const wave = n => Array.from({length:n}, (_, k) => `<i style="--h:${(.25 + Math.abs(Math.sin(k * 1.7 + n) * .55) + (k % 5 === 0 ? .2 : 0)).toFixed(2)}"></i>`).join("");
     const stepOv = [
       `<div class="sc sc--chat"><div class="ph wa"><span class="ph__isl"></span>
-          <div class="wa__hd"><span class="wa__back">›</span><span class="wa__av"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><span class="wa__nm"><b>המפיק 🎧</b><small>מחובר/ת</small></span></div>
+          <div class="wa__hd"><span class="wa__back">›</span><span class="wa__av"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><span class="wa__nm"><b>${L("המפיק","The Producer")} 🎧</b><small>${L("מחובר/ת","online")}</small></span></div>
           <div class="wa__body">
-            <div class="wa__m wa__in m1">היי אבישי! יש לי שיר חדש 🎶<em>14:02</em></div>
+            <div class="wa__m wa__in m1">${L("היי אבישי! יש לי שיר חדש 🎶","Hey Avishai! Got a new song for you 🎶")}<em>14:02</em></div>
             <div class="wa__m wa__in wa__au m2"><span class="wa__pl">▶</span><span class="wa__wv">${wave(22)}</span><em>0:42</em></div>
-            <div class="wa__m wa__out m3">קיבלתי! מתחיל לעבוד 🥁<em>14:03 <span class="wa__tk">✓✓</span></em></div>
+            <div class="wa__m wa__out m3">${L("קיבלתי! מתחיל לעבוד 🥁","Got it! Starting now 🥁")}<em>14:03 <span class="wa__tk">✓✓</span></em></div>
           </div>
-          <div class="wa__ft"><span class="wa__inp">הודעה</span><span class="wa__mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg></span></div></div></div>`,
+          <div class="wa__ft"><span class="wa__inp">${L("הודעה","Message")}</span><span class="wa__mic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg></span></div></div></div>`,
       `<div class="sc sc--snare"><svg class="sn" viewBox="-250 -70 900 400">
           <g class="sn__waves"><g transform="translate(-250 0) scale(2)"><path class="sn__w" d="M0 70 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/></g><g transform="translate(426 0) scale(2)"><path class="sn__w sn__w--r" d="M0 70 q8 -16 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0"/></g></g>
           <ellipse class="sn__glow" cx="200" cy="200" rx="190" ry="60"/>
           <image href="assets/snare-bb.webp" x="0" y="0" width="400" height="314"/>
           <ellipse class="sn__ring" cx="215" cy="66" rx="70" ry="22"/><ellipse class="sn__ring r2" cx="215" cy="66" rx="70" ry="22"/>
           <line class="sn__stick" x1="430" y1="-66" x2="240" y2="58"/></svg></div>`,
-      `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>לייב</span>
-          <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>המפיק</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
+      `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>${L("לייב","LIVE")}</span>
+          <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>${L("המפיק","Producer")}</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
           <div class="scr__tile scr__tile--me"><video class="fg" muted playsinline loop preload="none" poster="assets/me-call.jpg" data-src="assets/me-call.mp4"></video><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>
           </div></div>`,
       `<div class="sc sc--stems"><div class="daw"><span class="daw__tb"><i></i><i></i><i></i><b></b><i></i><i></i></span>
           <span class="daw__ruler"></span>
           ${["Kick In","Kick Out","Snare Top","Snare Bottom","Hi-Hat","Tom 1","Tom 2","Floor","OH R","OH L","Room R","Room L"].map((t,k) => `<span class="daw__row" style="--k:${k};--hue:${Math.round(k * 28)}"><span class="daw__hd"><i></i><b>${t}</b><u>M</u><u>S</u></span><span class="daw__lane">${wave(90)}</span></span>`).join("")}
           <span class="daw__tp"><i></i><i class="play"></i><i class="rec"></i><b>00:00:24</b></span><span class="daw__head"></span></div>
-        <em class="sc__sent">נשלח ✓ <small>תוך 24 שעות</small></em></div>`
+        <em class="sc__sent">${L("נשלח ✓","Sent ✓")} <small>${L("תוך 24 שעות","within 24 hours")}</small></em></div>`
     ];
     $("#steps").insertAdjacentHTML("beforeend", (S.steps || []).filter(s => s.title).map((s,i) => `
       <li class="step${i < 4 ? " has-media" : ""}">
         ${i < 4 ? `<span class="step__media" aria-hidden="true">${stepOv[i] || ""}</span>` : ""}
         <span class="step__icon"><svg viewBox="0 0 24 24"><use href="#${stepIcons[i % stepIcons.length]}"/></svg></span>
-        <span class="step__n">שלב ${i+1}</span>
+        <span class="step__n">${L("שלב","Step")} ${i+1}</span>
         <h3>${esc(s.title)}</h3>
         <p>${esc(s.text)}</p>
       </li>`).join(""));
@@ -2016,7 +2144,7 @@ window.mergeContent = function (saved) {
       const sb = $("#heroSnd");
       if(sb && /hero(-v2)?\.mp4/.test(bg)){
         sb.hidden = false;
-        const paint = () => { const on = !v.muted; sb.classList.toggle("is-on", on); sb.setAttribute("aria-pressed", on); sb.setAttribute("aria-label", on ? "השתקה" : "הפעלת סאונד"); };
+        const paint = () => { const on = !v.muted; sb.classList.toggle("is-on", on); sb.setAttribute("aria-pressed", on); sb.setAttribute("aria-label", on ? L("השתקה","Mute") : L("הפעלת סאונד","Sound on")); };
         const audible = () => !v.muted;
         sb.addEventListener("click", e => { e.stopPropagation(); touched = true; soundOn = !soundOn; v.muted = !(soundOn && heroIn); if(soundOn){ v.volume = 1; const p = v.play(); if(p && p.catch) p.catch(() => {}); } paint(); });
         // sound only from the speaker button — touching the page never turns it on
@@ -2067,7 +2195,7 @@ window.mergeContent = function (saved) {
       let sb = $("#heroSnd"); if(!sb) return; const nb = sb.cloneNode(true); sb.replaceWith(nb); sb = nb; sb.hidden = false;
       let muted = true;
       const apply = () => { if(soundOn && heroIn && $("#modal").hidden && !$("#heroPlayer")){ cmd("unMute"); cmd("setVolume", [100]); cmd("playVideo"); } else cmd("mute"); };
-      const paint = () => { const on = soundOn && !muted; sb.classList.toggle("is-on", on); sb.setAttribute("aria-pressed", on); sb.setAttribute("aria-label", on ? "השתקה" : "הפעלת סאונד"); };
+      const paint = () => { const on = soundOn && !muted; sb.classList.toggle("is-on", on); sb.setAttribute("aria-pressed", on); sb.setAttribute("aria-label", on ? L("השתקה","Mute") : L("הפעלת סאונד","Sound on")); };
       addEventListener("message", e => { if(e.source !== fr.contentWindow) return; let d; try { d = typeof e.data === "string" ? JSON.parse(e.data) : e.data; } catch(err){ return; }
         if(d && d.info && typeof d.info.muted === "boolean"){ muted = d.info.muted; paint(); } });
       sb.addEventListener("click", e => { e.stopPropagation(); soundOn = !(soundOn && !muted); if(loc) loc.muted = true; apply(); paint(); });
@@ -2090,7 +2218,7 @@ window.mergeContent = function (saved) {
       $("#hero").classList.add("is-playing");
       $("#hero").insertAdjacentHTML("beforeend", `<div class="hero__player" id="heroPlayer">
         <div class="hero__player-box"><iframe src="${embedUrl(introId)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
-        <button type="button" class="hero__player-x" aria-label="סגירת הסרטון"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+        <button type="button" class="hero__player-x" aria-label="${L("סגירת הסרטון","Close video")}"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
       </div>`);
       $("#heroPlayer .hero__player-x").addEventListener("click", closeHeroPlayer);
     });
@@ -2152,7 +2280,7 @@ window.mergeContent = function (saved) {
         return ""; };
       const covers = S.covers.map(c => { const src = String(c.url).trim(), id = ytId(c.url);
         return { c, id, src, prev: id ? "" : previewOf(c, src), thumb: id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }; });
-      ring.innerHTML = covers.map((cv,i) => `<div class="c3__card" data-i="${i}" role="button" tabindex="0" aria-label="קאבר ${esc(cv.c.style || "")}">
+      ring.innerHTML = covers.map((cv,i) => `<div class="c3__card" data-i="${i}" role="button" tabindex="0" aria-label="${L("קאבר","Cover")} ${esc(cv.c.style || "")}">
           <div class="c3__float" style="animation-delay:${(-i * .7).toFixed(1)}s">
             <div class="c3__media">${cv.prev ? `${cv.thumb ? `<img class="c3__poster" src="${esc(cv.thumb)}" alt="" decoding="async">` : ""}<video src="${esc(cv.prev)}" muted loop playsinline autoplay preload="metadata"></video>`
               : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" decoding="async">` : ""}</div>
@@ -2165,7 +2293,7 @@ window.mergeContent = function (saved) {
       const cards = [...ring.children], loops = $$("video", ring);
       // one player with sound, reused (so the very first tap plays on iPhone)
       const full = document.createElement("video"); full.className = "c3__full"; full.playsInline = true; full.setAttribute("playsinline", ""); full.preload = "none";
-      const closeBtn = document.createElement("button"); closeBtn.type = "button"; closeBtn.className = "c3__x"; closeBtn.setAttribute("aria-label", "סגירה");
+      const closeBtn = document.createElement("button"); closeBtn.type = "button"; closeBtn.className = "c3__x"; closeBtn.setAttribute("aria-label", L("סגירה","Close"));
       closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
       const prog = document.createElement("span"); prog.className = "c3__prog"; prog.innerHTML = "<i></i>";
       let angle = 0, target = 0, active = -1, raf = 0, inView = false, playing = -1, frame = null, timer = 0, hold = 0;
@@ -2181,7 +2309,7 @@ window.mergeContent = function (saved) {
       const setActive = i => { if(i === active) return; active = i;
         cards.forEach((el,j) => el.classList.toggle("is-front", j === i));
         const c = covers[i].c; label.textContent = c.style || c.title || ""; label.classList.remove("in"); void label.offsetWidth; label.classList.add("in");
-        sub.textContent = c.title && c.style ? c.title : "לחצו על הסרטון להאזנה"; };
+        sub.textContent = c.title && c.style ? c.title : L("לחצו על הסרטון להאזנה","Tap the video to listen"); };
       const nearest = () => ((Math.round(angle / STEP) % n) + n) % n;
       const tick = () => { angle += (target - angle) * .085; if(Math.abs(target - angle) < .05) angle = target;
         paint(); setActive(nearest()); raf = angle !== target ? requestAnimationFrame(tick) : 0; };
@@ -2253,7 +2381,7 @@ window.mergeContent = function (saved) {
       // vertical studio clip: full-screen tall card (shorts thumbnail is vertical too)
       $("#studioVideo").innerHTML = `<div class="video video--tall" data-id="${esc(sid)}">
         <img src="https://i.ytimg.com/vi/${esc(sid)}/oardefault.jpg" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${esc(sid)}/hqdefault.jpg'">
-        <button type="button" aria-label="נגן: ${esc(S.studioTitle || "")}"><span class="play">${icon('i-play')}</span></button>
+        <button type="button" aria-label="${L("נגן","Play")}: ${esc(S.studioTitle || "")}"><span class="play">${icon('i-play')}</span></button>
         ${S.studioTitle ? `<span class="video__cap">${esc(S.studioTitle)}</span>` : ""}
       </div>`; }
 
@@ -2264,22 +2392,22 @@ window.mergeContent = function (saved) {
     $("#tracks").innerHTML = S.sources.map((t,i) => `
       <article class="track" data-i="${i}">
         <div class="track__top">
-          ${real(t.audio) ? `<button class="track__btn" type="button" aria-label="נגן ${esc(t.name)}">${icon('i-play','i-play')}${icon('i-pause','i-pause')}</button>` : ``}
+          ${real(t.audio) ? `<button class="track__btn" type="button" aria-label="${L("נגן","Play")} ${esc(t.name)}">${icon('i-play','i-play')}${icon('i-pause','i-pause')}</button>` : ``}
           <h3 class="track__name">${esc(t.name)}</h3>
           ${real(t.audio) ? `<span class="track__time"><span class="cur">0:00</span> / <span class="dur">0:00</span></span>` : ``}
         </div>
         <div class="track__body"><div class="track__in">
-        ${real(t.audio) ? `<div class="wave" role="slider" tabindex="0" aria-label="מיקום בשיר ${esc(t.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${bars(t.name).map((h,j) => `<i style="height:${h}%;--d:${((j * 37) % 11) * -.07}s"></i>`).join("")}<b class="wave__head" aria-hidden="true"></b></div>
+        ${real(t.audio) ? `<div class="wave" role="slider" tabindex="0" aria-label="${L("מיקום בשיר","Position in")} ${esc(t.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${bars(t.name).map((h,j) => `<i style="height:${h}%;--d:${((j * 37) % 11) * -.07}s"></i>`).join("")}<b class="wave__head" aria-hidden="true"></b></div>
         <div class="skip" dir="ltr">
-          <button type="button" data-skip="-10" aria-label="10 שניות אחורה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 4 12l7 7M20 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>10</button>
-          <span class="skip__hint">גררו על הגל כדי להעביר</span>
-          <button type="button" data-skip="10" aria-label="10 שניות קדימה">10<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 5 7 7-7 7M4 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" data-skip="-10" aria-label="${L("10 שניות אחורה","Back 10 seconds")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 4 12l7 7M20 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>10</button>
+          <span class="skip__hint">${L("גררו על הגל כדי להעביר","Drag the waveform to scrub")}</span>
+          <button type="button" data-skip="10" aria-label="${L("10 שניות קדימה","Forward 10 seconds")}">10<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 5 7 7-7 7M4 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>` : ``}
         ${real(t.audio) && real(t.mix) ? `<div class="mixer">
-          <div class="mixer__labels" aria-hidden="true"><b data-k="full">כל ההפקה</b><b data-k="drums" class="on">רק תופים</b></div>
-          <input type="range" min="0" max="100" value="0" aria-label="מעבר בין התופים לבד לבין ההפקה המלאה">
+          <div class="mixer__labels" aria-hidden="true"><b data-k="full">${L("כל ההפקה","Full mix")}</b><b data-k="drums" class="on">${L("רק תופים","Drums only")}</b></div>
+          <input type="range" min="0" max="100" value="0" aria-label="${L("מעבר בין התופים לבד לבין ההפקה המלאה","Blend between drums only and the full mix")}">
         </div>` : ``}
-        ${real(t.drive) ? `<a class="btn btn--line" href="${esc(t.drive)}" target="_blank" rel="noopener">${icon('i-folder')}לערוצים המלאים</a>` : ``}
+        ${real(t.drive) ? `<a class="btn btn--line" href="${esc(t.drive)}" target="_blank" rel="noopener">${icon('i-folder')}${L("לערוצים המלאים","Get the full stems")}</a>` : ``}
         </div></div>
       </article>`).join("");
     // a wallet-style stack: one source open, the rest tucked in behind — tap a card to pull it out
@@ -2338,8 +2466,8 @@ window.mergeContent = function (saved) {
       function wire(){
         a.addEventListener("loadedmetadata", () => { dur.textContent = fmt(a.duration); if(pending !== null){ const q = pending; pending = null; seek(q); } });
         a.addEventListener("timeupdate", () => { paint(); if(b && !b.paused && Math.abs(b.currentTime - a.currentTime) > .15) b.currentTime = a.currentTime; });
-        a.addEventListener("play", () => { pauseAudio(a); el.classList.add("is-playing"); btn.setAttribute("aria-label","השהה "+t.name); });
-        a.addEventListener("pause", () => { b && b.pause(); el.classList.remove("is-playing"); btn.setAttribute("aria-label","נגן "+t.name); });
+        a.addEventListener("play", () => { pauseAudio(a); el.classList.add("is-playing"); btn.setAttribute("aria-label",L("השהה ","Pause ")+t.name); });
+        a.addEventListener("pause", () => { b && b.pause(); el.classList.remove("is-playing"); btn.setAttribute("aria-label",L("נגן ","Play ")+t.name); });
         a.addEventListener("ended", () => { b && b.pause(); a.currentTime = 0; paint(); });
         if(b){ a.addEventListener("error", fallback, {once:true}); b.addEventListener("error", fallback, {once:true}); }
       }
@@ -2374,14 +2502,14 @@ window.mergeContent = function (saved) {
       <div class="gearcat">
         <div class="gearcat__head">
           <h3>${esc(c)}</h3>
-          <button type="button" data-rail="${ci}" data-dir="1" aria-label="הקודם"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button type="button" data-rail="${ci}" data-dir="-1" aria-label="הבא"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" data-rail="${ci}" data-dir="1" aria-label="${L("הקודם","Previous")}"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" data-rail="${ci}" data-dir="-1" aria-label="${L("הבא","Next")}"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
         <div class="gearrail" id="rail${ci}">
           ${S.gear.filter(g => g.category === c).map(it => {
             const baked = GEAR_MAP[it.img];
             const inner = `<div class="gcard__img${baked ? " is-baked" : ""}">${real(it.img) ? `<img src="${esc(baked || it.img)}" alt="${esc(it.name)}" loading="lazy" decoding="async" onerror="this.outerHTML=this.parentNode.dataset.ph||''">` : ph}</div>
-              <div class="gcard__body"><span class="gcard__role">${esc(it.role)}</span><span class="gcard__name">${esc(it.name)}</span>${real(it.url) ? `<span class="gcard__go">לצפייה במוצר ←</span>` : ``}</div>`;
+              <div class="gcard__body"><span class="gcard__role">${esc(it.role)}</span><span class="gcard__name">${esc(it.name)}</span>${real(it.url) ? `<span class="gcard__go">${L("לצפייה במוצר ←","View product →")}</span>` : ``}</div>`;
             return real(it.url) ? `<a class="gcard" href="${esc(it.url)}" target="_blank" rel="noopener">${inner}</a>` : `<div class="gcard">${inner}</div>`;
           }).join("")}
         </div>
@@ -2396,12 +2524,12 @@ window.mergeContent = function (saved) {
     let quotes = S.testimonials;
     if(quotes.length){
       // each recommendation looks like a WhatsApp message from the producer
-      const times = ["21:47","13:05","18:32","10:14","23:08","16:41"], replies = ["תודה אחי! 🙏🥁","איזה כיף לשמוע ❤️","תודה רבה! 🙌"];
+      const times = ["21:47","13:05","18:32","10:14","23:08","16:41"], replies = EN ? ["Thanks, man! 🙏🥁","So good to hear ❤️","Thank you so much! 🙌"] : ["תודה אחי! 🙏🥁","איזה כיף לשמוע ❤️","תודה רבה! 🙌"];
       let qi = 0;
       const card = q => { const k = qi++ % quotes.length;
         return `<figure class="quote wq">
           <div class="wq__hd"><span class="wq__back" aria-hidden="true">›</span><span class="wq__av" aria-hidden="true">${q.photo ? `<img src="${esc(q.photo)}" alt="" loading="lazy" decoding="async">` : esc((q.name||"?").trim().charAt(0))}</span>
-            <span class="wq__nm"><b>${esc(q.name)}</b><small>${q.role ? esc(q.role) : "מפיק"}</small></span></div>
+            <span class="wq__nm"><b>${esc(q.name)}</b><small>${q.role ? esc(q.role) : L("מפיק","Producer")}</small></span></div>
           <div class="wq__body">
             <p class="wq__in">${esc(q.text).replace(/\*([^*]+)\*/g, "<b>$1</b>")}<em class="wq__t">${times[k % times.length]}</em></p>
             <p class="wq__out">${replies[k % replies.length]}<em class="wq__t">${times[k % times.length].replace(/\d$/, d => (+d + 1) % 10)} <span class="wq__tk">✓✓</span></em></p>
@@ -2432,7 +2560,7 @@ window.mergeContent = function (saved) {
     } else $("#testimonials").hidden = true;
 
     // socials
-    const labels = {facebook:"פייסבוק", instagram:"אינסטגרם", youtube:"יוטיוב", tiktok:"טיקטוק", spotify:"ספוטיפיי", soundcloud:"סאונדקלאוד"};
+    const labels = EN ? {facebook:"Facebook", instagram:"Instagram", youtube:"YouTube", tiktok:"TikTok", spotify:"Spotify", soundcloud:"SoundCloud"} : {facebook:"פייסבוק", instagram:"אינסטגרם", youtube:"יוטיוב", tiktok:"טיקטוק", spotify:"ספוטיפיי", soundcloud:"סאונדקלאוד"};
     $("#socials").innerHTML = S.socials.filter(s => real(s.url) && labels[s.type]).map(s =>
       `<a href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${labels[s.type]}">${icon('i-'+s.type)}</a>`).join("");
     $("#menuSocials").innerHTML = $("#socials").innerHTML;
@@ -2625,7 +2753,8 @@ window.mergeContent = function (saved) {
     let data = null;
     try { data = await withTimeout(fresh, cached ? 1500 : 2500); } catch(e){}
     if(!data) data = cached;
-    S = mergeContent(data);
+    S = toEN(mergeContent(data));
+    try { langSwitch(); enStatic(); } catch(e){ console.error(e); }
     try { render(S); } catch(e){ console.error(e); }
     // keep the opening screen up until the opening video is actually moving and the first photos are in (max ~6.5s)
     const ready = () => new Promise(res => {

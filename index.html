@@ -2139,7 +2139,7 @@ window.mergeContent = function (saved) {
     if(!S.covers.length) $("#covers").hidden = true;
     else {
       const ring = $("#c3d"), label = $("#c3Style"), sub = $("#c3Sub"), bar = $("#c3Bar"), stage = $("#c3Stage");
-      const n = S.covers.length, STEP = 360 / Math.max(n, 3), AUTO = 2200;
+      const n = S.covers.length, STEP = 360 / Math.max(n, 3), AUTO = 3900;
       const previewOf = (c, src) => { if(real(c.preview)) return c.preview;
         if(/res\.cloudinary\.com/.test(src)) return src.replace(/\/upload\/[^/]*\/(v\d+\/)/, "/upload/so_8,du_6,w_240,h_240,c_fill,q_auto:low,ac_none/$1");
         if(/^assets\/covers\/[^/]+\.mp4$/.test(src)) return src.replace(/\.mp4$/, "_p.mp4");

@@ -179,7 +179,7 @@ window.SITE_LINKS = { home: "./", admin: "admin.html" };
     post: body => remote ? postRemote(body).catch(e => gs ? call("apiPost", body) : Promise.reject(e)) : call("apiPost", body)
   };
   // never leave the opening screen stuck
-  setTimeout(() => { const i = document.getElementById("intro"); if (i) i.remove(); }, 7000);
+  setTimeout(() => { const i = document.getElementById("intro"); if (i) i.remove(); }, 11000);
 })();
 
 

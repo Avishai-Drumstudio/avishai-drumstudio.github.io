@@ -1521,7 +1521,7 @@ window.SITE_LINKS = { home: "./", admin: "admin.html" };
     post: body => remote ? postRemote(body).catch(e => gs ? call("apiPost", body) : Promise.reject(e)) : call("apiPost", body)
   };
   // never leave the opening screen stuck
-  setTimeout(() => { const i = document.getElementById("intro"); if (i) i.remove(); }, 7000);
+  setTimeout(() => { const i = document.getElementById("intro"); if (i) i.remove(); }, 11000);
 })();
 
 
@@ -2139,7 +2139,7 @@ window.mergeContent = function (saved) {
     if(!S.covers.length) $("#covers").hidden = true;
     else {
       const ring = $("#c3d"), label = $("#c3Style"), sub = $("#c3Sub"), bar = $("#c3Bar"), stage = $("#c3Stage");
-      const n = S.covers.length, STEP = 360 / Math.max(n, 3), AUTO = 3900;
+      const n = S.covers.length, STEP = 360 / Math.max(n, 3), AUTO = 3000;
       const previewOf = (c, src) => { if(real(c.preview)) return c.preview;
         if(/res\.cloudinary\.com/.test(src)) return src.replace(/\/upload\/[^/]*\/(v\d+\/)/, "/upload/so_8,du_6,w_240,h_240,c_fill,q_auto:low,ac_none/$1");
         if(/^assets\/covers\/[^/]+\.mp4$/.test(src)) return src.replace(/\.mp4$/, "_p.mp4");
@@ -2621,6 +2621,14 @@ window.mergeContent = function (saved) {
     if(!data) data = cached;
     S = mergeContent(data);
     try { render(S); } catch(e){ console.error(e); }
+    // keep the opening screen up until the opening video is actually moving and the first photos are in (max ~6.5s)
+    const ready = () => new Promise(res => {
+      const v = $("#heroVid"), imgs = [...document.querySelectorAll(".c3__poster, #heroImg")];
+      const vidOk = new Promise(r => { if(!v || !v.getAttribute("src")) return r(); if(!v.paused && v.readyState >= 3) return r();
+        ["playing","canplaythrough"].forEach(ev => v.addEventListener(ev, r, {once:true})); v.addEventListener("error", r, {once:true}); });
+      const imgOk = Promise.all(imgs.map(im => im.complete ? 0 : new Promise(r => { im.addEventListener("load", r, {once:true}); im.addEventListener("error", r, {once:true}); })));
+      Promise.all([vidOk, imgOk]).then(res); setTimeout(res, 6500); });
+    await ready();
     const wait = Math.max(0, 350 - (Date.now() - started));
     const safe = f => { try { f(); } catch(e){ console.error(e); } };
     setTimeout(() => {
@@ -2630,7 +2638,7 @@ window.mergeContent = function (saved) {
     }, wait);
   }
   // never leave the opening screen stuck
-  setTimeout(() => { const i = document.getElementById("intro"); if(i) i.remove(); }, 8000);
+  setTimeout(() => { const i = document.getElementById("intro"); if(i) i.remove(); }, 11000);
   // wait for the deferred animation libraries
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();

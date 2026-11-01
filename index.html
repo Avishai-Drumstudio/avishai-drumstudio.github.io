@@ -1581,7 +1581,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 16,
+  layoutV: 17,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1678,10 +1678,10 @@ window.mergeContent = function (saved) {
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
   }
-  if (saved && (saved.layoutV || 0) < 16 && typeof d.aboutText === "string") { // about: singers + producers, names slightly bolder (Avishai asked)
-    const NEW = "מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש*, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת* ו*שי וגוס*.";
+  if (saved && (saved.layoutV || 0) < 17 && typeof d.aboutText === "string") { // about: singers + producers, names slightly bolder (Avishai asked)
+    const NEW = "מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש*, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.";
     d.aboutText = d.aboutText.replace(/מביא להפקה שלך ניסיון עשיר[^\n]*?(ועוד\s*\.*\s*|\.)(?=\s*\n|$)/, NEW + " ");
-    d.layoutV = Math.max(d.layoutV || 0, 16);
+    d.layoutV = Math.max(d.layoutV || 0, 17);
   }
   if (saved && (saved.layoutV || 0) < 15) { // covers: funk first, then the new gospel one, pop-rock, pop; "ים-תיכוני" renamed (Avishai asked)
     const cv = Array.isArray(d.covers) ? d.covers.slice() : [];

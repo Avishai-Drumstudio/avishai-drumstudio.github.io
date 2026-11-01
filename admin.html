@@ -240,10 +240,13 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 21,
+  layoutV: 22,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
+    { url: "https://youtu.be/1QuNAhONztA", title: "להקת נשמחה – מחרוזת שירי שבת", show: true },
+    { url: "https://youtu.be/ogfbC9pYXsQ", title: "מחרוזת שירי פורים | הרבנות הצבאית ואיחוד הלהקות", show: true },
+    { url: "https://youtu.be/qV9VPSyfSVI", title: "אביה שרמן – הכל לטובה", show: true },
     { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true },
     { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/1ui0jm29em4", title: "אבישי רוזן – חמש דקות (קליפ רשמי)", show: true },
@@ -336,6 +339,11 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 22) { // the 3 most-watched productions from his playlist go first
+    const pr = Array.isArray(d.productions) ? d.productions.slice() : [];
+    const add = window.SITE_DEFAULTS.productions.slice(0, 3).filter(n => !pr.some(p => p && (p.url || "").includes(n.url.split("/").pop())));
+    d.productions = add.map(x => ({...x})).concat(pr); d.layoutV = Math.max(d.layoutV || 0, 22);
   }
   if (saved && (saved.layoutV || 0) < 21) { // testimonial: יוני
     const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [];

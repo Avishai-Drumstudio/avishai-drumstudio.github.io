@@ -1639,10 +1639,13 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 21,
+  layoutV: 22,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
+    { url: "https://youtu.be/1QuNAhONztA", title: "להקת נשמחה – מחרוזת שירי שבת", show: true },
+    { url: "https://youtu.be/ogfbC9pYXsQ", title: "מחרוזת שירי פורים | הרבנות הצבאית ואיחוד הלהקות", show: true },
+    { url: "https://youtu.be/qV9VPSyfSVI", title: "אביה שרמן – הכל לטובה", show: true },
     { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true },
     { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/1ui0jm29em4", title: "אבישי רוזן – חמש דקות (קליפ רשמי)", show: true },
@@ -1735,6 +1738,11 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 22) { // the 3 most-watched productions from his playlist go first
+    const pr = Array.isArray(d.productions) ? d.productions.slice() : [];
+    const add = window.SITE_DEFAULTS.productions.slice(0, 3).filter(n => !pr.some(p => p && (p.url || "").includes(n.url.split("/").pop())));
+    d.productions = add.map(x => ({...x})).concat(pr); d.layoutV = Math.max(d.layoutV || 0, 22);
   }
   if (saved && (saved.layoutV || 0) < 21) { // testimonial: יוני
     const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [];
@@ -1847,7 +1855,7 @@ window.mergeContent = function (saved) {
     cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
     names: { "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
     quotes: { "יוני": "I've recorded quite a few sessions with Avishai — in person and remotely, single and double sessions. With him you get a great vibe, real dedication, attention to detail and someone who truly listens — plus *the best stems you can get*. Never once disappointed. You're in good hands 🥁", "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },
-    titles: { "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
+    titles: { "1QuNAhONztA": "Nishmecha Band — Shabbat Medley", "ogfbC9pYXsQ": "Purim Medley | IDF Military Rabbinate Band", "qV9VPSyfSVI": "Aviya Sherman — Hakol Letova", "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
   };
   const toEN = S => { if(!EN) return S; const T = EN_TEXT, tr = (m, v) => (m[String(v || "").trim()] || v);
     ["eyebrow","title","lead","trust","waMessage","aboutTitle","aboutText","hProcess","hProductions","hCovers","pCovers","hSources","pSources","hStudio","studioHl","hTestimonials","ctaTitle","ctaText"].forEach(k => { S[k] = T[k]; });

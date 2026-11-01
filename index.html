@@ -1276,6 +1276,15 @@ html,body{max-width:100%;overflow-x:hidden}
 .is-en .eyebrow[data-hero]{letter-spacing:.04em}
 .is-en .top__start{margin-inline-end:8px}
 
+/* animated fallback for the opening video */
+.hero__anim{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.hero-anim .hero__mp4{opacity:0}
+/* language switch: bigger, smooth */
+.langsw{padding:3px!important}
+.langsw a{font-size:13px!important;padding:8px 11px!important;min-width:38px;text-align:center}
+html.lang-out body{opacity:0;transition:opacity .15s ease}
+html{background:#0f1716}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1283,7 +1292,7 @@ html,body{max-width:100%;overflow-x:hidden}
 </head>
 <body>
 
-<div class="intro" id="intro" aria-hidden="true">
+<div class="intro" id="intro" aria-hidden="true"><script>try{if(sessionStorage.getItem("ay_fast"))document.getElementById("intro").style.display="none"}catch(e){}</script>
   <div class="intro__in">
     <span class="onair"><i></i>LIVE</span>
     <div class="intro__eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
@@ -1313,7 +1322,7 @@ html,body{max-width:100%;overflow-x:hidden}
     <div class="hero__bg" id="heroBg">
       <div class="hero__media" id="heroMedia">
         <img class="hero__poster" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high" onerror="this.remove()">
-        <video class="hero__mp4" id="heroVid" src="assets/hero-v2.mp4" poster="assets/hero.jpg" muted autoplay loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+        <img class="hero__anim" id="heroAnim" alt="" data-src="assets/hero-anim.webp" hidden><video class="hero__mp4" id="heroVid" src="assets/hero-v2.mp4" poster="assets/hero.jpg" muted autoplay loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
       </div>
       <div class="fog" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
@@ -1884,7 +1893,10 @@ window.mergeContent = function (saved) {
     const w = document.createElement("div"); w.className = "langsw"; w.id = "langSw"; w.setAttribute("role", "group"); w.setAttribute("aria-label", "Language");
     w.innerHTML = `<a href="./" data-l="he" lang="he"${EN ? "" : ' aria-current="true"'}>HE</a><a href="?lang=en" data-l="en" lang="en"${EN ? ' aria-current="true"' : ""}>EN</a>`;
     w.addEventListener("click", e => { const a = e.target.closest("a[data-l]"); if(!a) return; e.preventDefault(); if(a.dataset.l === LANG) return;
-            const u = new URL(location.href); if(a.dataset.l === "en") u.searchParams.set("lang", "en"); else u.searchParams.delete("lang"); location.href = u.toString(); });
+            try { sessionStorage.setItem("ay_fast", "1"); sessionStorage.setItem("ay_y", String(Math.round(scrollY))); } catch(err){}
+      document.documentElement.classList.add("lang-out");
+      const u = new URL(location.href); if(a.dataset.l === "en") u.searchParams.set("lang", "en"); else u.searchParams.delete("lang");
+      setTimeout(() => { location.replace(u.toString()); }, 160); });
     const cta = host.querySelector(":scope > .js-wa"); host.insertBefore(w, cta || null); };
   // gear photos cleaned up and placed on one uniform studio tile (made from the original product shots)
   const GEAR_MAP = {"https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3063bcfa4_IMG_8097.jpeg":"assets/gear/7c9e82c9fd-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3edea3952_image.png":"assets/gear/c4371ec2be-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/3f0778a59_IMG_8122.jpeg":"assets/gear/02f48413b9-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg":"assets/gear/52202702f9-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/40b8c99b4_IMG_8103.jpeg":"assets/gear/ca56fb5d09-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/528481e05_IMG_8125.jpeg":"assets/gear/8d9df6ca91-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/586af5b12_image.png":"assets/gear/6f9b6031f4-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/59a6e307f_image.png":"assets/gear/b2505a770b-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/7e3813ffb_image.png":"assets/gear/1c42c3e50c-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/87cabe3a2_IMG_8121.jpeg":"assets/gear/df3661349d-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/885386856_IMG_8116.jpeg":"assets/gear/1fcb3c57f5-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/903783247_image.png":"assets/gear/afa9133bba-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a10c19e67_image.png":"assets/gear/897e4da3f5-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/a6b75f1fb_IMG_8134.jpeg":"assets/gear/2858230857-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ad89ebef7_IMG_8117.jpeg":"assets/gear/f6732bc158-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bc8a0e938_image.png":"assets/gear/33ee342ca8-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg":"assets/gear/6fb7b6512a-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/cace07592_image.png":"assets/gear/f90e176886-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/d6c1cd271_thomann-image.jpg":"assets/gear/226516085d-v4.webp","https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ea1af205d_image.png":"assets/gear/eeca685210-v4.webp"};
@@ -2767,14 +2779,22 @@ window.mergeContent = function (saved) {
     S = toEN(mergeContent(data));
     try { langSwitch(); enStatic(); } catch(e){ console.error(e); }
     try { render(S); } catch(e){ console.error(e); }
-    // keep the opening screen up until the opening video is actually moving and the first photos are in (max ~6.5s)
-    const ready = () => new Promise(res => {
-      const v = $("#heroVid"), imgs = [...document.querySelectorAll(".c3__poster, #heroImg")];
-      const vidOk = new Promise(r => { if(!v || !v.getAttribute("src")) return r(); if(!v.paused && v.readyState >= 3) return r();
-        ["playing","canplaythrough"].forEach(ev => v.addEventListener(ev, r, {once:true})); v.addEventListener("error", r, {once:true}); });
-      const imgOk = Promise.all(imgs.map(im => im.complete ? 0 : new Promise(r => { im.addEventListener("load", r, {once:true}); im.addEventListener("error", r, {once:true}); })));
-      Promise.all([vidOk, imgOk]).then(res); setTimeout(res, 6500); });
-    await ready();
+    // opening video, guaranteed: if the browser won't autoplay it (in-app browsers, data saver, battery saver),
+    // an animated image of the same clip runs instead — images always move. The real video takes over once it plays.
+    const fast = (() => { try { const f = sessionStorage.getItem("ay_fast"); sessionStorage.removeItem("ay_fast"); return f; } catch(e){ return null; } })();
+    const heroMoving = () => new Promise(res => {
+      const v = $("#heroVid"); if(!v || !v.getAttribute("src")) return res(false);
+      let t0 = v.currentTime, done = false; const ok = () => { if(done) return; if(!v.paused && v.currentTime > t0 + .05){ done = true; res(true); } };
+      v.addEventListener("timeupdate", ok); setTimeout(() => { if(!done){ done = true; res(false); } }, fast ? 900 : 2200); });
+    const useAnim = () => new Promise(res => { const an = $("#heroAnim"); if(!an) return res();
+      an.addEventListener("load", res, {once:true}); an.addEventListener("error", res, {once:true}); setTimeout(res, 3500);
+      an.src = an.dataset.src; an.hidden = false; document.documentElement.classList.add("hero-anim");
+      // the moment the real video starts moving (e.g. after the first touch), it takes over again
+      const v = $("#heroVid"); if(v){ const back = () => { if(!v.paused && v.currentTime > .2){ an.hidden = true; document.documentElement.classList.remove("hero-anim"); v.removeEventListener("timeupdate", back); } }; v.addEventListener("timeupdate", back); } });
+    const imgsOk = () => Promise.race([Promise.all([...document.querySelectorAll(".c3__poster, #heroImg")].map(im => im.complete ? 0 : new Promise(r => { im.addEventListener("load", r, {once:true}); im.addEventListener("error", r, {once:true}); }))), new Promise(r => setTimeout(r, 2500))]);
+    if(!(await heroMoving())) await useAnim();
+    if(!fast) await imgsOk();
+    if(fast){ const i = $("#intro"); if(i) i.remove(); try { const y = +sessionStorage.getItem("ay_y") || 0; sessionStorage.removeItem("ay_y"); if(y) scrollTo(0, y); } catch(e){} }
     const wait = Math.max(0, 350 - (Date.now() - started));
     const safe = f => { try { f(); } catch(e){ console.error(e); } };
     setTimeout(() => {

@@ -1563,12 +1563,13 @@ window.SITE_DEFAULTS = {
   hCovers: "קאברים",
   pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
   covers: [
-    { url: "assets/covers/c1.mp4", poster: "assets/covers/c1.jpg", style: "רוק", title: "", show: true },
     { url: "assets/covers/funk.mp4", poster: "assets/covers/funk.jpg", style: "פאנק", title: "", show: true },
-    { url: "assets/covers/c4.mp4", poster: "assets/covers/c4.jpg", style: "ים-תיכוני", title: "", show: true },
+    { url: "assets/covers/c6.mp4", poster: "assets/covers/c6.jpg", style: "גוספל", title: "", show: true },
+    { url: "assets/covers/c5.mp4", poster: "assets/covers/c5.jpg", style: "פופ-רוק", title: "", show: true },
     { url: "assets/covers/c2.mp4", poster: "assets/covers/c2.jpg", style: "פופ", title: "", show: true },
+    { url: "assets/covers/c1.mp4", poster: "assets/covers/c1.jpg", style: "רוק", title: "", show: true },
     { url: "assets/covers/c3.mp4", poster: "assets/covers/c3.jpg", style: "גרוב", title: "", show: true },
-    { url: "assets/covers/c5.mp4", poster: "assets/covers/c5.jpg", style: "פופ-רוק", title: "", show: true }
+    { url: "assets/covers/c4.mp4", poster: "assets/covers/c4.jpg", style: "בלדה 6/8", title: "", show: true }
   ],
   hSources: "סורסים",
   pSources: "ערוצי תופים כמו שהם יוצאים מהאולפן, לפני מיקס.",
@@ -1579,7 +1580,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 14,
+  layoutV: 15,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1675,6 +1676,15 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 15) { // covers: funk first, then the new gospel one, pop-rock, pop; "ים-תיכוני" renamed (Avishai asked)
+    const cv = Array.isArray(d.covers) ? d.covers.slice() : [];
+    if (!cv.some(x => x && /c6\.mp4/.test(x.url || ""))) cv.push({ url: "assets/covers/c6.mp4", poster: "assets/covers/c6.jpg", style: "גוספל", title: "", show: true });
+    cv.forEach(x => { if (x && /c4\.mp4/.test(x.url || "") && /ים.?תיכוני/.test(x.style || "")) x.style = "בלדה 6/8"; });
+    const rank = ["funk.mp4", "c6.mp4", "c5.mp4", "c2.mp4"];
+    const r = x => { const i = rank.findIndex(k => (x && x.url || "").includes(k)); return i < 0 ? 99 : i; };
+    d.covers = cv.map((x, i) => [x, i]).sort((A, B) => (r(A[0]) - r(B[0])) || (A[1] - B[1])).map(p => p[0]);
+    d.layoutV = Math.max(d.layoutV || 0, 15);
   }
   if (saved && (saved.layoutV || 0) < 14) { // one more selected production (Avishai asked)
     const pr = Array.isArray(d.productions) ? d.productions.slice() : [];

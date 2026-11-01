@@ -193,7 +193,7 @@ window.SITE_DEFAULTS = {
   waMessage: "שלום אבישי 👋\nהגעתי אליך דרך האתר.\n\nשמי: \nאשמח לבדוק אם אתה פנוי להקלטת תופים בתאריך: \nסוג הפרויקט: שיר / מחרוזת / אלבום\nז'אנר: \n\nאשלח לך סקיצה ורפרנס כאן. תודה!",
   phone: "053-2854507",
   heroImage: "assets/hero.jpg",
-  bgVideo: "assets/hero.mp4",
+  bgVideo: "assets/hero-v2.mp4",
   introVideo: "https://youtu.be/SMZbWh5Qp8A",
   heroIntroEnd: 0, heroIntroCut: 2.5, // play N seconds of the ending, stopping heroIntroCut seconds before the end (the outro logo); // opening background = the last N seconds of the intro video, with a sound button (0 = use the studio clip)
   studioVideo: "https://youtube.com/shorts/acj-V-isUmU",
@@ -240,7 +240,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 17,
+  layoutV: 18,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -337,6 +337,7 @@ window.mergeContent = function (saved) {
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
   }
+  if (saved && (saved.layoutV || 0) < 18) { if (d.bgVideo === "assets/hero.mp4") d.bgVideo = "assets/hero-v2.mp4"; d.layoutV = Math.max(d.layoutV || 0, 18); } // lighter opening video
   if (saved && (saved.layoutV || 0) < 17 && typeof d.aboutText === "string") { // about: singers + producers, names slightly bolder (Avishai asked)
     const NEW = "מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש*, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.";
     d.aboutText = d.aboutText.replace(/מביא להפקה שלך ניסיון עשיר[^\n]*?(ועוד\s*\.*\s*|\.)(?=\s*\n|$)/, NEW + " ");

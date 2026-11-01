@@ -1226,6 +1226,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .wq__t{float:left;font-style:normal;font-size:11px;color:#667781;margin:8px 10px 0 0;line-height:1;white-space:nowrap}
 .wq__tk{color:#53bdeb;font-weight:700;letter-spacing:-2px}
 #aboutBody b.nm{font-weight:600;color:inherit}
+.c3__media img.c3__poster{z-index:0}.c3__media video{z-index:0;background:transparent}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1264,7 +1265,7 @@ html,body{max-width:100%;overflow-x:hidden}
     <div class="hero__bg" id="heroBg">
       <div class="hero__media" id="heroMedia">
         <img class="hero__poster" id="heroImg" src="assets/hero.jpg" alt="" fetchpriority="high" onerror="this.remove()">
-        <video class="hero__mp4" id="heroVid" src="assets/hero.mp4" poster="assets/hero.jpg" muted autoplay loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+        <video class="hero__mp4" id="heroVid" src="assets/hero-v2.mp4" poster="assets/hero.jpg" muted autoplay loop playsinline webkit-playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
       </div>
       <div class="fog" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
@@ -1534,7 +1535,7 @@ window.SITE_DEFAULTS = {
   waMessage: "שלום אבישי 👋\nהגעתי אליך דרך האתר.\n\nשמי: \nאשמח לבדוק אם אתה פנוי להקלטת תופים בתאריך: \nסוג הפרויקט: שיר / מחרוזת / אלבום\nז'אנר: \n\nאשלח לך סקיצה ורפרנס כאן. תודה!",
   phone: "053-2854507",
   heroImage: "assets/hero.jpg",
-  bgVideo: "assets/hero.mp4",
+  bgVideo: "assets/hero-v2.mp4",
   introVideo: "https://youtu.be/SMZbWh5Qp8A",
   heroIntroEnd: 0, heroIntroCut: 2.5, // play N seconds of the ending, stopping heroIntroCut seconds before the end (the outro logo); // opening background = the last N seconds of the intro video, with a sound button (0 = use the studio clip)
   studioVideo: "https://youtube.com/shorts/acj-V-isUmU",
@@ -1581,7 +1582,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 17,
+  layoutV: 18,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1678,6 +1679,7 @@ window.mergeContent = function (saved) {
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
   }
+  if (saved && (saved.layoutV || 0) < 18) { if (d.bgVideo === "assets/hero.mp4") d.bgVideo = "assets/hero-v2.mp4"; d.layoutV = Math.max(d.layoutV || 0, 18); } // lighter opening video
   if (saved && (saved.layoutV || 0) < 17 && typeof d.aboutText === "string") { // about: singers + producers, names slightly bolder (Avishai asked)
     const NEW = "מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש*, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.";
     d.aboutText = d.aboutText.replace(/מביא להפקה שלך ניסיון עשיר[^\n]*?(ועוד\s*\.*\s*|\.)(?=\s*\n|$)/, NEW + " ");
@@ -2006,7 +2008,7 @@ window.mergeContent = function (saved) {
       const tryPlay = () => { v.muted = !(touched && soundOn && heroIn); const p = v.play(); if(p && p.catch) p.catch(() => { if(!v.muted){ v.muted = true; v.play().catch(() => {}); } }); };
       // sound on/off: starts muted (phones only allow that), one tap turns the studio sound on
       const sb = $("#heroSnd");
-      if(sb && /hero\.mp4/.test(bg)){
+      if(sb && /hero(-v2)?\.mp4/.test(bg)){
         sb.hidden = false;
         const paint = () => { const on = !v.muted; sb.classList.toggle("is-on", on); sb.setAttribute("aria-pressed", on); sb.setAttribute("aria-label", on ? "השתקה" : "הפעלת סאונד"); };
         const audible = () => !v.muted;
@@ -2146,7 +2148,7 @@ window.mergeContent = function (saved) {
         return { c, id, src, prev: id ? "" : previewOf(c, src), thumb: id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }; });
       ring.innerHTML = covers.map((cv,i) => `<div class="c3__card" data-i="${i}" role="button" tabindex="0" aria-label="קאבר ${esc(cv.c.style || "")}">
           <div class="c3__float" style="animation-delay:${(-i * .7).toFixed(1)}s">
-            <div class="c3__media">${cv.prev ? `<video src="${esc(cv.prev)}" ${cv.thumb ? `poster="${esc(cv.thumb)}"` : ""} muted loop playsinline autoplay preload="auto"></video>`
+            <div class="c3__media">${cv.prev ? `${cv.thumb ? `<img class="c3__poster" src="${esc(cv.thumb)}" alt="" decoding="async">` : ""}<video src="${esc(cv.prev)}" muted loop playsinline autoplay preload="metadata"></video>`
               : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" decoding="async">` : ""}</div>
             <span class="c3__glare" aria-hidden="true"></span>
             <span class="c3__tag">${esc(cv.c.style || cv.c.title || "")}</span>

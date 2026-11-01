@@ -1225,6 +1225,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .wq__in b{font-weight:700;color:#111b21}
 .wq__t{float:left;font-style:normal;font-size:11px;color:#667781;margin:8px 10px 0 0;line-height:1;white-space:nowrap}
 .wq__tk{color:#53bdeb;font-weight:700;letter-spacing:-2px}
+#aboutBody b.nm{font-weight:600;color:inherit}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1580,7 +1581,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 15,
+  layoutV: 16,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1676,6 +1677,11 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 16 && typeof d.aboutText === "string") { // about: singers + producers, names slightly bolder (Avishai asked)
+    const NEW = "מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש*, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת* ו*שי וגוס*.";
+    d.aboutText = d.aboutText.replace(/מביא להפקה שלך ניסיון עשיר[^\n]*?(ועוד\s*\.*\s*|\.)(?=\s*\n|$)/, NEW + " ");
+    d.layoutV = Math.max(d.layoutV || 0, 16);
   }
   if (saved && (saved.layoutV || 0) < 15) { // covers: funk first, then the new gospel one, pop-rock, pop; "ים-תיכוני" renamed (Avishai asked)
     const cv = Array.isArray(d.covers) ? d.covers.slice() : [];
@@ -1934,7 +1940,7 @@ window.mergeContent = function (saved) {
 
     // about
     txt("aboutTitle", S.aboutTitle); splitWords($("#aboutTitle"));
-    $("#aboutBody").innerHTML = String(S.aboutText || "").split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join("");
+    $("#aboutBody").innerHTML = String(S.aboutText || "").split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).map(p => `<p>${esc(p).replace(/\*([^*]+)\*/g, '<b class="nm">$1</b>').replace(/\n/g, "<br>")}</p>`).join("");
     if(real(S.aboutImage)) $("#aboutImg").src = S.aboutImage; else $("#aboutImg").remove();
 
     // facts + steps

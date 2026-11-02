@@ -1639,17 +1639,17 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 23,
+  layoutV: 24,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
+    { url: "https://youtu.be/mvIhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
     { url: "https://youtu.be/qV9VPSyfSVI", title: "אביה שרמן – הכל לטובה", show: true },
     { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/1ui0jm29em4", title: "אבישי רוזן – חמש דקות (קליפ רשמי)", show: true },
     { url: "https://youtu.be/9kgGM_m-i9I", title: "", show: true },
     { url: "https://youtu.be/qGAhDaOMN2s", title: "", show: true },
     { url: "https://youtu.be/i3dohlGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true },
-    { url: "https://youtu.be/mvIhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
     { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true }
   ],
   sources: [
@@ -1736,6 +1736,11 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 24) { // Michal Gringlick first (Avishai asked)
+    const pr = Array.isArray(d.productions) ? d.productions.slice() : [], i = pr.findIndex(p => p && /mvIhYC6DV9A/.test(p.url || ""));
+    if (i > 0) pr.unshift(pr.splice(i, 1)[0]);
+    d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 24);
   }
   if (saved && (saved.layoutV || 0) < 23) { // no bands; artists first, in an inviting order (Avishai asked)
     const drop = ["1QuNAhONztA", "ogfbC9pYXsQ", "dnbj0Vzzb-w"];

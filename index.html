@@ -1352,6 +1352,16 @@ html{background:#0f1716}
 .wave__head::before{content:"";position:absolute;left:-16px;right:-16px;top:0;bottom:-24px}
 .wave{touch-action:none}
 
+/* tighter seam between "how it works" and the covers */
+#process{padding-bottom:12px!important}
+#covers{padding-top:22px!important}
+/* about: the fader is a light dimmer — down = black & white and dim, up = full colour with a teal stage light */
+.about__media{--fv:.3}
+.about__card img{filter:grayscale(calc(1 - var(--fv) * 1.35)) saturate(calc(.75 + var(--fv) * .7)) brightness(calc(.62 + var(--fv) * .45)) contrast(1.05);transition:filter .15s linear}
+.about__card::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(120% 70% at 50% 0%,rgba(46,211,195,calc(var(--fv) * .38)),transparent 60%),radial-gradient(90% 60% at 50% 110%,rgba(255,190,110,calc(var(--fv) * .22)),transparent 70%)}
+.about__card{box-shadow:0 0 0 1px rgba(46,211,195,calc(var(--fv) * .5)),0 20px 60px -20px rgba(46,211,195,calc(var(--fv) * .6))}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1706,7 +1716,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 29,
+  layoutV: 30,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1752,7 +1762,7 @@ window.SITE_DEFAULTS = {
   ],
   custom: [],
   testimonials: [
-    { name: "ניצן אלון", role: "מפיקה", photo: "assets/people/nitzan-alon.jpg", text: "אבישי מתופף מקצועי, מדויק ומהיר, עם *סאונד מעולה וסורסים נקיים*. העבודה איתו מרחוק נוחה ויעילה – הוא שולח טייק ראשוני, מקבל הערות ומדייק את התפקיד בדיוק למה שההפקה צריכה. כמפיקה, לקבל תופים ברמה הכי גבוהה בלי להיות בסשן חוסך המון זמן, בלי שום פשרה על האיכות. ומעבר לזה – איש רגיש ומתוק שתמיד כיף לעבוד איתו ❤️", show: true },
+    { name: "ניצן אלון", role: "מפיקה", reply: "תודה ניצן היקרה, כיף לעבוד יחד 🙌🏼", photo: "assets/people/nitzan-alon.jpg", text: "אבישי מתופף מקצועי, מדויק ומהיר, עם *סאונד מעולה וסורסים נקיים*. העבודה איתו מרחוק נוחה ויעילה – הוא שולח טייק ראשוני, מקבל הערות ומדייק את התפקיד בדיוק למה שההפקה צריכה. כמפיקה, לקבל תופים ברמה הכי גבוהה בלי להיות בסשן חוסך המון זמן, בלי שום פשרה על האיכות. ומעבר לזה – איש רגיש ומתוק שתמיד כיף לעבוד איתו ❤️", show: true },
     { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true },
     { name: "יוני", role: "מפיק", photo: "assets/people/yoni.jpg", text: "הקלטתי אצל ישר כמה וכמה סשנים – מקרוב ומרחוק, בודדים וכפולים. אצלו זה אווירה, השקעה, תשומת לב והקשבה, ו*הסורסים הכי טובים שאפשר*. אף פעם לא מתאכזבים – אתם בידיים טובות 🥁", show: true },
     { name: "איציק סוויסה", role: "מפיק", photo: "assets/people/itzik-swisa.jpg", text: "זכיתי לעבוד עם אבישי בכמה פרויקטים מקוריים שהפקתי, והעבודה איתו היא פשוט תענוג – כיפית, מקצועית ומדויקת. אבישי יודע להביא את עצמו ואת *הצבע המדויק לשיר*, מבחירת הסנר הנכון ועד המכה שמכניסה את הלב לתוך השיר.", show: true }
@@ -1903,6 +1913,7 @@ window.mergeContent = function (saved) {
     const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [], i = t.findIndex(x => x && x.name === "ניצן אלון");
     if (i > 0) t.unshift(t.splice(i, 1)[0]); d.testimonials = t;
   }
+  if (saved && (saved.layoutV || 0) < 30) (d.testimonials || []).forEach(t => { if (t && t.name === "ניצן אלון" && !t.reply) t.reply = "תודה ניצן היקרה, כיף לעבוד יחד 🙌🏼"; });
   // final pass (runs after every older fix-up): the selected productions in the order Avishai chose, no duplicates, no bands
   if (saved && (saved.layoutV || 0) < 28) {
     const id = p => { const m = String(p && p.url || "").match(/(?:youtu\.be\/|v=|shorts\/)([\w-]{11})/); return m ? m[1] : ""; };
@@ -1911,7 +1922,7 @@ window.mergeContent = function (saved) {
     D.concat(Array.isArray(d.productions) ? d.productions : []).forEach(p => { const k = id(p); if (!k || seen.has(k) || drop.includes(k)) return; seen.add(k); out.push({...p}); });
     d.productions = out;
   }
-  if (saved && (saved.layoutV || 0) < 29) d.layoutV = 29;
+  if (saved && (saved.layoutV || 0) < 30) d.layoutV = 30;
   return d;
 };
 
@@ -1969,6 +1980,7 @@ window.mergeContent = function (saved) {
     styles: { "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
     cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
     names: { "הלוואי":"Halevai", "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "איציק סוויסה":"Itzik Swisa", "ניצן אלון":"Nitzan Alon", "מפיקה":"Producer", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
+    replies: { "ניצן אלון": "Thank you, dear Nitzan — always a joy working together 🙌🏼" },
     quotes: { "ניצן אלון": "Avishai is a professional, precise and fast drummer, with *a great sound and clean stems*. Working with him remotely is easy and efficient — he sends a first take, takes your notes and fine-tunes the part to exactly what the production needs. As a producer, getting top-level drums without being at the session saves me so much time, with zero compromise on quality. And beyond that, he's a sensitive, sweet person who's always a pleasure to work with ❤️", "איציק סוויסה": "I've had the privilege of working with Avishai on several original projects I produced, and it's always a pleasure — fun, professional and precise. Avishai brings himself and *exactly the right color to every song*, from choosing the right snare to the one hit that puts the heart into the track.", "יוני": "I've recorded quite a few sessions with Avishai — in person and remotely, single and double sessions. With him you get a great vibe, real dedication, attention to detail and someone who truly listens — plus *the best stems you can get*. Never once disappointed. You're in good hands 🥁", "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },
     titles: { "1QuNAhONztA": "Nishmecha Band — Shabbat Medley", "ogfbC9pYXsQ": "Purim Medley | IDF Military Rabbinate Band", "qV9VPSyfSVI": "Aviya Sherman — Hakol Letova", "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
   };
@@ -1979,7 +1991,7 @@ window.mergeContent = function (saved) {
     S.gear = (S.gear || []).map(g => ({...g, category: tr(T.cats, g.category || "כללי"), name: tr(T.names, g.name)}));
     if(Array.isArray(S.gearCats)) S.gearCats = S.gearCats.map(c => ({...c, name: tr(T.cats, c.name)}));
     S.sources = (S.sources || []).map(t => ({...t, name: tr(T.names, t.name)}));
-    S.testimonials = (S.testimonials || []).map(q => ({...q, text: T.quotes[q.name] || q.text, role: tr(T.names, q.role || "מפיק"), name: tr(T.names, q.name)}));
+    S.testimonials = (S.testimonials || []).map(q => ({...q, text: T.quotes[q.name] || q.text, reply: T.replies[q.name] || "", role: tr(T.names, q.role || "מפיק"), name: tr(T.names, q.name)}));
     S.productions = (S.productions || []).map(p => { const id = ytId(p.url); return {...p, title: T.titles[id] || (/[א-ת]/.test(p.title || "") ? "" : p.title)}; });
     S.marquee1 = "Rock, Pop, Funk, Mediterranean, Hasidic, Alternative";
     S.custom = []; S.show = {...S.show, facts:false, marquee:false};
@@ -2422,7 +2434,7 @@ window.mergeContent = function (saved) {
 
     // about: a studio fader — rides up with the scroll, and you can push it with a finger
     (() => { const f = $("#aboutFader"); if(!f) return; let held = false, cur = .3, want = .3, raf = 0;
-      const set = v => { cur = v; f.style.setProperty("--v", v.toFixed(3)); };
+      const media = f.closest(".about__media") || f.parentNode; const set = v => { cur = v; f.style.setProperty("--v", v.toFixed(3)); if(media) media.style.setProperty("--fv", v.toFixed(3)); };
       const ease = () => { cur += (want - cur) * .12; set(cur); raf = Math.abs(want - cur) > .002 ? requestAnimationFrame(ease) : 0; };
       const aim = v => { want = Math.max(0, Math.min(1, v)); if(!raf) raf = requestAnimationFrame(ease); };
       const fromScroll = () => { if(held) return; const r = f.getBoundingClientRect(); aim(.15 + .6 * Math.max(0, Math.min(1, (innerHeight - r.top) / (innerHeight + r.height)))); };
@@ -2490,7 +2502,8 @@ window.mergeContent = function (saved) {
       let liftT = 0; const lift = () => { stage.classList.add("lift"); clearTimeout(liftT); liftT = setTimeout(() => stage.classList.remove("lift"), 700); };
       function stopPlay(){ if(playing < 0) return; const el = cards[playing]; el.classList.remove("is-play"); el.querySelector(".c3__media")?.classList.remove("need-sound"); full.pause(); full.remove(); closeBtn.remove(); prog.remove();
         if(frame){ frame.remove(); frame = null; } playing = -1; stage.classList.remove("is-playing"); lift(); paint(); pauseFor(1500); }
-      function play(i){ const cv = covers[i]; if(!cv) return; stopPlay(); stopAuto(); clearTimeout(hold); pauseAudio();
+      let playAt = 0;
+      function play(i){ const cv = covers[i]; if(!cv) return; playAt = Date.now(); stopPlay(); stopAuto(); clearTimeout(hold); pauseAudio();
         playing = i; const el = cards[i], media = el.querySelector(".c3__media"); el.classList.add("is-play"); stage.classList.add("is-playing"); lift(); paint();
         if(!cv.id){ if(full.getAttribute("src") !== cv.src){ full.src = cv.src; if(cv.thumb) full.poster = cv.thumb; }
           media.appendChild(full); media.appendChild(prog); prog.firstChild.style.width = "0%"; full.muted = false; try{ full.currentTime = 0; }catch(_){}
@@ -2504,8 +2517,9 @@ window.mergeContent = function (saved) {
       full.addEventListener("timeupdate", () => { if(full.duration) prog.firstChild.style.width = (full.currentTime / full.duration * 100).toFixed(1) + "%"; });
       full.addEventListener("ended", stopPlay);
       closeBtn.addEventListener("click", e => { e.stopPropagation(); stopPlay(); });
-      document.addEventListener("click", e => { if(playing < 0) return; const m = cards[playing] && cards[playing].querySelector(".c3__media");
-        if(m && m.contains(e.target)) return; if(e.target.closest(".c3__card") && e.target.closest(".c3__card") !== cards[playing]) return; stopPlay(); }, true);
+      const outside = e => { if(playing < 0) return; const m = cards[playing] && cards[playing].querySelector(".c3__media");
+        if(m && m.contains(e.target)) return; if(e.target.closest(".c3__card") && e.target.closest(".c3__card") !== cards[playing]) return; if(Date.now() - playAt < 400) return; stopPlay(); };
+      ["pointerdown","touchstart"].forEach(ev => document.addEventListener(ev, outside, {capture:true, passive:true}));
       // tap: front card plays; a side card turns to the front and plays — one tap
       let moved = false;
       ring.addEventListener("click", e => { if(moved) return; const el = e.target.closest(".c3__card"); if(!el) return; const i = +el.dataset.i;
@@ -2702,7 +2716,7 @@ window.mergeContent = function (saved) {
             <span class="wq__nm"><b>${esc(q.name)}</b><small>${q.role ? esc(q.role) : L("מפיק","Producer")}</small></span></div>
           <div class="wq__body">
             <p class="wq__in">${esc(q.text).replace(/\*([^*]+)\*/g, "<b>$1</b>")}<em class="wq__t">${times[k % times.length]}</em></p>
-            <p class="wq__out">${replies[k % replies.length]}<em class="wq__t">${times[k % times.length].replace(/\d$/, d => (+d + 1) % 10)} <span class="wq__tk">✓✓</span></em></p>
+            <p class="wq__out">${esc(q.reply || replies[k % replies.length])}<em class="wq__t">${times[k % times.length].replace(/\d$/, d => (+d + 1) % 10)} <span class="wq__tk">✓✓</span></em></p>
           </div>
         </figure>`; };
       const box = $("#quotes"), set = quotes.map(card).join(""), reps = quotes.length < 4 ? 4 : 2;
@@ -2723,7 +2737,7 @@ window.mergeContent = function (saved) {
         box.addEventListener("pointerdown", hold); box.addEventListener("touchstart", hold, {passive:true});
         ["pointerup","pointercancel","touchend","mouseleave"].forEach(ev => box.addEventListener(ev, release, {passive:true}));
         box.addEventListener("scroll", () => { if(held){ const u = unit(); if(box.scrollLeft < u * .5) box.scrollLeft += u; else if(box.scrollLeft > u * 2.5) box.scrollLeft -= u; } }, {passive:true});
-        requestAnimationFrame(() => { box.scrollLeft = Math.round(unit()); x = box.scrollLeft; });
+        requestAnimationFrame(() => { const first = track.children[quotes.length] || track.firstElementChild; box.scrollLeft = Math.round(first.offsetLeft - (box.clientWidth - first.offsetWidth) / 2); x = box.scrollLeft; held = true; setTimeout(() => { held = false; last = 0; x = box.scrollLeft; }, 2500); });
         if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; }).observe(box); else inView = true;
         raf = requestAnimationFrame(step);
       }

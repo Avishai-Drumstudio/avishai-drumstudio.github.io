@@ -1660,7 +1660,7 @@ window.SITE_DEFAULTS = {
   hCovers: "קאברים",
   pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
   covers: [
-    { url: "assets/covers/funk.mp4", poster: "assets/covers/funk.jpg", style: "פאנק", title: "", show: true },
+    { url: "assets/covers/funk.mp4", poster: "assets/covers/funk.jpg", style: "פיוז׳ן", title: "", show: true },
     { url: "assets/covers/c6.mp4", poster: "assets/covers/c6.jpg", style: "גוספל", title: "", show: true },
     { url: "assets/covers/c5.mp4", poster: "assets/covers/c5.jpg", style: "פופ-רוק", title: "", show: true },
     { url: "assets/covers/c2.mp4", poster: "assets/covers/c2.jpg", style: "פופ", title: "", show: true },
@@ -1677,7 +1677,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 25,
+  layoutV: 26,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1775,6 +1775,9 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 26) { // the funk cover is called fusion
+    d.covers = (Array.isArray(d.covers) ? d.covers : []).map(x => x && /funk\.mp4/.test(x.url || "") ? {...x, style: "פיוז׳ן"} : x); d.layoutV = Math.max(d.layoutV || 0, 26);
   }
   if (saved && (saved.layoutV || 0) < 25) { // testimonial: איציק סוויסה
     const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [];
@@ -1908,7 +1911,7 @@ window.mergeContent = function (saved) {
       { title: "The Recording", text: "I send you a take for your notes, or we jump on a live video call so you hear the room in real time — just like being there." },
       { title: "The Stems", text: "Within 24 hours you'll have clean, mix-ready stems in your preferred format. Up to 3 rounds of revisions included." }
     ],
-    styles: { "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
+    styles: { "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
     cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
     names: { "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "איציק סוויסה":"Itzik Swisa", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
     quotes: { "איציק סוויסה": "I've had the privilege of working with Avishai on several original projects I produced, and it's always a pleasure — fun, professional and precise. Avishai brings himself and *exactly the right color to every song*, from choosing the right snare to the one hit that puts the heart into the track.", "יוני": "I've recorded quite a few sessions with Avishai — in person and remotely, single and double sessions. With him you get a great vibe, real dedication, attention to detail and someone who truly listens — plus *the best stems you can get*. Never once disappointed. You're in good hands 🥁", "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },

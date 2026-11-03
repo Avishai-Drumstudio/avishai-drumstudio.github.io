@@ -223,7 +223,7 @@ window.SITE_DEFAULTS = {
   hCovers: "קאברים",
   pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
   covers: [
-    { url: "assets/covers/funk.mp4", poster: "assets/covers/funk.jpg", style: "פאנק", title: "", show: true },
+    { url: "assets/covers/funk.mp4", poster: "assets/covers/funk.jpg", style: "פיוז׳ן", title: "", show: true },
     { url: "assets/covers/c6.mp4", poster: "assets/covers/c6.jpg", style: "גוספל", title: "", show: true },
     { url: "assets/covers/c5.mp4", poster: "assets/covers/c5.jpg", style: "פופ-רוק", title: "", show: true },
     { url: "assets/covers/c2.mp4", poster: "assets/covers/c2.jpg", style: "פופ", title: "", show: true },
@@ -240,7 +240,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 25,
+  layoutV: 26,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -338,6 +338,9 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 26) { // the funk cover is called fusion
+    d.covers = (Array.isArray(d.covers) ? d.covers : []).map(x => x && /funk\.mp4/.test(x.url || "") ? {...x, style: "פיוז׳ן"} : x); d.layoutV = Math.max(d.layoutV || 0, 26);
   }
   if (saved && (saved.layoutV || 0) < 25) { // testimonial: איציק סוויסה
     const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [];

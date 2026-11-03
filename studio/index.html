@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261104001154';
+window.STUDIO_VERSION = '20261104003806';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -2136,6 +2136,26 @@ function rqSummary(q, data) {
   return 'עדכון: ' + who + ' — ' + q.preview.changes.map(c => c[0] + ' ' + (c[2] || 'ריק')).join(', ');
 }
 
+/* "שולם?" אחרי אירוע — אירועים מהיומיים האחרונים (והיום, אחרי שעת הסיום) שעוד לא שולמו ולא נשאלו */
+const HM_NOW = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+function payCheckList(gigs, cfg, skipIds) {
+  const t = todayISO(), from = addDays(t, -2), asked = (cfg && cfg.payAsk) || {}, now = HM_NOW();
+  return gigs.filter(g => Number(g.fee) > 0 && !g.paidDate && g.date >= from && g.date <= t && !asked[g.id] && !skipIds.has(g.id)
+    && (g.date < t || now >= (g.end && g.end > (g.start || '') ? g.end : '22:00')))
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.start || '').localeCompare(b.start || ''));
+}
+function PayCheck({ list, onAnswer, onClose }) {
+  return html`<${Modal} title="💰 שולם?" onClose=${onClose}>
+    <ul className="space-y-3">${list.map(g => html`<li key=${g.id} className="rounded-2xl glass-soft p-3">
+      <p className="text-sm font-semibold">${shortDate(g.date)} ${gigLine(g)} · <b>${money(amt(g))}</b></p>
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        <button onClick=${() => onAnswer(g, 'מזומן')} className="rounded-2xl grad px-2 py-3 text-sm font-bold">💵 מזומן</button>
+        <button onClick=${() => onAnswer(g, 'העברה בנקאית')} className="rounded-2xl grad px-2 py-3 text-sm font-bold">🏦 העברה</button>
+        <button onClick=${() => onAnswer(g, '')} className="rounded-2xl glass-soft px-2 py-3 text-sm font-bold">❌ עוד לא</button>
+      </div></li>`)}</ul>
+  <//>`;
+}
+
 function SecretaryInbox({ list, data, busy, onDecide, onClose }) {
   const ok = list.filter(q => !q.err);
   return html`<${Modal} title=${'📋 המזכירה מבקשת (' + list.length + ')'} onClose=${onClose} wide>
@@ -3642,6 +3662,20 @@ function App() {
   const planNew = planNow.filter(t => t.op === 'create').length, planUpd = planNow.filter(t => t.op === 'update').length, planDel = planNow.filter(t => t.op === 'delete' && !t.keep).length;
   const gsyncApi = { planNew, planUpd, planDel, fullPending, runFull, ok: mcpOk, pending: gPending, running: gsRun.running, done: gsRun.done, total: gsRun.total, error: gsRun.error, run: runSync, calendars: gCals, loadCalendars, setCalendar };
   const smN = sec.list.length;
+  /* חלון "שולם?" — נפתח לבד בפתיחת האפליקציה אחרי אירוע (פעם אחת בכל פתיחה) */
+  const [payQ, setPayQ] = useState(null), payQShown = useRef(false);
+  useEffect(() => {
+    if (!lastSync || payQShown.current) return;
+    const skip = new Set(); sec.list.forEach(q => (q.ids || []).forEach(x => skip.add(x)));
+    const l = payCheckList(gigs, data.config, skip);
+    if (l.length) { payQShown.current = true; setPayQ(l); }
+  }, [!!lastSync, sec.at]);
+  const payAnswer = (g, method) => {
+    if (method) { update(g.id, { paidDate: todayISO(), method }); setToast('💰 ' + (g.client || autoTitle(g)) + ' — שולם ב' + method); setTimeout(() => celebrate('paid'), 120); }
+    else { setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { payAsk: Object.assign({}, ((d.config || {}).payAsk) || {}, { [g.id]: todayISO() }) }) })); setToast('⏳ נשאר ממתין לתשלום'); }
+    setPayQ(l => { const n = (l || []).filter(x => x.id !== g.id); return n.length ? n : null; });
+    setTimeout(() => window.__secSyncSilent && window.__secSyncSilent(), 1500);
+  };
   const smBtn = window.SM_SHEET_ID ? html`
       <button onClick=${() => smN ? setInboxOpen(true) : secSync(true)} disabled=${sec.status === 'working'} aria-label=${smN ? smN + ' בקשות מהמזכירה מחכות' : 'סנכרון מזכירה'}
         className=${'relative flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ' + (smN ? 'grad' : sec.status === 'error' ? 'glass-soft text-bad' : sec.status === 'need' && sec.at ? 'glass-soft text-warn' : 'glass-soft text-muted')}>
@@ -4005,6 +4039,7 @@ function App() {
         }} />`}
       ${lockOn && appLocked && html`<${AppLock} admin=${data.admin} pin=${(data.config || {}).pin} onOk=${() => appUnlocked(data.admin.hash)} onSetPin=${pin => setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { pin }) }))} />`}
       ${login && html`<${AdminLogin} adminData=${data.admin} mode=${login} onSuccess=${onLoggedIn} onSetPassword=${onSetPassword} onClose=${() => setLogin(null)} />`}
+      ${payQ && !(lockOn && appLocked) && html`<${PayCheck} list=${payQ} onAnswer=${payAnswer} onClose=${() => setPayQ(null)} />`}
       ${inboxOpen && html`<${SecretaryInbox} list=${sec.list} data=${data} busy=${secBusy} onDecide=${secDecide} onClose=${() => setInboxOpen(false)} />`}
       ${histOpen && html`<${Modal} title="מכונת הזמן — חזרה אחורה" onClose=${() => setHistOpen(false)}>
         <p className="text-sm text-muted">כל מה ששינית מאז שפתחת את האפליקציה. אפשר לבטל את הפעולה האחרונה, או לחזור לכל נקודה קודמת.</p>

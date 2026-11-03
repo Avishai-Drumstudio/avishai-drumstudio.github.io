@@ -54,6 +54,8 @@ End commit messages with the attribution lines the session gives you.
   request id = one request. Pending (status empty/ממתין) are shown in `SecretaryInbox`; only on approval: cloud backup
   (`__studioBackups.snap`, slots backup-pre-0..9) → `rqApply` → status בוצע / נדחה. Executed ids kept in `config.rqDone`.
 - New gig fields: `dress` (קוד לבוש), `production` (הפקה), `setlist` (רשימת שירים).
-- Payment check links: `#pay=<gigId>&m=cash|transfer|no` (from the 23:00 "💰 שולם?" Google Calendar events that the main
-  secretary's 22:00 scheduled task creates) → after cloud load, confirm → paidDate=today + method (מזומן / העברה בנקאית).
+- "💰 שולם?" popup (`PayCheck`): on app open, gigs from the last 2 days (today only after its end time) with fee > 0, not paid,
+  not in `config.payAsk`, not in a pending secretary request → 💵 מזומן / 🏦 העברה (paidDate=today + method) / ❌ עוד לא (payAsk[id]).
+  The main secretary also asks at 23:00 in chat (scheduled task) and writes the answer as a request in "בקשות" for approval.
+- Payment check links `#pay=<gigId>&m=cash|transfer|no` still work (confirm → mark paid), but nothing creates them now.
   Calendar adoption in `create_event` skips events starting with 🎼 / 💰 / ☀️.

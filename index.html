@@ -1314,6 +1314,10 @@ html{background:#0f1716}
 #testimonials .head{margin-bottom:12px}
 #testimonials .head h2{font-size:clamp(1.5rem,5.6vw,2.3rem)}
 .quotes__track{gap:12px!important}
+/* YouTube fallbacks */
+.ytout{position:absolute;z-index:6;top:8px;inset-inline-start:8px;font:600 11.5px/1 Rubik,system-ui,sans-serif;color:#fff;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.2);padding:6px 9px;border-radius:999px;text-decoration:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.ytfail{position:absolute;inset:0;z-index:5;display:grid;place-items:center;align-content:center;gap:10px;background:radial-gradient(circle at 50% 45%,rgba(46,211,195,.18),rgba(8,12,11,.92));color:#fff;text-decoration:none;font:700 15px/1.2 Rubik,system-ui,sans-serif;border-radius:inherit}
+.ytfail__play{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:#FF0033;font-size:24px;padding-left:4px;box-shadow:0 10px 30px rgba(255,0,51,.35)}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1961,7 +1965,26 @@ window.mergeContent = function (saved) {
   // the opening video gets the connection first; the rest of the photos warm up quietly once the page has settled
   addEventListener("load", () => setTimeout(() => { try { Object.values(GEAR_MAP).forEach(u => { const i = new Image(); i.decoding = "async"; i.src = u; });
     document.querySelectorAll('img[loading="lazy"]').forEach(im => { im.loading = "eager"; }); } catch(e){} }, 3500));
-  const embedUrl = (id, extra="") => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1${extra}`;
+  const embedUrl = (id, extra="") => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}${extra}`;
+  // every YouTube player gets a "watch on YouTube" way out, and if the player itself fails (in-app browsers, blocked embeds) it turns into a big button
+  (() => { const seen = new WeakSet();
+    const watchUrl = src => { const m = String(src).match(/embed\/([\w-]{11})/); return m ? `https://www.youtube.com/watch?v=${m[1]}` : ""; };
+    const fail = fr => { const url = watchUrl(fr.src); if(!url || !fr.parentNode) return;
+      const a = document.createElement("a"); a.className = "ytfail"; a.href = url; a.target = "_blank"; a.rel = "noopener";
+      a.innerHTML = `<span class="ytfail__play">▶</span><b>${L("לצפייה ביוטיוב","Watch on YouTube")}</b>`; if(fr._out) fr._out.remove(); fr.replaceWith(a); };
+    const hook = fr => { if(seen.has(fr) || !/youtube(-nocookie)?\.com\/embed\//.test(fr.src) || fr.id === "heroYt") return; seen.add(fr);
+      const url = watchUrl(fr.src), host = fr.parentNode;
+      if(url && host && !host.querySelector(".ytout")){ const a = document.createElement("a"); a.className = "ytout"; a.href = url; a.target = "_blank"; a.rel = "noopener"; a.textContent = L("פתיחה ביוטיוב ↗","Open in YouTube ↗"); host.appendChild(a); fr._out = a; }
+      let ok = false;
+      const listen = () => { try { fr.contentWindow.postMessage(JSON.stringify({event:"listening", id:"yt", channel:"widget"}), "*"); } catch(e){} };
+      fr.addEventListener("load", () => { ok = true; listen(); setTimeout(listen, 700); setTimeout(listen, 2000); });
+      addEventListener("message", e => { if(e.source !== fr.contentWindow) return; let d; try { d = typeof e.data === "string" ? JSON.parse(e.data) : e.data; } catch(err){ return; }
+        if(!d) return; if(d.event === "onReady" || d.event === "infoDelivery" || d.event === "initialDelivery") ok = true;
+        if(d.event === "onError") fail(fr); });
+      // the player frame never loaded at all = blocked; a loaded player keeps playing (the YouTube link stays as a way out)
+      setTimeout(() => { if(!ok && fr.isConnected) fail(fr); }, 12000); };
+    new MutationObserver(ms => ms.forEach(m => { m.removedNodes.forEach(n => { if(n.nodeType === 1){ (n.tagName === "IFRAME" ? [n] : [...(n.querySelectorAll ? n.querySelectorAll("iframe") : [])]).forEach(f => f._out && f._out.remove()); } }); m.addedNodes.forEach(n => { if(n.nodeType !== 1) return; if(n.tagName === "IFRAME") hook(n); else n.querySelectorAll && n.querySelectorAll("iframe").forEach(hook); }); }))
+      .observe(document.documentElement, {childList:true, subtree:true}); })();
   const thumbFix = "if(this.naturalWidth<=120){this.remove()}";
 
   /* ---------------- load content (saved in the admin panel) ---------------- */
@@ -2027,7 +2050,7 @@ window.mergeContent = function (saved) {
     function playInline(it){
       if(it.classList.contains("is-playing")) return;
       stopInline(); pauseAudio(); it.classList.add("is-playing");
-      it.insertAdjacentHTML("beforeend", `<iframe class="reel__frame" src="${embedUrl(it.dataset.id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`);
+      it.insertAdjacentHTML("beforeend", `<iframe class="reel__frame" src="${embedUrl(it.dataset.id)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`);
     }
     track.addEventListener("click", e => { const it = e.target.closest(".reel__item"); if(!it || dragged) return;
       const i = +it.dataset.i; stopAuto(); if(i === active) playInline(it); else center(i); });
@@ -2257,7 +2280,7 @@ window.mergeContent = function (saved) {
       const fr = $("#heroYt"); let dur = 0, start = 0, seeked = false, shown = false, soundOn = false, heroIn = true;
       const cmd = (func, args = []) => { try { fr.contentWindow.postMessage(JSON.stringify({event:"command", func, args}), "*"); } catch(e){} };
       const listen = () => { try { fr.contentWindow.postMessage(JSON.stringify({event:"listening", id:"heroYt", channel:"widget"}), "*"); } catch(e){} };
-      fr.addEventListener("load", () => { listen(); setTimeout(listen, 600); setTimeout(listen, 1500); });
+      fr.addEventListener("load", () => { ok = true; listen(); setTimeout(listen, 600); setTimeout(listen, 1500); });
       addEventListener("message", e => {
         if(!/youtube/.test(e.origin) || e.source !== fr.contentWindow) return;
         let d; try { d = typeof e.data === "string" ? JSON.parse(e.data) : e.data; } catch(err){ return; }
@@ -2297,7 +2320,7 @@ window.mergeContent = function (saved) {
       if(!introId || $("#heroPlayer")) return; pauseAudio();
       $("#hero").classList.add("is-playing");
       $("#hero").insertAdjacentHTML("beforeend", `<div class="hero__player" id="heroPlayer">
-        <div class="hero__player-box"><iframe src="${embedUrl(introId)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+        <div class="hero__player-box"><iframe src="${embedUrl(introId)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
         <button type="button" class="hero__player-x" aria-label="${L("סגירת הסרטון","Close video")}"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
       </div>`);
       $("#heroPlayer .hero__player-x").addEventListener("click", closeHeroPlayer);
@@ -2410,7 +2433,7 @@ window.mergeContent = function (saved) {
         if(!cv.id){ if(full.getAttribute("src") !== cv.src){ full.src = cv.src; if(cv.thumb) full.poster = cv.thumb; }
           media.appendChild(full); media.appendChild(prog); prog.firstChild.style.width = "0%"; full.muted = false; try{ full.currentTime = 0; }catch(_){}
           const p = full.play(); if(p && p.catch) p.catch(() => stopPlay()); }
-        else { frame = document.createElement("iframe"); frame.className = "c3__yt"; frame.src = embedUrl(cv.id); frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; frame.title = "YouTube"; media.appendChild(frame); }
+        else { frame = document.createElement("iframe"); frame.className = "c3__yt"; frame.src = embedUrl(cv.id); frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; frame.title = "YouTube"; frame.referrerPolicy = "strict-origin-when-cross-origin"; media.appendChild(frame); }
         el.querySelector(".c3__float").appendChild(closeBtn); }
       full.addEventListener("timeupdate", () => { if(full.duration) prog.firstChild.style.width = (full.currentTime / full.duration * 100).toFixed(1) + "%"; });
       full.addEventListener("ended", stopPlay);
@@ -2650,12 +2673,12 @@ window.mergeContent = function (saved) {
   document.addEventListener("click", e => {
     const b = e.target.closest(".video button"); if(!b) return;
     pauseAudio(); const box = b.parentElement;
-    box.innerHTML = `<iframe src="${embedUrl(box.dataset.id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    box.innerHTML = `<iframe src="${embedUrl(box.dataset.id)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   });
   let lenis = null, lastFocus = null;
   function openModal(id){
     if(!id) return; pauseAudio(); lastFocus = document.activeElement;
-    $("#modalBox").innerHTML = `<iframe src="${embedUrl(id)}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    $("#modalBox").innerHTML = `<iframe src="${embedUrl(id)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
     $("#modalYt").href = `https://www.youtube.com/watch?v=${id}`;
     $("#modal").hidden = false; lenis && lenis.stop(); document.documentElement.style.overflow = "hidden"; $("#modalClose").focus();
   }

@@ -1698,7 +1698,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 27,
+  layoutV: 28,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1746,7 +1746,8 @@ window.SITE_DEFAULTS = {
   testimonials: [
     { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true },
     { name: "יוני", role: "מפיק", photo: "assets/people/yoni.jpg", text: "הקלטתי אצל ישר כמה וכמה סשנים – מקרוב ומרחוק, בודדים וכפולים. אצלו זה אווירה, השקעה, תשומת לב והקשבה, ו*הסורסים הכי טובים שאפשר*. אף פעם לא מתאכזבים – אתם בידיים טובות 🥁", show: true },
-    { name: "איציק סוויסה", role: "מפיק", photo: "assets/people/itzik-swisa.jpg", text: "זכיתי לעבוד עם אבישי בכמה פרויקטים מקוריים שהפקתי, והעבודה איתו היא פשוט תענוג – כיפית, מקצועית ומדויקת. אבישי יודע להביא את עצמו ואת *הצבע המדויק לשיר*, מבחירת הסנר הנכון ועד המכה שמכניסה את הלב לתוך השיר.", show: true }
+    { name: "איציק סוויסה", role: "מפיק", photo: "assets/people/itzik-swisa.jpg", text: "זכיתי לעבוד עם אבישי בכמה פרויקטים מקוריים שהפקתי, והעבודה איתו היא פשוט תענוג – כיפית, מקצועית ומדויקת. אבישי יודע להביא את עצמו ואת *הצבע המדויק לשיר*, מבחירת הסנר הנכון ועד המכה שמכניסה את הלב לתוך השיר.", show: true },
+    { name: "ניצן אלון", role: "מפיקה", photo: "assets/people/nitzan-alon.jpg", text: "אבישי מתופף מקצועי, מדויק ומהיר, עם *סאונד מעולה וסורסים נקיים*. העבודה איתו מרחוק נוחה ויעילה – הוא שולח טייק ראשוני, מקבל הערות ומדייק את התפקיד בדיוק למה שההפקה צריכה. כמפיקה, לקבל תופים ברמה הכי גבוהה בלי להיות בסשן חוסך המון זמן, בלי שום פשרה על האיכות. ומעבר לזה – איש רגיש ומתוק שתמיד כיף לעבוד איתו ❤️", show: true }
   ],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
@@ -1885,6 +1886,19 @@ window.mergeContent = function (saved) {
   all.forEach((k, i) => { if (d.order.includes(k)) return;
     const prev = all.slice(0, i).reverse().find(x => d.order.includes(x)); // new sections land next to their default neighbour
     prev ? d.order.splice(d.order.indexOf(prev) + 1, 0, k) : d.order.unshift(k); });
+  if (saved && (saved.layoutV || 0) < 28) { // testimonial: ניצן אלון
+    const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [];
+    if (!t.some(x => x && x.name === "ניצן אלון")) t.push(JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials.find(x => x.name === "ניצן אלון"))));
+    d.testimonials = t;
+  }
+  // final pass (runs after every older fix-up): the selected productions in the order Avishai chose, no duplicates, no bands
+  if (saved && (saved.layoutV || 0) < 28) {
+    const id = p => { const m = String(p && p.url || "").match(/(?:youtu\.be\/|v=|shorts\/)([\w-]{11})/); return m ? m[1] : ""; };
+    const drop = ["1QuNAhONztA", "ogfbC9pYXsQ", "dnbj0Vzzb-w"];
+    const D = window.SITE_DEFAULTS.productions, seen = new Set(), out = [];
+    D.concat(Array.isArray(d.productions) ? d.productions : []).forEach(p => { const k = id(p); if (!k || seen.has(k) || drop.includes(k)) return; seen.add(k); out.push({...p}); });
+    d.productions = out; d.layoutV = 28;
+  }
   return d;
 };
 
@@ -1941,8 +1955,8 @@ window.mergeContent = function (saved) {
     ],
     styles: { "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
     cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
-    names: { "הלוואי":"Halevai", "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "איציק סוויסה":"Itzik Swisa", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
-    quotes: { "איציק סוויסה": "I've had the privilege of working with Avishai on several original projects I produced, and it's always a pleasure — fun, professional and precise. Avishai brings himself and *exactly the right color to every song*, from choosing the right snare to the one hit that puts the heart into the track.", "יוני": "I've recorded quite a few sessions with Avishai — in person and remotely, single and double sessions. With him you get a great vibe, real dedication, attention to detail and someone who truly listens — plus *the best stems you can get*. Never once disappointed. You're in good hands 🥁", "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },
+    names: { "הלוואי":"Halevai", "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "איציק סוויסה":"Itzik Swisa", "ניצן אלון":"Nitzan Alon", "מפיקה":"Producer", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
+    quotes: { "ניצן אלון": "Avishai is a professional, precise and fast drummer, with *a great sound and clean stems*. Working with him remotely is easy and efficient — he sends a first take, takes your notes and fine-tunes the part to exactly what the production needs. As a producer, getting top-level drums without being at the session saves me so much time, with zero compromise on quality. And beyond that, he's a sensitive, sweet person who's always a pleasure to work with ❤️", "איציק סוויסה": "I've had the privilege of working with Avishai on several original projects I produced, and it's always a pleasure — fun, professional and precise. Avishai brings himself and *exactly the right color to every song*, from choosing the right snare to the one hit that puts the heart into the track.", "יוני": "I've recorded quite a few sessions with Avishai — in person and remotely, single and double sessions. With him you get a great vibe, real dedication, attention to detail and someone who truly listens — plus *the best stems you can get*. Never once disappointed. You're in good hands 🥁", "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },
     titles: { "1QuNAhONztA": "Nishmecha Band — Shabbat Medley", "ogfbC9pYXsQ": "Purim Medley | IDF Military Rabbinate Band", "qV9VPSyfSVI": "Aviya Sherman — Hakol Letova", "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
   };
   const toEN = S => { if(!EN) return S; const T = EN_TEXT, tr = (m, v) => (m[String(v || "").trim()] || v);
@@ -2493,7 +2507,7 @@ window.mergeContent = function (saved) {
       // only move / play loops while on screen; first touch wakes loops in battery-saver mode
       const wake = () => { if(!inView || reduce) return; loops.forEach(v => { if(v._near === false) return; v.muted = true; if(v.paused) v.play().catch(() => {}); }); };
       if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting;
-        if(inView){ wake(); startAuto(); } else { stopAuto(); stopPlay(); loops.forEach(v => v.pause()); } }, {threshold:.25}).observe(stage);
+        if(inView){ wake(); startAuto(); } else { stopAuto(); loops.forEach(v => v.pause()); } // a cover that is playing keeps playing while you scroll on }, {threshold:.25}).observe(stage);
       else { inView = true; startAuto(); }
       ["touchstart","pointerdown","scroll"].forEach(ev => addEventListener(ev, wake, {passive:true}));
       // restart the timing line every automatic step

@@ -240,7 +240,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 30,
+  layoutV: 31,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -390,7 +390,7 @@ window.mergeContent = function (saved) {
   }
   if (saved && (saved.layoutV || 0) < 18) { if (d.bgVideo === "assets/hero.mp4") d.bgVideo = "assets/hero-v2.mp4"; d.layoutV = Math.max(d.layoutV || 0, 18); } // lighter opening video
   if (saved && (saved.layoutV || 0) < 17 && typeof d.aboutText === "string") { // about: singers + producers, names slightly bolder (Avishai asked)
-    const NEW = "מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש*, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.";
+    const NEW = "מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.";
     d.aboutText = d.aboutText.replace(/מביא להפקה שלך ניסיון עשיר[^\n]*?(ועוד\s*\.*\s*|\.)(?=\s*\n|$)/, NEW + " ");
     d.layoutV = Math.max(d.layoutV || 0, 17);
   }
@@ -446,7 +446,10 @@ window.mergeContent = function (saved) {
     D.concat(Array.isArray(d.productions) ? d.productions : []).forEach(p => { const k = id(p); if (!k || seen.has(k) || drop.includes(k)) return; seen.add(k); out.push({...p}); });
     d.productions = out;
   }
-  if (saved && (saved.layoutV || 0) < 30) d.layoutV = 30;
+  if (saved && (saved.layoutV || 0) < 31 && typeof d.aboutText === "string") d.aboutText = d.aboutText.replace("*אביב אלוש*, ומפיקים", "*אביב אלוש* ועוד, ומפיקים"); // Avishai asked
+  // sharper cover videos (always, so older saves pick them up too)
+  if (Array.isArray(d.covers)) d.covers = d.covers.map(x => x && /covers\/(c\d|funk)\.mp4$/.test(x.url || "") ? {...x, url: x.url.replace(/\.mp4$/, "-hq.mp4")} : x);
+  if (saved && (saved.layoutV || 0) < 31) d.layoutV = 31;
   return d;
 };
 

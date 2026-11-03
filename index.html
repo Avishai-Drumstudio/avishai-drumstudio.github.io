@@ -1362,6 +1362,13 @@ html{background:#0f1716}
   background:radial-gradient(120% 70% at 50% 0%,rgba(46,211,195,calc(var(--fv) * .38)),transparent 60%),radial-gradient(90% 60% at 50% 110%,rgba(255,190,110,calc(var(--fv) * .22)),transparent 70%)}
 .about__card{box-shadow:0 0 0 1px rgba(46,211,195,calc(var(--fv) * .5)),0 20px 60px -20px rgba(46,211,195,calc(var(--fv) * .6))}
 
+/* covers: a draggable dot on the time line */
+.c3__prog{left:12px;right:12px;bottom:6px;height:22px;background:none;overflow:visible;touch-action:none;cursor:pointer;direction:ltr}
+.c3__prog::before{content:"";position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;border-radius:3px;background:rgba(255,255,255,.25)}
+.c3__prog i{position:absolute;left:0;top:50%;height:3px;margin-top:-1.5px;border-radius:3px}
+.c3__prog i b{position:absolute;right:-7px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(46,211,195,.35),0 2px 6px rgba(0,0,0,.4);transition:transform .15s}
+.c3__prog.seek i{transition:none}.c3__prog.seek i b{transform:scale(1.3)}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1716,7 +1723,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 30,
+  layoutV: 31,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1866,7 +1873,7 @@ window.mergeContent = function (saved) {
   }
   if (saved && (saved.layoutV || 0) < 18) { if (d.bgVideo === "assets/hero.mp4") d.bgVideo = "assets/hero-v2.mp4"; d.layoutV = Math.max(d.layoutV || 0, 18); } // lighter opening video
   if (saved && (saved.layoutV || 0) < 17 && typeof d.aboutText === "string") { // about: singers + producers, names slightly bolder (Avishai asked)
-    const NEW = "מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש*, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.";
+    const NEW = "מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.";
     d.aboutText = d.aboutText.replace(/מביא להפקה שלך ניסיון עשיר[^\n]*?(ועוד\s*\.*\s*|\.)(?=\s*\n|$)/, NEW + " ");
     d.layoutV = Math.max(d.layoutV || 0, 17);
   }
@@ -1922,7 +1929,10 @@ window.mergeContent = function (saved) {
     D.concat(Array.isArray(d.productions) ? d.productions : []).forEach(p => { const k = id(p); if (!k || seen.has(k) || drop.includes(k)) return; seen.add(k); out.push({...p}); });
     d.productions = out;
   }
-  if (saved && (saved.layoutV || 0) < 30) d.layoutV = 30;
+  if (saved && (saved.layoutV || 0) < 31 && typeof d.aboutText === "string") d.aboutText = d.aboutText.replace("*אביב אלוש*, ומפיקים", "*אביב אלוש* ועוד, ומפיקים"); // Avishai asked
+  // sharper cover videos (always, so older saves pick them up too)
+  if (Array.isArray(d.covers)) d.covers = d.covers.map(x => x && /covers\/(c\d|funk)\.mp4$/.test(x.url || "") ? {...x, url: x.url.replace(/\.mp4$/, "-hq.mp4")} : x);
+  if (saved && (saved.layoutV || 0) < 31) d.layoutV = 31;
   return d;
 };
 
@@ -1959,7 +1969,7 @@ window.mergeContent = function (saved) {
     trust: "Studio and stage experience with Israel's top artists and producers",
     waMessage: "Hi Avishai 👋\nI found you through your website.\n\nMy name: \nI'd like to check your availability for a drum session on: \nProject type: single / medley / album\nGenre: \n\nI'll send you a demo and a reference here. Thanks!",
     aboutTitle: "Avishai Yashar",
-    aboutText: "I'm 29, married, and a proud dad.\nI started out in the IDF Military Rabbinate Band and have since played stages in Israel and abroad alongside some of the country's finest artists.\nOver the years I've recorded and performed with leading Israeli singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur* and *Aviv Alush*, and worked with producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and many others.\nWhatever the genre — rock, pop, funk, Mediterranean or Hasidic — I bring the right feel to the track.\n\nThese days most of my sessions are remote: fast and precise, with clear communication throughout, so you save valuable time.\n\nTogether we'll dial in the sound for your project, and you'll get mix-ready tracks that are natural, balanced and clean.",
+    aboutText: "I'm 29, married, and a proud dad.\nI started out in the IDF Military Rabbinate Band and have since played stages in Israel and abroad alongside some of the country's finest artists.\nOver the years I've recorded and performed with leading Israeli singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur* and *Aviv Alush*, among others, and worked with producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and many others.\nWhatever the genre — rock, pop, funk, Mediterranean or Hasidic — I bring the right feel to the track.\n\nThese days most of my sessions are remote: fast and precise, with clear communication throughout, so you save valuable time.\n\nTogether we'll dial in the sound for your project, and you'll get mix-ready tracks that are natural, balanced and clean.",
     hProcess: "How It Works",
     hProductions: "Songs I've Played On",
     hCovers: "Covers",
@@ -2453,7 +2463,7 @@ window.mergeContent = function (saved) {
       const n = S.covers.length, STEP = 360 / Math.max(n, 3), AUTO = 3000;
       const previewOf = (c, src) => { if(real(c.preview)) return c.preview;
         if(/res\.cloudinary\.com/.test(src)) return src.replace(/\/upload\/[^/]*\/(v\d+\/)/, "/upload/so_8,du_6,w_240,h_240,c_fill,q_auto:low,ac_none/$1");
-        if(/^assets\/covers\/[^/]+\.mp4$/.test(src)) return src.replace(/\.mp4$/, "_p.mp4");
+        if(/^assets\/covers\/[^/]+\.mp4$/.test(src)) return src.replace(/(-hq)?\.mp4$/, "_p.mp4");
         return ""; };
       const covers = S.covers.map(c => { const src = String(c.url).trim(), id = ytId(c.url);
         return { c, id, src, prev: id ? "" : previewOf(c, src), thumb: id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }; });
@@ -2472,7 +2482,7 @@ window.mergeContent = function (saved) {
       const full = document.createElement("video"); full.className = "c3__full"; full.playsInline = true; full.setAttribute("playsinline", ""); full.preload = "auto";
       const closeBtn = document.createElement("button"); closeBtn.type = "button"; closeBtn.className = "c3__x"; closeBtn.setAttribute("aria-label", L("סגירה","Close"));
       closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
-      const prog = document.createElement("span"); prog.className = "c3__prog"; prog.innerHTML = "<i></i>";
+      const prog = document.createElement("span"); prog.className = "c3__prog"; prog.innerHTML = "<i><b></b></i>";
       let angle = 0, target = 0, active = -1, raf = 0, inView = false, playing = -1, frame = null, timer = 0, hold = 0;
       const R = () => { const w = cards[0].offsetWidth; return Math.max(w * .95, (w / 2) / Math.tan(Math.PI / Math.max(n, 3)) + w * .22); };
       const paint = () => { const r = R();
@@ -2514,7 +2524,16 @@ window.mergeContent = function (saved) {
           go(); }
         else { frame = document.createElement("iframe"); frame.className = "c3__yt"; frame.src = embedUrl(cv.id); frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; frame.title = "YouTube"; frame.referrerPolicy = "strict-origin-when-cross-origin"; media.appendChild(frame); }
         el.querySelector(".c3__float").appendChild(closeBtn); }
-      full.addEventListener("timeupdate", () => { if(full.duration) prog.firstChild.style.width = (full.currentTime / full.duration * 100).toFixed(1) + "%"; });
+      let seeking = false;
+      full.addEventListener("timeupdate", () => { if(full.duration && !seeking) prog.firstChild.style.width = (full.currentTime / full.duration * 100).toFixed(1) + "%"; });
+      // drag the dot on the line to jump forward / back
+      const seekTo = e => { const r = prog.getBoundingClientRect(); let f = (e.clientX - r.left) / r.width; f = Math.max(0, Math.min(1, f));
+        prog.firstChild.style.width = (f * 100).toFixed(1) + "%"; if(full.duration) try{ full.currentTime = f * full.duration; }catch(_){} };
+      prog.addEventListener("pointerdown", e => { e.stopPropagation(); e.preventDefault(); seeking = true; prog.classList.add("seek"); try{ prog.setPointerCapture(e.pointerId); }catch(_){} seekTo(e); });
+      prog.addEventListener("pointermove", e => { if(seeking){ e.stopPropagation(); seekTo(e); } });
+      const endSeek = e => { if(!seeking) return; seeking = false; prog.classList.remove("seek"); if(full.paused && playing >= 0) full.play().catch(() => {}); };
+      prog.addEventListener("pointerup", endSeek); prog.addEventListener("pointercancel", endSeek);
+      prog.addEventListener("click", e => e.stopPropagation());
       full.addEventListener("ended", stopPlay);
       closeBtn.addEventListener("click", e => { e.stopPropagation(); stopPlay(); });
       const outside = e => { if(playing < 0) return; const m = cards[playing] && cards[playing].querySelector(".c3__media");

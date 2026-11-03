@@ -1285,6 +1285,23 @@ html,body{max-width:100%;overflow-x:hidden}
 html.lang-out body{opacity:0;transition:opacity .15s ease}
 html{background:#0f1716}
 
+/* testimonials: smaller WhatsApp cards, so the next section peeks in */
+.quote.wq{width:min(72vw,290px)!important}
+.wq__hd{padding:7px 10px;gap:7px}
+.wq__av{width:30px;height:30px;font-size:13px}
+.wq__nm b{font-size:13.5px}.wq__nm small{font-size:11px}
+.wq__body{min-height:0;padding:10px 10px 12px;gap:5px}
+.wq__in,.wq__out{font-size:13.5px!important;line-height:1.45!important;padding:6px 9px}
+.wq__out{font-size:12.5px!important}
+.wq__t{font-size:10px;margin-top:6px}
+#testimonials{padding-bottom:clamp(18px,4vw,40px)!important}
+#testimonials .head{margin-bottom:18px}
+#testimonials .quotes{padding-top:6px;padding-bottom:6px}
+#testimonials + .section,#testimonials + section{padding-top:clamp(26px,6vw,56px)!important}
+.quote.wq .wq__in,.quote.wq .wq__out{font-size:13.5px!important;line-height:1.45!important}
+.quote.wq .wq__out{font-size:12.5px!important}
+#testimonials .head h2{font-size:clamp(1.7rem,6.4vw,2.6rem)}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>

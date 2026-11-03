@@ -1323,6 +1323,27 @@ html{background:#0f1716}
 .is-en .c3__media.need-sound::before{content:"🔇 Tap for sound"}
 .c3.is-playing #c3Style{opacity:0;transition:opacity .3s}
 
+/* sources: a friendlier scrub bar */
+.wave{height:70px;gap:2px;padding:0 2px}
+.wave i{transition:background .15s}
+.wave__head{width:2px;top:-6px;bottom:-6px;background:#fff;transition:left .12s linear}
+.wave__head::after{width:20px;height:20px;margin-left:-10px;bottom:-10px;background:#fff;box-shadow:0 0 0 5px rgba(46,211,195,.35),0 4px 14px rgba(0,0,0,.5)}
+.track.is-playing .wave__head{transition:none}
+.wave__tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;font:600 11px/1 Rubik,system-ui,sans-serif;font-style:normal;color:#0c1412;background:#2ED3C3;padding:5px 8px;border-radius:999px;box-shadow:0 4px 14px rgba(46,211,195,.35);animation:tipBob 1.6s ease-in-out infinite;pointer-events:none}
+.wave__tip::after{content:"";position:absolute;top:100%;left:50%;margin-left:-5px;border:5px solid transparent;border-top-color:#2ED3C3}
+@keyframes tipBob{50%{transform:translate(-50%,-3px)}}
+.track.scrubbed .wave__tip,.track.is-playing .wave__tip{opacity:0;transition:opacity .3s}
+.wave__times{display:flex;justify-content:space-between;font:500 12px/1 Rubik,system-ui,sans-serif;color:var(--muted);margin-top:-6px}
+.track__time{display:none}
+.stems-link{justify-self:center;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:999px;border:1px solid var(--line)}
+.stems-link svg{width:14px;height:14px}
+.stems-link:hover{color:var(--lime);border-color:rgba(46,211,195,.5)}
+.track__in .wave{margin:30px 12px 0}
+.wave__times{margin:12px 6px 0}
+.wave__tip{left:-6px;transform:none}
+.wave__tip::after{left:12px;margin-left:0}
+@keyframes tipBob{50%{transform:translateY(-3px)}}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1677,22 +1698,21 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 26,
+  layoutV: 27,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
+    { url: "https://youtu.be/i3dohlGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true },
+    { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/mvIhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
     { url: "https://youtu.be/qV9VPSyfSVI", title: "אביה שרמן – הכל לטובה", show: true },
-    { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/1ui0jm29em4", title: "אבישי רוזן – חמש דקות (קליפ רשמי)", show: true },
     { url: "https://youtu.be/9kgGM_m-i9I", title: "", show: true },
     { url: "https://youtu.be/qGAhDaOMN2s", title: "", show: true },
-    { url: "https://youtu.be/i3dohlGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true },
     { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true }
   ],
   sources: [
-    { name: "אלנתן שלום", mix: "", audio: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/0c5afe0a5_.mp3", drive: "https://drive.google.com/drive/folders/1-dH-V356X2e5Lmw8rw-bqHWlSoCR2pZJ?usp=sharing", show: true },
-    { name: "זירה ריקה", mix: "", audio: "", drive: "https://drive.google.com/drive/folders/1FkOUO-WOalogkMx66P5cOJC8LHAdzL6y?usp=sharing", show: true }
+    { name: "הלוואי", mix: "", audio: "assets/sources/halevai.mp3", peaks: [83, 77, 79, 69, 80, 71, 75, 92, 79, 90, 46, 21, 19, 20, 67, 92, 100, 91, 92, 72, 20, 18, 18, 18, 19, 30, 93, 68, 64, 28, 88, 59, 64, 74, 93, 79, 69, 68, 75, 71, 72, 69, 73, 71, 72, 67, 58, 80, 75, 79, 73, 96, 86, 68, 42, 75, 75, 74, 93, 68, 70, 44, 21, 18], drive: "https://drive.google.com/drive/folders/1-dH-V356X2e5Lmw8rw-bqHWlSoCR2pZJ?usp=sharing", show: true }
   ],
   gear: [
     { category: "מערכות תופים", role: "Drumset", name: "Gretsch USA Custom", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ea1af205d_image.png", url: "https://www.thomann.ie/gretsch_drums_us_custom_24_candy_apple_red.htm", show: true },
@@ -1775,6 +1795,14 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 27) { // sources: only "הלוואי" (the ending groove), productions order (Avishai asked)
+    d.sources = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.sources));
+    const order = ["i3dohlGVZD4", "5eJqw0t3e9c", "mvIhYC6DV9A", "qV9VPSyfSVI", "1ui0jm29em4"];
+    const id = p => { const m = String(p && p.url || "").match(/(?:youtu\.be\/|v=|shorts\/)([\w-]{11})/); return m ? m[1] : ""; };
+    const r = p => { const k = order.indexOf(id(p)); return k < 0 ? 50 : k; };
+    d.productions = (Array.isArray(d.productions) ? d.productions : []).map((p, i) => [p, i]).sort((A, B) => (r(A[0]) - r(B[0])) || (A[1] - B[1])).map(x => x[0]);
+    d.layoutV = Math.max(d.layoutV || 0, 27);
   }
   if (saved && (saved.layoutV || 0) < 26) { // the funk cover is called fusion
     d.covers = (Array.isArray(d.covers) ? d.covers : []).map(x => x && /funk\.mp4/.test(x.url || "") ? {...x, style: "פיוז׳ן"} : x); d.layoutV = Math.max(d.layoutV || 0, 26);
@@ -1913,7 +1941,7 @@ window.mergeContent = function (saved) {
     ],
     styles: { "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
     cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
-    names: { "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "איציק סוויסה":"Itzik Swisa", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
+    names: { "הלוואי":"Halevai", "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "איציק סוויסה":"Itzik Swisa", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
     quotes: { "איציק סוויסה": "I've had the privilege of working with Avishai on several original projects I produced, and it's always a pleasure — fun, professional and precise. Avishai brings himself and *exactly the right color to every song*, from choosing the right snare to the one hit that puts the heart into the track.", "יוני": "I've recorded quite a few sessions with Avishai — in person and remotely, single and double sessions. With him you get a great vibe, real dedication, attention to detail and someone who truly listens — plus *the best stems you can get*. Never once disappointed. You're in good hands 🥁", "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },
     titles: { "1QuNAhONztA": "Nishmecha Band — Shabbat Medley", "ogfbC9pYXsQ": "Purim Medley | IDF Military Rabbinate Band", "qV9VPSyfSVI": "Aviya Sherman — Hakol Letova", "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
   };
@@ -2511,17 +2539,13 @@ window.mergeContent = function (saved) {
           ${real(t.audio) ? `<span class="track__time"><span class="cur">0:00</span> / <span class="dur">0:00</span></span>` : ``}
         </div>
         <div class="track__body"><div class="track__in">
-        ${real(t.audio) ? `<div class="wave" role="slider" tabindex="0" aria-label="${L("מיקום בשיר","Position in")} ${esc(t.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${bars(t.name).map((h,j) => `<i style="height:${h}%;--d:${((j * 37) % 11) * -.07}s"></i>`).join("")}<b class="wave__head" aria-hidden="true"></b></div>
-        <div class="skip" dir="ltr">
-          <button type="button" data-skip="-10" aria-label="${L("10 שניות אחורה","Back 10 seconds")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 4 12l7 7M20 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>10</button>
-          <span class="skip__hint">${L("גררו על הגל כדי להעביר","Drag to scrub")}</span>
-          <button type="button" data-skip="10" aria-label="${L("10 שניות קדימה","Forward 10 seconds")}">10<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 5 7 7-7 7M4 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>` : ``}
+        ${real(t.audio) ? `<div class="wave" role="slider" tabindex="0" aria-label="${L("מיקום בשיר","Position in")} ${esc(t.name)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${(Array.isArray(t.peaks) && t.peaks.length ? t.peaks : bars(t.name)).map((h,j) => `<i style="height:${h}%;--d:${((j * 37) % 11) * -.07}s"></i>`).join("")}<b class="wave__head" aria-hidden="true"><em class="wave__tip">${L("גררו כדי לדלג","Drag to skip")}</em></b></div>
+        <div class="wave__times" dir="ltr"><span class="cur2">0:00</span><span class="dur2">0:00</span></div>` : ``}
         ${real(t.audio) && real(t.mix) ? `<div class="mixer">
           <div class="mixer__labels" aria-hidden="true"><b data-k="full">${L("כל ההפקה","Full mix")}</b><b data-k="drums" class="on">${L("רק תופים","Drums only")}</b></div>
           <input type="range" min="0" max="100" value="0" aria-label="${L("מעבר בין התופים לבד לבין ההפקה המלאה","Blend between drums only and the full mix")}">
         </div>` : ``}
-        ${real(t.drive) ? `<a class="btn btn--line" href="${esc(t.drive)}" target="_blank" rel="noopener">${icon('i-folder')}${L("לערוצים המלאים","Download full stems")}</a>` : ``}
+        ${real(t.drive) ? `<a class="stems-link" href="${esc(t.drive)}" target="_blank" rel="noopener">${icon('i-folder')}${L("לערוצים המלאים","Full stems")} ↗</a>` : ``}
         </div></div>
       </article>`).join("");
     // a wallet-style stack: one source open, the rest tucked in behind — tap a card to pull it out
@@ -2567,7 +2591,9 @@ window.mergeContent = function (saved) {
         audios.splice(audios.indexOf(a),1); audios.splice(audios.indexOf(b),1);
         a = mk(t.audio, false); b = mk(t.mix, false); a.__pair = b; b.__pair = a; audios.push(a, b); wire(); a.currentTime = tA; applyMix(); };
 
-      const paint = () => { const p = a.duration ? a.currentTime / a.duration : 0; const k = Math.round(p * bs.length);
+      const cur2 = $(".cur2", el), dur2 = $(".dur2", el); let rafP = 0;
+      const tick = () => { paint(); if(!a.paused) rafP = requestAnimationFrame(tick); else rafP = 0; };
+      const paint = () => { const p = a.duration ? a.currentTime / a.duration : 0; const k = Math.round(p * bs.length); if(cur2) cur2.textContent = fmt(a.currentTime); if(dur2 && a.duration) dur2.textContent = fmt(a.duration);
         bs.forEach((x,i) => x.classList.toggle("on", i < k)); cur.textContent = fmt(a.currentTime); wave.setAttribute("aria-valuenow", Math.round(p*100));
         head.style.left = (p*100) + "%"; };
       const play = () => { setupGraph(); if(ctx && ctx.state === "suspended") ctx.resume();
@@ -2578,9 +2604,9 @@ window.mergeContent = function (saved) {
         a.currentTime = p * a.duration; if(b) b.currentTime = a.currentTime; paint(); };
 
       function wire(){
-        a.addEventListener("loadedmetadata", () => { dur.textContent = fmt(a.duration); if(pending !== null){ const q = pending; pending = null; seek(q); } });
+        a.addEventListener("loadedmetadata", () => { dur.textContent = fmt(a.duration); const d2 = $(".dur2", el); if(d2) d2.textContent = fmt(a.duration); if(pending !== null){ const q = pending; pending = null; seek(q); } });
         a.addEventListener("timeupdate", () => { paint(); if(b && !b.paused && Math.abs(b.currentTime - a.currentTime) > .15) b.currentTime = a.currentTime; });
-        a.addEventListener("play", () => { pauseAudio(a); el.classList.add("is-playing"); btn.setAttribute("aria-label",L("השהה ","Pause ")+t.name); });
+        a.addEventListener("play", () => { pauseAudio(a); el.classList.add("is-playing"); if(!rafP) rafP = requestAnimationFrame(tick); btn.setAttribute("aria-label",L("השהה ","Pause ")+t.name); });
         a.addEventListener("pause", () => { b && b.pause(); el.classList.remove("is-playing"); btn.setAttribute("aria-label",L("נגן ","Play ")+t.name); });
         a.addEventListener("ended", () => { b && b.pause(); a.currentTime = 0; paint(); });
         if(b){ a.addEventListener("error", fallback, {once:true}); b.addEventListener("error", fallback, {once:true}); }
@@ -2592,7 +2618,7 @@ window.mergeContent = function (saved) {
       // tap or drag along the waveform to move through the song
       let scrub = false;
       const at = e => { const r = wave.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
-      wave.addEventListener("pointerdown", e => { scrub = true; try { wave.setPointerCapture(e.pointerId); } catch(_){} el.classList.add("is-scrub"); seek(at(e)); });
+      wave.addEventListener("pointerdown", e => { scrub = true; el.classList.add("scrubbed"); try { wave.setPointerCapture(e.pointerId); } catch(_){} el.classList.add("is-scrub"); seek(at(e)); });
       wave.addEventListener("pointermove", e => { if(scrub) seek(at(e)); });
       wave.addEventListener("pointerup", () => { if(!scrub) return; scrub = false; el.classList.remove("is-scrub"); if(a.paused) play(); });
       wave.addEventListener("pointercancel", () => { scrub = false; el.classList.remove("is-scrub"); });

@@ -240,22 +240,21 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 26,
+  layoutV: 27,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
+    { url: "https://youtu.be/i3dohlGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true },
+    { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/mvIhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
     { url: "https://youtu.be/qV9VPSyfSVI", title: "אביה שרמן – הכל לטובה", show: true },
-    { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/1ui0jm29em4", title: "אבישי רוזן – חמש דקות (קליפ רשמי)", show: true },
     { url: "https://youtu.be/9kgGM_m-i9I", title: "", show: true },
     { url: "https://youtu.be/qGAhDaOMN2s", title: "", show: true },
-    { url: "https://youtu.be/i3dohlGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true },
     { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true }
   ],
   sources: [
-    { name: "אלנתן שלום", mix: "", audio: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/0c5afe0a5_.mp3", drive: "https://drive.google.com/drive/folders/1-dH-V356X2e5Lmw8rw-bqHWlSoCR2pZJ?usp=sharing", show: true },
-    { name: "זירה ריקה", mix: "", audio: "", drive: "https://drive.google.com/drive/folders/1FkOUO-WOalogkMx66P5cOJC8LHAdzL6y?usp=sharing", show: true }
+    { name: "הלוואי", mix: "", audio: "assets/sources/halevai.mp3", peaks: [83, 77, 79, 69, 80, 71, 75, 92, 79, 90, 46, 21, 19, 20, 67, 92, 100, 91, 92, 72, 20, 18, 18, 18, 19, 30, 93, 68, 64, 28, 88, 59, 64, 74, 93, 79, 69, 68, 75, 71, 72, 69, 73, 71, 72, 67, 58, 80, 75, 79, 73, 96, 86, 68, 42, 75, 75, 74, 93, 68, 70, 44, 21, 18], drive: "https://drive.google.com/drive/folders/1-dH-V356X2e5Lmw8rw-bqHWlSoCR2pZJ?usp=sharing", show: true }
   ],
   gear: [
     { category: "מערכות תופים", role: "Drumset", name: "Gretsch USA Custom", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/ea1af205d_image.png", url: "https://www.thomann.ie/gretsch_drums_us_custom_24_candy_apple_red.htm", show: true },
@@ -338,6 +337,14 @@ window.mergeContent = function (saved) {
       if (at >= 0) pr[at] = { url: NEW, title: "", show: true }; else pr.push({ url: NEW, title: "", show: true });
     }
     d.productions = pr; d.layoutV = Math.max(d.layoutV || 0, 13);
+  }
+  if (saved && (saved.layoutV || 0) < 27) { // sources: only "הלוואי" (the ending groove), productions order (Avishai asked)
+    d.sources = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.sources));
+    const order = ["i3dohlGVZD4", "5eJqw0t3e9c", "mvIhYC6DV9A", "qV9VPSyfSVI", "1ui0jm29em4"];
+    const id = p => { const m = String(p && p.url || "").match(/(?:youtu\.be\/|v=|shorts\/)([\w-]{11})/); return m ? m[1] : ""; };
+    const r = p => { const k = order.indexOf(id(p)); return k < 0 ? 50 : k; };
+    d.productions = (Array.isArray(d.productions) ? d.productions : []).map((p, i) => [p, i]).sort((A, B) => (r(A[0]) - r(B[0])) || (A[1] - B[1])).map(x => x[0]);
+    d.layoutV = Math.max(d.layoutV || 0, 27);
   }
   if (saved && (saved.layoutV || 0) < 26) { // the funk cover is called fusion
     d.covers = (Array.isArray(d.covers) ? d.covers : []).map(x => x && /funk\.mp4/.test(x.url || "") ? {...x, style: "פיוז׳ן"} : x); d.layoutV = Math.max(d.layoutV || 0, 26);

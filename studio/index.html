@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261104003806';
+window.STUDIO_VERSION = '20261104005457';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -787,7 +787,9 @@ const docsDone = g => modeOf(g) === 'none' || hasRec(g) || hasComb(g);
 const needsInvoice = g => modeOf(g) !== 'none' && !isComb(g);
 const recLabel = g => isComb(g) ? 'חשבונית מס/קבלה' : 'קבלה';
 const invPending = g => modeOf(g) !== 'none' && Number(g.fee) > 0 && !g.paidDate && !hasInv(g);
-const cashSkip = g => CFG.cashNoReceipt !== false && g.method === 'מזומן';
+/* תשלום במזומן = בלי מע״מ: + מע״מ → המחיר נשאר והמע״מ יורד; כולל מע״מ → המחיר בלי המע״מ */
+const cashNoVat = g => g.vat === 'plus' ? { vat: 'none' } : g.vat === 'incl' ? { vat: 'none', fee: Math.round(Number(g.fee || 0) / (1 + vatRateOf(g) / 100)) } : {};
+const cashSkip = g =>CFG.cashNoReceipt !== false && g.method === 'מזומן';
 const recPending = g => modeOf(g) !== 'none' && Number(g.fee) > 0 && !!g.paidDate && !docsDone(g) && !cashSkip(g);
 const invOpen = g => hasInv(g) && !g.paidDate && Number(g.fee) > 0;
 const DOCS = {
@@ -2056,6 +2058,7 @@ function rqSet(ctx, g, key, val) {
   if (key === 'paidDate') { const d = val ? rqDate(val) : ''; if (val && !d) throw 'תאריך תשלום לא תקין: "' + val + '"'; return Object.assign({}, g, { paidDate: d }); }
   if (key === 'loadIn' || key === 'start' || key === 'end') { const t = val ? rqTime(val) : ''; if (val && !t) throw 'שעה לא תקינה: "' + val + '" (צריך HH:MM)'; return Object.assign({}, g, { [key]: t }); }
   if (key === 'fee' || key === 'travelFee') { const n = Number(val.replace(/[^\d.]/g, '')); if (val && !isFinite(n)) throw 'סכום לא תקין: "' + val + '"'; return Object.assign({}, g, { [key]: n || 0 }); }
+  if (key === 'method' && /מזומן/.test(val)) return Object.assign({}, g, { method: 'מזומן' }, cashNoVat(g));
   if (key === 'vat') return Object.assign({}, g, { vat: rqVat(val), vatRate: g.vatRate !== undefined && g.vatRate !== '' ? g.vatRate : CFG.vatRate });
   if (key === 'type') return Object.assign({}, g, { type: rqType(val) || g.type });
   if (key === 'pay') { if (/^לא|ממתין|בוטל|עתידי/.test(val) || !val) return Object.assign({}, g, { paidDate: '' });
@@ -3671,7 +3674,7 @@ function App() {
     if (l.length) { payQShown.current = true; setPayQ(l); }
   }, [!!lastSync, sec.at]);
   const payAnswer = (g, method) => {
-    if (method) { update(g.id, { paidDate: todayISO(), method }); setToast('💰 ' + (g.client || autoTitle(g)) + ' — שולם ב' + method); setTimeout(() => celebrate('paid'), 120); }
+    if (method) { update(g.id, Object.assign({ paidDate: todayISO(), method }, method === 'מזומן' ? cashNoVat(g) : {})); setToast('💰 ' + (g.client || autoTitle(g)) + ' — שולם ב' + method); setTimeout(() => celebrate('paid'), 120); }
     else { setData(d => Object.assign({}, d, { config: Object.assign({}, d.config, { payAsk: Object.assign({}, ((d.config || {}).payAsk) || {}, { [g.id]: todayISO() }) }) })); setToast('⏳ נשאר ממתין לתשלום'); }
     setPayQ(l => { const n = (l || []).filter(x => x.id !== g.id); return n.length ? n : null; });
     setTimeout(() => window.__secSyncSilent && window.__secSyncSilent(), 1500);
@@ -3802,7 +3805,7 @@ function App() {
     if (g.paidDate) { setToast('✓ כבר מסומן כשולם (' + (g.method || '') + ')'); return; }
     setTimeout(() => ask('לסמן ששולם ב' + method + '? ' + what, { ok: method === 'מזומן' ? '💵 שולם במזומן' : '🏦 שולם בהעברה' }).then(ok => {
       if (!ok) return;
-      update(g.id, { paidDate: todayISO(), method }); setToast('💰 סומן: שולם ב' + method);
+      update(g.id, Object.assign({ paidDate: todayISO(), method }, method === 'מזומן' ? cashNoVat(g) : {})); setToast('💰 סומן: שולם ב' + method);
       setTimeout(() => celebrate('paid'), 120);
       setTimeout(() => window.__secSyncSilent && window.__secSyncSilent(), 1500); // לעדכן את לשונית "נתונים"
     }), 400);

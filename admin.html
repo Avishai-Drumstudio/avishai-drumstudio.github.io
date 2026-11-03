@@ -240,7 +240,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 28,
+  layoutV: 29,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -286,10 +286,10 @@ window.SITE_DEFAULTS = {
   ],
   custom: [],
   testimonials: [
+    { name: "ניצן אלון", role: "מפיקה", photo: "assets/people/nitzan-alon.jpg", text: "אבישי מתופף מקצועי, מדויק ומהיר, עם *סאונד מעולה וסורסים נקיים*. העבודה איתו מרחוק נוחה ויעילה – הוא שולח טייק ראשוני, מקבל הערות ומדייק את התפקיד בדיוק למה שההפקה צריכה. כמפיקה, לקבל תופים ברמה הכי גבוהה בלי להיות בסשן חוסך המון זמן, בלי שום פשרה על האיכות. ומעבר לזה – איש רגיש ומתוק שתמיד כיף לעבוד איתו ❤️", show: true },
     { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true },
     { name: "יוני", role: "מפיק", photo: "assets/people/yoni.jpg", text: "הקלטתי אצל ישר כמה וכמה סשנים – מקרוב ומרחוק, בודדים וכפולים. אצלו זה אווירה, השקעה, תשומת לב והקשבה, ו*הסורסים הכי טובים שאפשר*. אף פעם לא מתאכזבים – אתם בידיים טובות 🥁", show: true },
-    { name: "איציק סוויסה", role: "מפיק", photo: "assets/people/itzik-swisa.jpg", text: "זכיתי לעבוד עם אבישי בכמה פרויקטים מקוריים שהפקתי, והעבודה איתו היא פשוט תענוג – כיפית, מקצועית ומדויקת. אבישי יודע להביא את עצמו ואת *הצבע המדויק לשיר*, מבחירת הסנר הנכון ועד המכה שמכניסה את הלב לתוך השיר.", show: true },
-    { name: "ניצן אלון", role: "מפיקה", photo: "assets/people/nitzan-alon.jpg", text: "אבישי מתופף מקצועי, מדויק ומהיר, עם *סאונד מעולה וסורסים נקיים*. העבודה איתו מרחוק נוחה ויעילה – הוא שולח טייק ראשוני, מקבל הערות ומדייק את התפקיד בדיוק למה שההפקה צריכה. כמפיקה, לקבל תופים ברמה הכי גבוהה בלי להיות בסשן חוסך המון זמן, בלי שום פשרה על האיכות. ומעבר לזה – איש רגיש ומתוק שתמיד כיף לעבוד איתו ❤️", show: true }
+    { name: "איציק סוויסה", role: "מפיק", photo: "assets/people/itzik-swisa.jpg", text: "זכיתי לעבוד עם אבישי בכמה פרויקטים מקוריים שהפקתי, והעבודה איתו היא פשוט תענוג – כיפית, מקצועית ומדויקת. אבישי יודע להביא את עצמו ואת *הצבע המדויק לשיר*, מבחירת הסנר הנכון ועד המכה שמכניסה את הלב לתוך השיר.", show: true }
   ],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
@@ -433,14 +433,19 @@ window.mergeContent = function (saved) {
     if (!t.some(x => x && x.name === "ניצן אלון")) t.push(JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials.find(x => x.name === "ניצן אלון"))));
     d.testimonials = t;
   }
+  if (saved && (saved.layoutV || 0) < 29) { // Nitzan Alon's testimonial first
+    const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [], i = t.findIndex(x => x && x.name === "ניצן אלון");
+    if (i > 0) t.unshift(t.splice(i, 1)[0]); d.testimonials = t;
+  }
   // final pass (runs after every older fix-up): the selected productions in the order Avishai chose, no duplicates, no bands
   if (saved && (saved.layoutV || 0) < 28) {
     const id = p => { const m = String(p && p.url || "").match(/(?:youtu\.be\/|v=|shorts\/)([\w-]{11})/); return m ? m[1] : ""; };
     const drop = ["1QuNAhONztA", "ogfbC9pYXsQ", "dnbj0Vzzb-w"];
     const D = window.SITE_DEFAULTS.productions, seen = new Set(), out = [];
     D.concat(Array.isArray(d.productions) ? d.productions : []).forEach(p => { const k = id(p); if (!k || seen.has(k) || drop.includes(k)) return; seen.add(k); out.push({...p}); });
-    d.productions = out; d.layoutV = 28;
+    d.productions = out;
   }
+  if (saved && (saved.layoutV || 0) < 29) d.layoutV = 29;
   return d;
 };
 

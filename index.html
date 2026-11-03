@@ -1344,6 +1344,14 @@ html{background:#0f1716}
 .wave__tip::after{left:12px;margin-left:0}
 @keyframes tipBob{50%{transform:translateY(-3px)}}
 
+.c3__media img.c3__loop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.c3__card.is-play .c3__loop{opacity:0}
+.scr__tile--me img.fg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%}
+/* scrub: the white knob itself can be grabbed */
+.wave__head{pointer-events:auto;touch-action:none;cursor:grab}
+.wave__head::before{content:"";position:absolute;left:-16px;right:-16px;top:0;bottom:-24px}
+.wave{touch-action:none}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1698,7 +1706,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 28,
+  layoutV: 29,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1744,10 +1752,10 @@ window.SITE_DEFAULTS = {
   ],
   custom: [],
   testimonials: [
+    { name: "ניצן אלון", role: "מפיקה", photo: "assets/people/nitzan-alon.jpg", text: "אבישי מתופף מקצועי, מדויק ומהיר, עם *סאונד מעולה וסורסים נקיים*. העבודה איתו מרחוק נוחה ויעילה – הוא שולח טייק ראשוני, מקבל הערות ומדייק את התפקיד בדיוק למה שההפקה צריכה. כמפיקה, לקבל תופים ברמה הכי גבוהה בלי להיות בסשן חוסך המון זמן, בלי שום פשרה על האיכות. ומעבר לזה – איש רגיש ומתוק שתמיד כיף לעבוד איתו ❤️", show: true },
     { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true },
     { name: "יוני", role: "מפיק", photo: "assets/people/yoni.jpg", text: "הקלטתי אצל ישר כמה וכמה סשנים – מקרוב ומרחוק, בודדים וכפולים. אצלו זה אווירה, השקעה, תשומת לב והקשבה, ו*הסורסים הכי טובים שאפשר*. אף פעם לא מתאכזבים – אתם בידיים טובות 🥁", show: true },
-    { name: "איציק סוויסה", role: "מפיק", photo: "assets/people/itzik-swisa.jpg", text: "זכיתי לעבוד עם אבישי בכמה פרויקטים מקוריים שהפקתי, והעבודה איתו היא פשוט תענוג – כיפית, מקצועית ומדויקת. אבישי יודע להביא את עצמו ואת *הצבע המדויק לשיר*, מבחירת הסנר הנכון ועד המכה שמכניסה את הלב לתוך השיר.", show: true },
-    { name: "ניצן אלון", role: "מפיקה", photo: "assets/people/nitzan-alon.jpg", text: "אבישי מתופף מקצועי, מדויק ומהיר, עם *סאונד מעולה וסורסים נקיים*. העבודה איתו מרחוק נוחה ויעילה – הוא שולח טייק ראשוני, מקבל הערות ומדייק את התפקיד בדיוק למה שההפקה צריכה. כמפיקה, לקבל תופים ברמה הכי גבוהה בלי להיות בסשן חוסך המון זמן, בלי שום פשרה על האיכות. ומעבר לזה – איש רגיש ומתוק שתמיד כיף לעבוד איתו ❤️", show: true }
+    { name: "איציק סוויסה", role: "מפיק", photo: "assets/people/itzik-swisa.jpg", text: "זכיתי לעבוד עם אבישי בכמה פרויקטים מקוריים שהפקתי, והעבודה איתו היא פשוט תענוג – כיפית, מקצועית ומדויקת. אבישי יודע להביא את עצמו ואת *הצבע המדויק לשיר*, מבחירת הסנר הנכון ועד המכה שמכניסה את הלב לתוך השיר.", show: true }
   ],
   socials: [
     { type: "instagram", url: "https://www.instagram.com/avishai_yashar?igsh=cmEzY3loZWVhaGpr&utm_source=qr" },
@@ -1891,14 +1899,19 @@ window.mergeContent = function (saved) {
     if (!t.some(x => x && x.name === "ניצן אלון")) t.push(JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials.find(x => x.name === "ניצן אלון"))));
     d.testimonials = t;
   }
+  if (saved && (saved.layoutV || 0) < 29) { // Nitzan Alon's testimonial first
+    const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [], i = t.findIndex(x => x && x.name === "ניצן אלון");
+    if (i > 0) t.unshift(t.splice(i, 1)[0]); d.testimonials = t;
+  }
   // final pass (runs after every older fix-up): the selected productions in the order Avishai chose, no duplicates, no bands
   if (saved && (saved.layoutV || 0) < 28) {
     const id = p => { const m = String(p && p.url || "").match(/(?:youtu\.be\/|v=|shorts\/)([\w-]{11})/); return m ? m[1] : ""; };
     const drop = ["1QuNAhONztA", "ogfbC9pYXsQ", "dnbj0Vzzb-w"];
     const D = window.SITE_DEFAULTS.productions, seen = new Set(), out = [];
     D.concat(Array.isArray(d.productions) ? d.productions : []).forEach(p => { const k = id(p); if (!k || seen.has(k) || drop.includes(k)) return; seen.add(k); out.push({...p}); });
-    d.productions = out; d.layoutV = 28;
+    d.productions = out;
   }
+  if (saved && (saved.layoutV || 0) < 29) d.layoutV = 29;
   return d;
 };
 
@@ -2124,7 +2137,7 @@ window.mergeContent = function (saved) {
       resumeT = setTimeout(() => { if(!items.some(el => el.classList.contains("is-playing"))) startAuto(); }, 1500); };
     ["touchstart","wheel"].forEach(ev => track.addEventListener(ev, stopAuto, {passive:true}));
     if(!reduce && "IntersectionObserver" in window){
-      new IntersectionObserver(([e]) => { visible = e.isIntersecting; if(visible){ clearInterval(timer); timer = 0; startAuto(); } else dots.classList.remove("is-auto"); }).observe(track);
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; if(visible){ clearInterval(timer); timer = 0; startAuto(); } else { dots.classList.remove("is-auto"); stopInline(); } }).observe(track);
     }
     requestAnimationFrame(paint);
   }
@@ -2255,7 +2268,7 @@ window.mergeContent = function (saved) {
           <line class="sn__stick" x1="430" y1="-66" x2="240" y2="58"/></svg></div>`,
       `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>${L("לייב","LIVE")}</span>
           <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>${L("המפיק","Producer")}</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
-          <div class="scr__tile scr__tile--me"><video class="fg" muted playsinline loop preload="none" poster="assets/me-call.jpg" data-src="assets/me-call.mp4"></video><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>
+          <div class="scr__tile scr__tile--me"><img class="fg" src="assets/me-call.webp" alt="" decoding="async"><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>
           </div></div>`,
       `<div class="sc sc--stems"><div class="daw"><span class="daw__tb"><i></i><i></i><i></i><b></b><i></i><i></i></span>
           <span class="daw__ruler"></span>
@@ -2434,7 +2447,7 @@ window.mergeContent = function (saved) {
         return { c, id, src, prev: id ? "" : previewOf(c, src), thumb: id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }; });
       ring.innerHTML = covers.map((cv,i) => `<div class="c3__card" data-i="${i}" role="button" tabindex="0" aria-label="${L("קאבר","Cover")} ${esc(cv.c.style || "")}">
           <div class="c3__float" style="animation-delay:${(-i * .7).toFixed(1)}s">
-            <div class="c3__media">${cv.prev ? `${cv.thumb ? `<img class="c3__poster" src="${esc(cv.thumb)}" alt="" decoding="async">` : ""}<video src="${esc(cv.prev)}" muted loop playsinline autoplay preload="metadata"></video>`
+            <div class="c3__media">${cv.prev ? `${cv.thumb ? `<img class="c3__poster" src="${esc(cv.thumb)}" alt="" decoding="async">` : ""}<img class="c3__loop" src="${esc(/_p\.mp4$/.test(cv.prev) ? cv.prev.replace(/\.mp4$/, ".webp") : cv.prev)}" alt="" decoding="async">`
               : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" decoding="async">` : ""}</div>
             <span class="c3__glare" aria-hidden="true"></span>
             <span class="c3__tag">${esc(cv.c.style || cv.c.title || "")}</span>
@@ -2491,6 +2504,8 @@ window.mergeContent = function (saved) {
       full.addEventListener("timeupdate", () => { if(full.duration) prog.firstChild.style.width = (full.currentTime / full.duration * 100).toFixed(1) + "%"; });
       full.addEventListener("ended", stopPlay);
       closeBtn.addEventListener("click", e => { e.stopPropagation(); stopPlay(); });
+      document.addEventListener("click", e => { if(playing < 0) return; const m = cards[playing] && cards[playing].querySelector(".c3__media");
+        if(m && m.contains(e.target)) return; if(e.target.closest(".c3__card") && e.target.closest(".c3__card") !== cards[playing]) return; stopPlay(); }, true);
       // tap: front card plays; a side card turns to the front and plays — one tap
       let moved = false;
       ring.addEventListener("click", e => { if(moved) return; const el = e.target.closest(".c3__card"); if(!el) return; const i = +el.dataset.i;
@@ -2507,7 +2522,7 @@ window.mergeContent = function (saved) {
       // only move / play loops while on screen; first touch wakes loops in battery-saver mode
       const wake = () => { if(!inView || reduce) return; loops.forEach(v => { if(v._near === false) return; v.muted = true; if(v.paused) v.play().catch(() => {}); }); };
       if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting;
-        if(inView){ wake(); startAuto(); } else { stopAuto(); loops.forEach(v => v.pause()); } }, {threshold:.25}).observe(stage);
+        if(inView){ wake(); startAuto(); } else { stopAuto(); stopPlay(); loops.forEach(v => v.pause()); } }, {threshold:.25}).observe(stage);
       else { inView = true; startAuto(); }
       ["touchstart","pointerdown","scroll"].forEach(ev => addEventListener(ev, wake, {passive:true}));
       // restart the timing line every automatic step
@@ -2629,6 +2644,7 @@ window.mergeContent = function (saved) {
       wire();
 
       btn.addEventListener("click", () => a.paused ? play() : pause());
+      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { if(!e.isIntersecting && !a.paused) pause(); }, {threshold:0}).observe(el);
       // tap or drag along the waveform to move through the song
       let scrub = false;
       const at = e => { const r = wave.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
@@ -2724,6 +2740,8 @@ window.mergeContent = function (saved) {
   document.addEventListener("click", e => {
     const b = e.target.closest(".video button"); if(!b) return;
     pauseAudio(); const box = b.parentElement;
+    if(!box.dataset.orig){ box.dataset.orig = box.innerHTML;
+      if("IntersectionObserver" in window) new IntersectionObserver(([en]) => { if(!en.isIntersecting && box.querySelector("iframe")) box.innerHTML = box.dataset.orig; }).observe(box); }
     box.innerHTML = `<iframe src="${embedUrl(box.dataset.id)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
   });
   let lenis = null, lastFocus = null;

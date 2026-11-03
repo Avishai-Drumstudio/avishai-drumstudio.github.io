@@ -1301,6 +1301,19 @@ html{background:#0f1716}
 .quote.wq .wq__in,.quote.wq .wq__out{font-size:13.5px!important;line-height:1.45!important}
 .quote.wq .wq__out{font-size:12.5px!important}
 #testimonials .head h2{font-size:clamp(1.7rem,6.4vw,2.6rem)}
+/* testimonials, compact v2 */
+.quote.wq{width:min(62vw,250px)!important;border-radius:18px!important}
+.wq__hd{padding:6px 9px}
+.wq__av{width:26px;height:26px;font-size:12px}
+.wq__nm b{font-size:12.5px}.wq__nm small{font-size:10px}
+.wq__body{padding:8px 8px 10px;gap:4px}
+.quote.wq .wq__in{font-size:12.5px!important;line-height:1.42!important;padding:5px 8px}
+.quote.wq .wq__out{font-size:11.5px!important;padding:4px 8px}
+.wq__t{font-size:9.5px}
+#testimonials{padding-top:clamp(24px,5vw,48px)!important}
+#testimonials .head{margin-bottom:12px}
+#testimonials .head h2{font-size:clamp(1.5rem,5.6vw,2.3rem)}
+.quotes__track{gap:12px!important}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -2609,18 +2622,18 @@ window.mergeContent = function (saved) {
         let held = false, resumeT = 0, last = 0, raf = 0, inView = false, x = 0;
         const unit = () => track.scrollWidth / reps;           // width of one full set
         const step = now => { const dt = Math.min(50, now - (last || now)); last = now;
-          if(!held && inView){ x = box.scrollLeft + dt * .035; const u = unit(); if(x >= u * 2) x -= u; box.scrollLeft = x; }
+          if(held || !inView){ x = box.scrollLeft; } else { if(Math.abs(box.scrollLeft - Math.round(x)) > 2) x = box.scrollLeft; x += dt * .04; const u = unit(); if(x >= u * 2) x -= u; box.scrollLeft = Math.round(x); } // keep the fraction ourselves: phones only scroll by whole pixels
           // the card nearest the middle stands out
           const mid = box.getBoundingClientRect().left + box.clientWidth / 2;
           for(const el of track.children){ const r = el.getBoundingClientRect(); const d = Math.min(1, Math.abs(r.left + r.width / 2 - mid) / (box.clientWidth * .6));
             el.style.setProperty("--f", (1 - d).toFixed(3)); }
           raf = requestAnimationFrame(step); };
         const hold = () => { held = true; clearTimeout(resumeT); };
-        const release = () => { clearTimeout(resumeT); resumeT = setTimeout(() => { held = false; last = 0; }, 2200); };
+        const release = () => { clearTimeout(resumeT); resumeT = setTimeout(() => { held = false; last = 0; x = box.scrollLeft; }, 2200); };
         box.addEventListener("pointerdown", hold); box.addEventListener("touchstart", hold, {passive:true});
         ["pointerup","pointercancel","touchend","mouseleave"].forEach(ev => box.addEventListener(ev, release, {passive:true}));
         box.addEventListener("scroll", () => { if(held){ const u = unit(); if(box.scrollLeft < u * .5) box.scrollLeft += u; else if(box.scrollLeft > u * 2.5) box.scrollLeft -= u; } }, {passive:true});
-        requestAnimationFrame(() => { box.scrollLeft = unit(); });
+        requestAnimationFrame(() => { box.scrollLeft = Math.round(unit()); x = box.scrollLeft; });
         if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting; }).observe(box); else inView = true;
         raf = requestAnimationFrame(step);
       }

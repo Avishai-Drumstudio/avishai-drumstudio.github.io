@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261030002018';
+window.STUDIO_VERSION = '20261104001154';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -467,7 +467,7 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
       var q = '/calendars/' + calId(a) + '/events?singleEvents=true&maxResults=50&timeMin=' + encodeURIComponent(day + 'T00:00:00' + tz) + '&timeMax=' + encodeURIComponent(day + 'T23:59:59' + tz);
       return gfetch('GET', q).then(function (j) {
         var hit = (j.items || []).find(function (e) {
-          if (e.status === 'cancelled' || adopted[e.id] || /^🎼/.test(e.summary || '')) return false;
+          if (e.status === 'cancelled' || adopted[e.id] || /^(🎼|💰|☀️)/.test(e.summary || '')) return false;
           if (e.start && e.start.dateTime) return Math.abs(Date.parse(e.start.dateTime) - st) <= 60 * 60000;
           return e.start && e.start.date === day;
         });
@@ -3543,6 +3543,7 @@ function App() {
       if (manual) setToast('⚠️ סנכרון המזכירה נכשל: ' + smErrText(e));
     } finally { smLock.current = false; }
   };
+  window.__secSyncSilent = () => secSync(false);
   const secDecide = async (qs, approve) => {
     if (secBusy) return; setSecBusy(true);
     try {
@@ -3750,6 +3751,28 @@ function App() {
     return () => { document.removeEventListener('visibilitychange', onVis); clearTimeout(h); };
   }, [remindAsk && remindAsk.ids.join(), remindAsk && remindAsk.ready]);
   const update = useCallback((id, patch) => setGigs(l => l.map(g => g.id === id ? Object.assign({}, g, patch) : g)), [setGigs]);
+  /* קישור מהתראת 23:00 ביומן: #pay=<id>&m=cash|transfer|no → סימון תשלום אחרי אישור */
+  const payLinkDone = useRef(false);
+  useEffect(() => {
+    if (!lastSync || payLinkDone.current) return;
+    const h = location.hash || ''; if (!/^#pay=/.test(h)) return;
+    payLinkDone.current = true;
+    const p = new URLSearchParams(h.slice(1)), id = p.get('pay') || '', m = p.get('m') || '';
+    try { history.replaceState(null, '', location.href.split('#')[0]); } catch (e) {}
+    const g = dataRef.current.gigs.find(x => x.id === id);
+    if (!g) { setToast('⚠️ האירוע מהתזכורת לא נמצא'); return; }
+    const what = autoTitle(g) + ' · ' + fmtDate(g.date) + (Number(g.fee) > 0 ? ' · ' + money(amt(g)) : '');
+    if (m === 'no') { setToast('⏳ ' + what + ' — נשאר ממתין לתשלום'); return; }
+    const method = m === 'cash' ? 'מזומן' : m === 'transfer' ? 'העברה בנקאית' : '';
+    if (!method) return;
+    if (g.paidDate) { setToast('✓ כבר מסומן כשולם (' + (g.method || '') + ')'); return; }
+    setTimeout(() => ask('לסמן ששולם ב' + method + '? ' + what, { ok: method === 'מזומן' ? '💵 שולם במזומן' : '🏦 שולם בהעברה' }).then(ok => {
+      if (!ok) return;
+      update(g.id, { paidDate: todayISO(), method }); setToast('💰 סומן: שולם ב' + method);
+      setTimeout(() => celebrate('paid'), 120);
+      setTimeout(() => window.__secSyncSilent && window.__secSyncSilent(), 1500); // לעדכן את לשונית "נתונים"
+    }), 400);
+  }, [!!lastSync]);
   const byId = id => gigs.find(g => g.id === id);
   const [docReq, setDocReq] = useState(null), [payPreset, setPayPreset] = useState(null), [paySel, setPaySel] = useState([]);
   const gigFromQuick = r => {

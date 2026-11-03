@@ -2507,7 +2507,7 @@ window.mergeContent = function (saved) {
       // only move / play loops while on screen; first touch wakes loops in battery-saver mode
       const wake = () => { if(!inView || reduce) return; loops.forEach(v => { if(v._near === false) return; v.muted = true; if(v.paused) v.play().catch(() => {}); }); };
       if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting;
-        if(inView){ wake(); startAuto(); } else { stopAuto(); loops.forEach(v => v.pause()); } // a cover that is playing keeps playing while you scroll on }, {threshold:.25}).observe(stage);
+        if(inView){ wake(); startAuto(); } else { stopAuto(); loops.forEach(v => v.pause()); } }, {threshold:.25}).observe(stage);
       else { inView = true; startAuto(); }
       ["touchstart","pointerdown","scroll"].forEach(ev => addEventListener(ev, wake, {passive:true}));
       // restart the timing line every automatic step

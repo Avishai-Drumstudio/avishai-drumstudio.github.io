@@ -217,7 +217,7 @@ window.SITE_DEFAULTS = {
   steps: [
     { title: "הסקיצה", text: "סקיצה או פלייבק, טמפו ורפרנס לסאונד." },
     { title: "הסאונד", text: "מערכת, סנר וכיוון סאונד – בהתאמה להפקה." },
-    { title: "ההקלטה", text: "• מרחוק – גייד, הערות, טייק סופי\n• לייב בווידאו – שומעים בזמן אמת\n• באולפן – מקליטים יחד" },
+    { title: "ההקלטה", text: "• מרחוק – גייד, הערות, טייק סופי\n• לייב בווידאו – שומעים בזמן אמת\n• באולפן – מגיעים אליי לאולפן" },
     { title: "הערוצים", text: "קבלת ערוצים תוך 24 שעות · Mix Ready · כל פורמט · עד 3 סבבי תיקונים" }
   ],
   hProductions: "שירים שניגנתי בהם",
@@ -241,7 +241,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 38,
+  layoutV: 39,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -459,7 +459,8 @@ window.mergeContent = function (saved) {
   if (saved && (saved.layoutV || 0) < 35) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = x.text.replace("טייק סופי. או סשן", "טייק סופי.\nאו סשן"); }); d.layoutV = 35; }
   if (saved && (saved.layoutV || 0) < 36) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה" && !/באולפן/.test(x.text)) x.text += "\nאו סשן באולפן – מגיעים ומקליטים יחד."; }); d.layoutV = 36; }
   if (saved && (saved.layoutV || 0) < 37) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = "• גייד ראשוני – הערות – טייק סופי\n• סשן לייב בווידאו\n• סשן באולפן – מגיעים ומקליטים יחד"; }); d.layoutV = 37; }
-  if (saved && (saved.layoutV || 0) < 38) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = "• מרחוק – גייד, הערות, טייק סופי\n• לייב בווידאו – שומעים בזמן אמת\n• באולפן – מקליטים יחד"; }); d.layoutV = 38; }
+  if (saved && (saved.layoutV || 0) < 38) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = "• מרחוק – גייד, הערות, טייק סופי\n• לייב בווידאו – שומעים בזמן אמת\n• באולפן – מגיעים אליי לאולפן"; }); d.layoutV = 38; }
+  if (saved && (saved.layoutV || 0) < 39) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = String(x.text || "").replace("באולפן – מקליטים יחד", "באולפן – מגיעים אליי לאולפן"); }); d.layoutV = 39; }
   return d;
 };
 

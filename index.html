@@ -1794,15 +1794,15 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 42,
+  layoutV: 43,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
-    { url: "https://youtu.be/i3dohlGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true },
-    { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/mvIhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
+    { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/qV9VPSyfSVI", title: "אביה שרמן – הכל לטובה", show: true },
     { url: "https://youtu.be/1ui0jm29em4", title: "אבישי רוזן – חמש דקות (קליפ רשמי)", show: true },
+    { url: "https://youtu.be/i3dohlGVZD4", title: "מיה משרקי – נשאר רק געגוע", show: true },
     { url: "https://youtu.be/9kgGM_m-i9I", title: "", show: true },
     { url: "https://youtu.be/qGAhDaOMN2s", title: "", show: true },
     { url: "https://youtu.be/XopiF8ylTAo", title: "האחיות ג׳משיד – בוא נהיה שמש", show: true }
@@ -2022,6 +2022,13 @@ window.mergeContent = function (saved) {
     d.testimonials = t; d.layoutV = 41;
   }
   if (saved && (saved.layoutV || 0) < 42) { (d.testimonials || []).forEach(x => { if (x && x.name === "בניה מדליון") x.text = String(x.text || "").replace("הסורסים מדהימים", "הסורסים מעולים"); }); d.layoutV = 42; }
+  if (saved && (saved.layoutV || 0) < 43 && Array.isArray(d.productions)) { // Mia Mashraki moves back (her clip carries YouTube ads), after Avishai Rozen
+    const pr = d.productions.slice(), has = (p, k) => String(p && p.url || "").includes(k);
+    const i = pr.findIndex(p => has(p, "i3dohlGVZD4"));
+    if (i >= 0) { const m = pr.splice(i, 1)[0]; const r = pr.findIndex(p => has(p, "1ui0jm29em4")); pr.splice(r >= 0 ? r + 1 : Math.min(4, pr.length), 0, m); }
+    const g = pr.findIndex(p => has(p, "mvIhYC6DV9A")); if (g > 0) pr.unshift(pr.splice(g, 1)[0]); // Michal Gringlick first
+    d.productions = pr; d.layoutV = 43;
+  }
   return d;
 };
 

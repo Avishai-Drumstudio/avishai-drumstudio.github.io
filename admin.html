@@ -200,7 +200,7 @@ window.SITE_DEFAULTS = {
   studioTitle: "My Drum Studio",
   productionsFirst: 2,
 
-  credits: "מופיע עם *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nמקליט ל*נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
+  credits: "עובד עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
   aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. בן 29, נשוי ואבא לילד מתוק.",
   aboutImage: "assets/avishai.jpg",
@@ -241,7 +241,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 32,
+  layoutV: 33,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -455,7 +455,7 @@ window.mergeContent = function (saved) {
     ["hProcess","ctaTitle","ctaText","aboutText","credits"].forEach(k => d[k] = D[k]);
     d.steps = D.steps.map(x => ({...x}));
   }
-  if (saved && (saved.layoutV || 0) < 32) d.layoutV = 32;
+  if (saved && (saved.layoutV || 0) < 33) { d.credits = window.SITE_DEFAULTS.credits; d.layoutV = 33; }
   return d;
 };
 

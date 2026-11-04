@@ -1416,6 +1416,13 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
 @keyframes opRec2{0%,100%{opacity:1}50%{opacity:.55}}
 .c3__card.far .c3__loop{display:none}
 
+/* sources: no 3D on the open card — iPhone Safari mis-aims taps on 3D layers (play / drag did nothing) */
+.tracks{perspective:none!important}
+.track.is-open{transform:none!important}
+.track,.track *{-webkit-tap-highlight-color:transparent}
+.track__btn{touch-action:manipulation;position:relative;z-index:5}
+.wave{position:relative;z-index:4}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -2694,7 +2701,7 @@ window.mergeContent = function (saved) {
     $$(".track").forEach(el => {
       const t = S.sources[el.dataset.i]; if(!real(t.audio)) return;
       const hasMix = real(t.mix);
-      const mk = (src, cors) => { const x = new Audio(); x.preload = "none"; if(cors) x.crossOrigin = "anonymous"; x.src = src; return x; };
+      const mk = (src, cors) => { const x = new Audio(); x.preload = "none"; x.setAttribute("playsinline", ""); if(cors) x.crossOrigin = "anonymous"; x.src = src; x.hidden = true; document.body.appendChild(x); return x; };
       // a = drums only (drives the timeline), b = full production
       let a = mk(t.audio, hasMix), b = hasMix ? mk(t.mix, true) : null;
       let mix = 0, ctx = null, ga = null, gb = null, mode = hasMix ? "gain" : "single";
@@ -2735,7 +2742,7 @@ window.mergeContent = function (saved) {
       const play = () => { setupGraph(); if(ctx && ctx.state === "suspended") ctx.resume();
         el.classList.add("is-loading"); clearTimeout(watch);
         // if nothing has started after a few seconds (slow network / stuck file), reload once and try again
-        watch = setTimeout(() => { if(a.paused || a.readyState < 3){ if(!retried){ retried = true; const t0 = a.currentTime; try{ a.load(); a.currentTime = t0; }catch(_){} a.play().catch(() => {}); } else el.classList.remove("is-loading"); } }, 6000);
+        watch = setTimeout(() => { if(a.paused && a.readyState < 3){ if(!retried){ retried = true; const t0 = a.currentTime; try{ a.load(); a.currentTime = t0; }catch(_){} a.play().catch(() => {}); } else el.classList.remove("is-loading"); } }, 6000);
         if(b){ b.currentTime = a.currentTime; b.play().catch(() => {}); }
         const p = a.play(); if(p && p.catch) p.catch(err => { if(err && err.name === "NotAllowedError"){ el.classList.remove("is-loading"); return; }
           a.addEventListener("canplay", () => a.play().catch(() => el.classList.remove("is-loading")), {once:true}); try{ a.load(); }catch(_){} }); };
@@ -2758,7 +2765,9 @@ window.mergeContent = function (saved) {
       wire();
 
       btn.addEventListener("click", () => a.paused ? play() : pause());
-      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { if(!e.isIntersecting && !a.paused) pause(); }, {threshold:0}).observe(el);
+      // scrolled away → pause (double-checked against the real position: iPhone can misreport cards that use 3D)
+      const offScreen = () => { const r = el.getBoundingClientRect(); return r.bottom < 0 || r.top > innerHeight; };
+      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { if(!e.isIntersecting && !a.paused && offScreen()) pause(); }, {threshold:0}).observe(el);
       // start fetching the file a little before it scrolls into view, so play is instant
       const warm = () => { [a, b].forEach(x => { if(x && x.preload !== "auto"){ x.preload = "auto"; try{ x.load(); }catch(_){} } }); };
       if("IntersectionObserver" in window){ const wo = new IntersectionObserver(([e]) => { if(e.isIntersecting){ warm(); wo.disconnect(); } }, {rootMargin:"900px 0px"}); wo.observe(el); } else warm();

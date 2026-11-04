@@ -1396,6 +1396,15 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
 .opt3 small{font-size:11.5px;color:var(--muted);line-height:1.35}
 .opt3__ic svg{width:17px;height:17px}
 .opt3__ic svg{width:14px;height:14px}.opt3__ic{line-height:0}.opt3{gap:6px;margin-top:6px}.opt3 li{padding:7px 4px 6px;gap:1px;border-radius:12px}.opt3 b{font-size:14px}.opt3 small{font-size:11px;line-height:1.3}.opt3__cap{margin-top:2px;font-size:11.5px}
+/* step 3 tiles: livelier sub-lines and coloured icons */
+.opt3 small{color:rgba(237,228,211,.82);font-weight:500}
+.opt3 li:nth-child(1) .opt3__ic svg{stroke:#fff;filter:drop-shadow(0 0 4px rgba(255,255,255,.55));animation:opEnv 2.6s ease-in-out infinite}
+.opt3 li:nth-child(2) .opt3__ic svg{stroke:#7BF3E6;filter:drop-shadow(0 0 4px rgba(46,211,195,.7));animation:opCam 2.2s ease-in-out infinite}
+.opt3 li:nth-child(3) .opt3__ic svg{stroke:#FF4D4D;filter:drop-shadow(0 0 5px rgba(255,60,60,.85));animation:opRec 1.2s ease-in-out infinite}
+@keyframes opEnv{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes opCam{0%,100%{opacity:1}50%{opacity:.6}}
+@keyframes opRec{0%,100%{opacity:1}50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.opt3__ic svg{animation:none!important}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>

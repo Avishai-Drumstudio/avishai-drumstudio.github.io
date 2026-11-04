@@ -1431,6 +1431,14 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
 .c3__x{z-index:20;touch-action:manipulation}
 .c3__x::before{content:"";position:absolute;inset:-10px}
 
+/* covers: sharp preview clips over the small animated image */
+.c3__media video.c3__pv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;transition:opacity .4s}
+.c3__card.pv-ok .c3__pv{opacity:1}
+.c3__card.pv-ok .c3__loop,.c3__pv.off{display:none}
+.c3__card.is-play .c3__pv{opacity:0}
+/* the loading ring sits in the middle of the video (the gradient layer uses ::after too) */
+.c3__media.is-loading::after{inset:auto!important;left:50%!important;top:50%!important;width:46px!important;height:46px!important;margin:-23px 0 0 -23px!important;background:none!important;border-radius:50%!important;border:3px solid rgba(255,255,255,.25)!important;border-top-color:#fff!important;animation:aySpin .8s linear infinite!important;z-index:7!important}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -2131,7 +2139,7 @@ window.mergeContent = function (saved) {
   // the opening video gets the connection first; the rest of the photos warm up quietly once the page has settled
   addEventListener("load", () => setTimeout(() => { try { Object.values(GEAR_MAP).forEach(u => { const i = new Image(); i.decoding = "async"; i.src = u; });
     document.querySelectorAll('img[loading="lazy"]').forEach(im => { im.loading = "eager"; }); } catch(e){} }, 3500));
-  const embedUrl = (id, extra="") => `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}${extra}`;
+  const embedUrl = (id, extra="") => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}${extra}`;
   // every YouTube player gets a "watch on YouTube" way out, and if the player itself fails (in-app browsers, blocked embeds) it turns into a big button
   (() => { const seen = new WeakSet();
     const watchUrl = src => { const m = String(src).match(/embed\/([\w-]{11})/); return m ? `https://www.youtube.com/watch?v=${m[1]}` : ""; };
@@ -2565,7 +2573,7 @@ window.mergeContent = function (saved) {
         return { c, id, src, prev: id ? "" : previewOf(c, src), thumb: id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }; });
       ring.innerHTML = covers.map((cv,i) => `<div class="c3__card" data-i="${i}" role="button" tabindex="0" aria-label="${L("קאבר","Cover")} ${esc(cv.c.style || "")}">
           <div class="c3__float" style="animation-delay:${(-i * .7).toFixed(1)}s">
-            <div class="c3__media">${cv.prev ? `${cv.thumb ? `<img class="c3__poster" src="${esc(cv.thumb)}" alt="" decoding="async" loading="lazy">` : ""}<img class="c3__loop" data-src="${esc(/_p\.mp4$/.test(cv.prev) ? cv.prev.replace(/\.mp4$/, ".webp") : cv.prev)}" alt="" decoding="async">`
+            <div class="c3__media">${cv.prev ? `${cv.thumb ? `<img class="c3__poster" src="${esc(cv.thumb)}" alt="" decoding="async" loading="lazy">` : ""}${/_p\.mp4$/.test(cv.prev) ? `<video class="c3__pv" muted playsinline loop preload="none" disablepictureinpicture aria-hidden="true" data-src="${esc(cv.prev.replace(/_p\.mp4$/, "_pv.mp4"))}"></video>` : ""}<img class="c3__loop" data-src="${esc(/_p\.mp4$/.test(cv.prev) ? cv.prev.replace(/\.mp4$/, ".webp") : cv.prev)}" alt="" decoding="async">`
               : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" decoding="async">` : ""}</div>
             <span class="c3__glare" aria-hidden="true"></span>
             <span class="c3__tag">${esc(cv.c.style || cv.c.title || "")}</span>
@@ -2582,13 +2590,21 @@ window.mergeContent = function (saved) {
       let near = false; // the covers are close to the screen: time to fetch the moving previews
       let angle = 0, target = 0, active = -1, raf = 0, inView = false, playing = -1, frame = null, timer = 0, hold = 0;
       const R = () => { const w = cards[0].offsetWidth; return Math.max(w * .95, (w / 2) / Math.tan(Math.PI / Math.max(n, 3)) + w * .22); };
+      // sharp preview clip (muted video); if the phone won't autoplay it (in-app browsers, battery saver), the small animated image takes over
+      const loadPrev = el => { if(el._pv) return; el._pv = 1; const pv = el.querySelector(".c3__pv[data-src]"), lp = el.querySelector(".c3__loop[data-src]");
+        const useImg = () => { if(lp && lp.dataset.src){ lp.src = lp.dataset.src; lp.removeAttribute("data-src"); } if(pv) pv.classList.add("off"); };
+        if(!pv || reduce){ useImg(); return; }
+        pv.addEventListener("playing", () => el.classList.add("pv-ok"), {once:true});
+        pv.src = pv.dataset.src; pv.removeAttribute("data-src"); pv.muted = true; pv.preload = "auto";
+        const p = pv.play(); if(p && p.catch) p.catch(() => {});
+        setTimeout(() => { if(!el.classList.contains("pv-ok")) useImg(); }, 2500); };
       const paint = () => { const r = R();
         cards.forEach((el,i) => { let rel = ((i * STEP - angle) % 360 + 540) % 360 - 180; const a = rel * Math.PI / 180, cz = Math.cos(a);
           const lift = i === playing ? 230 : 0; // the playing card floats toward you
           el.style.transform = `translate3d(${(Math.sin(a) * r).toFixed(1)}px,0,${(cz * r - r + lift).toFixed(1)}px) rotateY(${rel.toFixed(1)}deg)`;
           el.style.opacity = String(Math.max(.12, .25 + .75 * (cz + 1) / 2 * (cz > 0 ? 1 : .6)).toFixed(3));
           const zi = String(Math.round(100 + cz * 100)); if(el._zi !== zi){ el._zi = zi; el.style.zIndex = zi; } const far = cz < .15; if(el._far !== far){ el._far = far; el.classList.toggle("far", far); } // cards at the back stop animating (smoother on older phones)
-          if(near && cz >= .15){ const lp = el.querySelector(".c3__loop[data-src]"); if(lp){ lp.src = lp.dataset.src; lp.removeAttribute("data-src"); } } // moving previews load only when they come near the front
+          if(near && cz >= .15) loadPrev(el); // moving previews load only when they come near the front
           const dm = cz > .96 ? "0" : (.45 - .45 * Math.max(0, cz)).toFixed(2); if(el._dm !== dm){ el._dm = dm; el.style.setProperty("--dim", dm); }
           const v = el.querySelector(".c3__media video:not(.c3__full)"); if(v){ const near = cz > .2; if(near !== v._near){ v._near = near; if(near && inView && !reduce){ v.muted = true; v.play().catch(() => {}); } else v.pause(); } } }); };
       const setActive = i => { if(i === active) return; active = i;

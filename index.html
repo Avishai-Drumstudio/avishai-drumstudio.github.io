@@ -1382,6 +1382,10 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
 @media (max-width:759px){.hero__cred{font-size:12.5px}}
 .hero__cred{font-size:15.5px!important;gap:6px;line-height:1.45}.hero__cred .hc__stat{font-size:14.5px!important;margin-top:8px}@media (min-width:760px){.hero__cred{font-size:17px!important}}
 .hero__cred{font-size:14px!important}.hero__cred .hc__stat{font-size:13.5px!important}@media (min-width:760px){.hero__cred{font-size:16px!important}}
+.step__list{list-style:none;display:inline-flex;flex-direction:column;gap:4px;text-align:start;margin:6px auto 0;padding:0;color:inherit}
+.step__list li{position:relative;padding-inline-start:16px;font-size:inherit;line-height:1.5;color:var(--muted)}
+.step__list li::before{content:"";position:absolute;inset-inline-start:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--lime)}
+.step__list li{font-size:16px}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1714,7 +1718,7 @@ window.SITE_DEFAULTS = {
   steps: [
     { title: "הסקיצה", text: "סקיצה או פלייבק, טמפו ורפרנס לסאונד." },
     { title: "הסאונד", text: "מערכת, סנר וכיוון סאונד – בהתאמה להפקה." },
-    { title: "ההקלטה", text: "גייד ראשון ← הערות ← טייק סופי.\nאו סשן לייב בווידאו.\nאו סשן באולפן – מגיעים ומקליטים יחד." },
+    { title: "ההקלטה", text: "• גייד ראשוני – הערות – טייק סופי\n• סשן לייב בווידאו\n• סשן באולפן – מגיעים ומקליטים יחד" },
     { title: "הערוצים", text: "קבלת ערוצים תוך 24 שעות · Mix Ready · כל פורמט · עד 3 סבבי תיקונים" }
   ],
   hProductions: "שירים שניגנתי בהם",
@@ -1738,7 +1742,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 36,
+  layoutV: 37,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1955,6 +1959,7 @@ window.mergeContent = function (saved) {
   if (saved && (saved.layoutV || 0) < 34) { d.credits = window.SITE_DEFAULTS.credits; d.layoutV = 34; }
   if (saved && (saved.layoutV || 0) < 35) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = x.text.replace("טייק סופי. או סשן", "טייק סופי.\nאו סשן"); }); d.layoutV = 35; }
   if (saved && (saved.layoutV || 0) < 36) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה" && !/באולפן/.test(x.text)) x.text += "\nאו סשן באולפן – מגיעים ומקליטים יחד."; }); d.layoutV = 36; }
+  if (saved && (saved.layoutV || 0) < 37) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = "• גייד ראשוני – הערות – טייק סופי\n• סשן לייב בווידאו\n• סשן באולפן – מגיעים ומקליטים יחד"; }); d.layoutV = 37; }
   return d;
 };
 
@@ -2007,7 +2012,7 @@ window.mergeContent = function (saved) {
     steps: [
       { title: "The Demo", text: "A demo or playback, the tempo and a sound reference." },
       { title: "The Sound", text: "Kit, snare and sonic direction — matched to the production." },
-      { title: "The Recording", text: "First take → your notes → final take.\nOr a live video session.\nOr an in-studio session — come and record together." },
+      { title: "The Recording", text: "• First take – notes – final take\n• Live video session\n• In-studio session – come and record together" },
       { title: "The Stems", text: "Stems within 24 hours · Mix Ready · any format · up to 3 revision rounds" }
     ],
     styles: { "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
@@ -2329,7 +2334,7 @@ window.mergeContent = function (saved) {
         <span class="step__icon"><svg viewBox="0 0 24 24"><use href="#${stepIcons[i % stepIcons.length]}"/></svg></span>
         <span class="step__n">${L("שלב","Step")} ${i+1}</span>
         <h3>${esc(s.title)}</h3>
-        <p>${esc(s.text).replace(/\n/g, "<br>")}</p>
+        ${/^\s*•/.test(s.text || "") ? `<ul class="step__list">${String(s.text).split("\n").map(x => x.replace(/^\s*•\s*/, "").trim()).filter(Boolean).map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p>${esc(s.text).replace(/\n/g, "<br>")}</p>`}
       </li>`).join(""));
 
     // hero background: poster + video (YouTube or mp4)

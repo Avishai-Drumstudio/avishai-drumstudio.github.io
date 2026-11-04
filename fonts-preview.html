@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>בחירת פונט</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;800&family=Frank+Ruhl+Libre:wght@500;800&family=Karantina:wght@700&family=Secular+One&family=Suez+One&family=Bona+Nova:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0F1716;--surface:#16211F;--text:#EDE4D3;--muted:#A39E90;--lime:#2ED3C3;--line:rgba(225,214,190,.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Heebo,Arial,sans-serif;padding:20px 16px 60px;line-height:1.6}
+.top{text-align:center;color:var(--muted);font-size:15px;margin-bottom:22px}
+.opt{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:26px 20px 24px;margin:0 auto 18px;max-width:520px;text-align:center;position:relative}
+.num{position:absolute;top:14px;right:16px;width:34px;height:34px;border-radius:50%;background:var(--lime);color:#0C1A18;font:800 17px/34px Heebo,sans-serif}
+.nm{color:var(--muted);font-size:13px;margin-bottom:14px;letter-spacing:.02em}
+.kick{color:var(--lime);font-size:14px;margin-bottom:6px}
+.h1{font-size:40px;line-height:1.12;margin-bottom:12px}
+.cred{font-size:14px;color:var(--muted);margin-bottom:22px}
+.cred b{color:var(--text);font-weight:600}
+.h2{font-size:30px;line-height:1.2}
+.bar{width:44px;height:3px;background:var(--lime);border-radius:3px;margin:10px auto 0}
+.f1 .h1,.f1 .h2{font-family:Heebo;font-weight:800}
+.f2 .h1,.f2 .h2{font-family:"Frank Ruhl Libre";font-weight:800}
+.f3 .h1,.f3 .h2{font-family:Karantina;font-weight:700;font-size:58px;line-height:1}
+.f3 .h2{font-size:44px}
+.f4 .h1,.f4 .h2{font-family:"Secular One"}
+.f5 .h1,.f5 .h2{font-family:"Suez One"}
+.f6 .h1,.f6 .h2{font-family:"Bona Nova";font-weight:700}
+</style>
+</head>
+<body>
+<p class="top">בחר מספר. הטקסט הרגיל נשאר כמו היום, רק הכותרות משתנות.</p>
+<script>
+const opts=[["f1","היום – Heebo"],["f2","Frank Ruhl Libre – קלאסי ויוקרתי"],["f3","Karantina – כרזת הופעה, רוקיסטי"],["f4","Secular One – עגול וחזק"],["f5","Suez One – סריף כבד, נוכח"],["f6","Bona Nova – אלגנטי, ספרותי"]];
+document.write(opts.map((o,i)=>`<div class="opt ${o[0]}"><span class="num">${i+1}</span><p class="nm">${o[1]}</p>
+<p class="kick">מתופף סשן | הקלטות מרחוק</p>
+<h1 class="h1">תופים מוכנים למיקס,<br>ישר להפקה שלך</h1>
+<p class="cred">הקלטות והופעות עם <b>נסרין</b> · <b>סטטיק</b> · <b>אהרון רזאל</b> · <b>אביב אלוש</b> ועוד</p>
+<h2 class="h2">הפקות נבחרות</h2><div class="bar"></div></div>`).join(""));
+</script>
+</body>
+</html>

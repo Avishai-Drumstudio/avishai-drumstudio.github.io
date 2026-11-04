@@ -200,8 +200,9 @@ window.SITE_DEFAULTS = {
   studioTitle: "My Drum Studio",
   productionsFirst: 2,
 
+  credits: "מופיע עם *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nמקליט ל*נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
-  aboutText: "מתופף וסשניסט. מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל, לצד מענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nאת רוב ההקלטות שלי היום אני מבצע מרחוק: מהר, מדויק, עם תקשורת רציפה ועבודה נעימה, מה שחוסך לך כמפיק זמן יקר.\n\nבסשן נתאים את הסאונד בדיוק לפרויקט שלך, כך שהערוצים מגיעים ברמת Mix Ready: סאונד בריא, טבעי ונקי לחלוטין.",
+  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. בן 29, נשוי ואבא לילד מתוק.",
   aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
@@ -212,12 +213,12 @@ window.SITE_DEFAULTS = {
     { title: "מרחוק – כאילו אתה בחדר", text: "שידור חי בווידאו ובסאונד מלא" },
     { title: "כל ז'אנר", text: "רוק, פופ, פאנק, ים-תיכוני, חסידי" }
   ],
-  hProcess: "איך זה עובד",
+  hProcess: "תהליך העבודה",
   steps: [
-    { title: "הסקיצה", text: "שולחים לי את השיר – סקיצה או פלייבק, עם טמפו ורפרנס לסאונד שאתה אוהב." },
-    { title: "הסאונד", text: "בוחרים יחד מערכת תופים, סנר וכיוון – סאונד שמתאים בדיוק להפקה שלך." },
-    { title: "ההקלטה", text: "אני שולח לך גייד ואתה נותן הערות, או שמתחברים לייב בווידאו ואתה שומע את האולפן בזמן אמת – כאילו אתה בחדר." },
-    { title: "הערוצים", text: "תוך 24 שעות אצלך: ערוצים נקיים ומוכנים למיקס, בפורמט שנוח לך. כולל עד 3 סבבי תיקונים." }
+    { title: "הסקיצה", text: "סקיצה או פלייבק, טמפו ורפרנס לסאונד." },
+    { title: "הסאונד", text: "מערכת, סנר וכיוון סאונד – בהתאמה להפקה." },
+    { title: "ההקלטה", text: "גייד ראשון ← הערות ← טייק סופי. או סשן לייב בווידאו." },
+    { title: "הערוצים", text: "קבלת ערוצים תוך 24 שעות · Mix Ready · כל פורמט · עד 3 סבבי תיקונים" }
   ],
   hProductions: "שירים שניגנתי בהם",
   hCovers: "קאברים",
@@ -236,11 +237,11 @@ window.SITE_DEFAULTS = {
   hStudio: "האולפן והציוד",
   studioHl: "Gretsch USA Custom · 4 סנרים · מיקרופונים: Sennheiser, Warm Audio",
   hTestimonials: "מה אומרים מפיקים",
-  ctaTitle: "יש לך שיר שמחכה לתופים?",
-  ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
+  ctaTitle: "השיר הבא שלך מחכה לתופים.",
+  ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 31,
+  layoutV: 32,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -449,7 +450,12 @@ window.mergeContent = function (saved) {
   if (saved && (saved.layoutV || 0) < 31 && typeof d.aboutText === "string") d.aboutText = d.aboutText.replace("*אביב אלוש*, ומפיקים", "*אביב אלוש* ועוד, ומפיקים"); // Avishai asked
   // sharper cover videos (always, so older saves pick them up too)
   if (Array.isArray(d.covers)) d.covers = d.covers.map(x => x && /covers\/(c\d|funk)\.mp4$/.test(x.url || "") ? {...x, url: x.url.replace(/\.mp4$/, "-hq.mp4")} : x);
-  if (saved && (saved.layoutV || 0) < 31) d.layoutV = 31;
+  if (saved && (saved.layoutV || 0) < 32) { // a confident tone: what you get, not "please work with me" (Avishai asked)
+    const D = window.SITE_DEFAULTS;
+    ["hProcess","ctaTitle","ctaText","aboutText","credits"].forEach(k => d[k] = D[k]);
+    d.steps = D.steps.map(x => ({...x}));
+  }
+  if (saved && (saved.layoutV || 0) < 32) d.layoutV = 32;
   return d;
 };
 
@@ -608,6 +614,7 @@ window.mergeContent = function (saved) {
       el("div", {class:"card"},
         field(S,"eyebrow","שורה קטנה מעל הכותרת"),
         field(S,"title","כותרת ראשית","textarea"),
+        field(S,"credits","קרדיטים מתחת לכותרת (שורה לכל שורה, *שם* = מודגש)","textarea"),
         field(S,"lead","טקסט מתחת לכותרת","textarea"),
         field(S,"trust","שורת ניסיון (מתחת לשלוש התיבות)","textarea")),
       el("div", {class:"card"},

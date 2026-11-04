@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://docs.google.com">
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&family=Suez+One&display=swap" rel="stylesheet">
 
 <style>
 /* Layout: full-bleed video hero that shrinks into a card on scroll; every section below is one centered column */
@@ -1369,6 +1369,18 @@ html{background:#0f1716}
 .c3__prog i b{position:absolute;right:-7px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(46,211,195,.35),0 2px 6px rgba(0,0,0,.4);transition:transform .15s}
 .c3__prog.seek i{transition:none}.c3__prog.seek i b{transform:scale(1.3)}
 
+/* hero credits under the title */
+.hero__cred{display:flex;flex-direction:column;gap:3px;margin:10px 0 16px;font-size:14px;line-height:1.5;color:rgba(237,228,211,.78);text-shadow:0 2px 14px rgba(0,0,0,.6);max-width:40ch}
+.hero__cred b{color:#fff;font-weight:600}
+.hero__cred .hc__stat{margin-top:6px;font-size:13px;color:var(--lime);font-weight:500;letter-spacing:.01em}
+@media (min-width:760px){.hero__cred{font-size:16px}.hero__cred .hc__stat{font-size:14.5px}}
+/* headings font: Suez One (one weight — no fake bold) */
+h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{font-family:"Suez One","Heebo",serif!important;font-weight:400!important;letter-spacing:0!important}
+.hero__cred{font-size:13px}.hero__cred b{white-space:nowrap}@media (min-width:760px){.hero__cred{font-size:16px}}
+#heroLead[hidden]{display:none!important}
+.hero__cred{max-width:none}
+@media (max-width:759px){.hero__cred{font-size:12.5px}}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1396,7 +1408,7 @@ html{background:#0f1716}
       <span class="brand__txt"><b>אבישי ישר</b><small>Live &amp; Studio Drums</small></span>
     </a>
     </div>
-    <a class="btn btn--lime js-wa" target="_blank" rel="noopener">דברו איתי</a>
+    <a class="btn btn--lime js-wa" target="_blank" rel="noopener">בדיקת זמינות</a>
   </div>
 </header>
 
@@ -1416,6 +1428,7 @@ html{background:#0f1716}
     <div class="wrap hero__content" id="heroContent">
       <span class="eyebrow" id="heroEyebrow" data-hero></span>
       <h1 id="heroTitle"></h1>
+      <p class="hero__cred" id="heroCred" data-hero></p>
       <p class="hero__sub" id="heroLead" data-hero></p>
       <div class="hero__cta" id="heroCta" data-hero>
         <a class="btn btn--lime js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>לתיאום הקלטה</a>
@@ -1455,7 +1468,6 @@ html{background:#0f1716}
         <h2 class="about__big" data-split>קצת עליי</h2>
         <h3 class="about__name" id="aboutTitle"></h3>
         <div class="about__body" id="aboutBody" data-reveal></div>
-        <a class="btn btn--lime js-wa" target="_blank" rel="noopener" data-reveal><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>בוא נדבר על ההפקה הבאה</a>
       </div>
     </div>
   </section>
@@ -1683,8 +1695,9 @@ window.SITE_DEFAULTS = {
   studioTitle: "My Drum Studio",
   productionsFirst: 2,
 
+  credits: "מופיע עם *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nמקליט ל*נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
-  aboutText: "מתופף וסשניסט. מביא להפקה שלך ניסיון עשיר מהקלטות והופעות עם האמנים והמפיקים המובילים בישראל, לצד מענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nאת רוב ההקלטות שלי היום אני מבצע מרחוק: מהר, מדויק, עם תקשורת רציפה ועבודה נעימה, מה שחוסך לך כמפיק זמן יקר.\n\nבסשן נתאים את הסאונד בדיוק לפרויקט שלך, כך שהערוצים מגיעים ברמת Mix Ready: סאונד בריא, טבעי ונקי לחלוטין.",
+  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. בן 29, נשוי ואבא לילד מתוק.",
   aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
@@ -1695,12 +1708,12 @@ window.SITE_DEFAULTS = {
     { title: "מרחוק – כאילו אתה בחדר", text: "שידור חי בווידאו ובסאונד מלא" },
     { title: "כל ז'אנר", text: "רוק, פופ, פאנק, ים-תיכוני, חסידי" }
   ],
-  hProcess: "איך זה עובד",
+  hProcess: "תהליך העבודה",
   steps: [
-    { title: "הסקיצה", text: "שולחים לי את השיר – סקיצה או פלייבק, עם טמפו ורפרנס לסאונד שאתה אוהב." },
-    { title: "הסאונד", text: "בוחרים יחד מערכת תופים, סנר וכיוון – סאונד שמתאים בדיוק להפקה שלך." },
-    { title: "ההקלטה", text: "אני שולח לך גייד ואתה נותן הערות, או שמתחברים לייב בווידאו ואתה שומע את האולפן בזמן אמת – כאילו אתה בחדר." },
-    { title: "הערוצים", text: "תוך 24 שעות אצלך: ערוצים נקיים ומוכנים למיקס, בפורמט שנוח לך. כולל עד 3 סבבי תיקונים." }
+    { title: "הסקיצה", text: "סקיצה או פלייבק, טמפו ורפרנס לסאונד." },
+    { title: "הסאונד", text: "מערכת, סנר וכיוון סאונד – בהתאמה להפקה." },
+    { title: "ההקלטה", text: "גייד ראשון ← הערות ← טייק סופי. או סשן לייב בווידאו." },
+    { title: "הערוצים", text: "קבלת ערוצים תוך 24 שעות · Mix Ready · כל פורמט · עד 3 סבבי תיקונים" }
   ],
   hProductions: "שירים שניגנתי בהם",
   hCovers: "קאברים",
@@ -1719,11 +1732,11 @@ window.SITE_DEFAULTS = {
   hStudio: "האולפן והציוד",
   studioHl: "Gretsch USA Custom · 4 סנרים · מיקרופונים: Sennheiser, Warm Audio",
   hTestimonials: "מה אומרים מפיקים",
-  ctaTitle: "יש לך שיר שמחכה לתופים?",
-  ctaText: "שלח סקיצה ואחזור אליך עם הצעה.",
+  ctaTitle: "השיר הבא שלך מחכה לתופים.",
+  ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 31,
+  layoutV: 32,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1932,7 +1945,12 @@ window.mergeContent = function (saved) {
   if (saved && (saved.layoutV || 0) < 31 && typeof d.aboutText === "string") d.aboutText = d.aboutText.replace("*אביב אלוש*, ומפיקים", "*אביב אלוש* ועוד, ומפיקים"); // Avishai asked
   // sharper cover videos (always, so older saves pick them up too)
   if (Array.isArray(d.covers)) d.covers = d.covers.map(x => x && /covers\/(c\d|funk)\.mp4$/.test(x.url || "") ? {...x, url: x.url.replace(/\.mp4$/, "-hq.mp4")} : x);
-  if (saved && (saved.layoutV || 0) < 31) d.layoutV = 31;
+  if (saved && (saved.layoutV || 0) < 32) { // a confident tone: what you get, not "please work with me" (Avishai asked)
+    const D = window.SITE_DEFAULTS;
+    ["hProcess","ctaTitle","ctaText","aboutText","credits"].forEach(k => d[k] = D[k]);
+    d.steps = D.steps.map(x => ({...x}));
+  }
+  if (saved && (saved.layoutV || 0) < 32) d.layoutV = 32;
   return d;
 };
 
@@ -1969,8 +1987,9 @@ window.mergeContent = function (saved) {
     trust: "Studio and stage experience with Israel's top artists and producers",
     waMessage: "Hi Avishai 👋\nI found you through your website.\n\nMy name: \nI'd like to check your availability for a drum session on: \nProject type: single / medley / album\nGenre: \n\nI'll send you a demo and a reference here. Thanks!",
     aboutTitle: "Avishai Yashar",
-    aboutText: "I'm 29, married, and a proud dad.\nI started out in the IDF Military Rabbinate Band and have since played stages in Israel and abroad alongside some of the country's finest artists.\nOver the years I've recorded and performed with leading Israeli singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur* and *Aviv Alush*, among others, and worked with producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and many others.\nWhatever the genre — rock, pop, funk, Mediterranean or Hasidic — I bring the right feel to the track.\n\nThese days most of my sessions are remote: fast and precise, with clear communication throughout, so you save valuable time.\n\nTogether we'll dial in the sound for your project, and you'll get mix-ready tracks that are natural, balanced and clean.",
-    hProcess: "How It Works",
+    aboutText: "Recording and performing with Israel's leading singers and producers — singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur* and *Aviv Alush*, among others, and producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and more.\nThe right feel for every genre — rock, pop, funk, Mediterranean and Hasidic.\n\nThese days, mostly remote sessions from my private studio.\n\nAn alumnus of the IDF Military Rabbinate Band, and from there to stages in Israel and abroad. 29, married, and a proud dad.",
+    hProcess: "The Process",
+    credits: "Performing with *Static*, *Nasrin*, *Yair Elitzur*, *Itzik Kala* and more\nRecording for *Naor Carmi*, *Elnatan Shalom*, *Netanel Ben Giat*, *Shai Vagos* and more\n🥁 Hundreds of productions · 🎧 Tens of millions of plays",
     hProductions: "Songs I've Played On",
     hCovers: "Covers",
     pCovers: "",
@@ -1979,13 +1998,13 @@ window.mergeContent = function (saved) {
     hStudio: "Studio & Gear",
     studioHl: "",
     hTestimonials: "What Producers Say",
-    ctaTitle: "Got a song that needs drums?",
-    ctaText: "Send me a demo and I'll get back to you with a quote.",
+    ctaTitle: "Your next song is waiting for drums.",
+    ctaText: "Send a demo for a quote",
     steps: [
-      { title: "The Demo", text: "Send me your song — a demo or playback — with the tempo and a reference for the sound you're after." },
-      { title: "The Sound", text: "We choose the kit, the snare and the overall direction together, so the drums fit your production perfectly." },
-      { title: "The Recording", text: "I send you a take for your notes, or we jump on a live video call so you hear the room in real time — just like being there." },
-      { title: "The Stems", text: "Within 24 hours you'll have clean, mix-ready stems in your preferred format. Up to 3 rounds of revisions included." }
+      { title: "The Demo", text: "A demo or playback, the tempo and a sound reference." },
+      { title: "The Sound", text: "Kit, snare and sonic direction — matched to the production." },
+      { title: "The Recording", text: "First take → your notes → final take. Or a live video session." },
+      { title: "The Stems", text: "Stems within 24 hours · Mix Ready · any format · up to 3 revision rounds" }
     ],
     styles: { "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
     cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
@@ -1995,7 +2014,7 @@ window.mergeContent = function (saved) {
     titles: { "1QuNAhONztA": "Nishmecha Band — Shabbat Medley", "ogfbC9pYXsQ": "Purim Medley | IDF Military Rabbinate Band", "qV9VPSyfSVI": "Aviya Sherman — Hakol Letova", "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
   };
   const toEN = S => { if(!EN) return S; const T = EN_TEXT, tr = (m, v) => (m[String(v || "").trim()] || v);
-    ["eyebrow","title","lead","trust","waMessage","aboutTitle","aboutText","hProcess","hProductions","hCovers","pCovers","hSources","pSources","hStudio","studioHl","hTestimonials","ctaTitle","ctaText"].forEach(k => { S[k] = T[k]; });
+    ["eyebrow","title","lead","trust","credits","waMessage","aboutTitle","aboutText","hProcess","hProductions","hCovers","pCovers","hSources","pSources","hStudio","studioHl","hTestimonials","ctaTitle","ctaText"].forEach(k => { S[k] = T[k]; });
     S.steps = T.steps.map(s => ({...s}));
     S.covers = (S.covers || []).map(c => ({...c, style: tr(T.styles, c.style), title: /[א-ת]/.test(c.title || "") ? "" : c.title}));
     S.gear = (S.gear || []).map(g => ({...g, category: tr(T.cats, g.category || "כללי"), name: tr(T.names, g.name)}));
@@ -2014,7 +2033,7 @@ window.mergeContent = function (saved) {
     set("#menuBtn", "Menu", "aria-label"); set(".brand", "Avishai Yashar – back to top", "aria-label");
     set(".brand__txt b", "Avishai Yashar");
     const waTxt = (a, t) => { const n = [...a.childNodes].find(x => x.nodeType === 3 && x.textContent.trim()); if(n) n.textContent = t; };
-    document.querySelectorAll(".top .js-wa").forEach(a => waTxt(a, "Let's Talk"));
+    document.querySelectorAll(".top .js-wa").forEach(a => waTxt(a, "Check Availability"));
     document.querySelectorAll("#heroCta .js-wa, .menu .js-wa, .cta .js-wa, #ctaSection .js-wa").forEach(a => waTxt(a, "Book a Session"));
     document.querySelectorAll("#about .js-wa").forEach(a => waTxt(a, "Let's talk about your project"));
     set("#watchIntro span", "Watch the Video");
@@ -2194,6 +2213,8 @@ window.mergeContent = function (saved) {
     // texts
     const txt = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v || ""; };
     txt("heroEyebrow", S.eyebrow); txt("heroTitle", S.title); splitWords($("#heroTitle"));
+    { const hc = $("#heroCred"); if(hc){ const lines = String(S.credits || "").split("\n").map(x => x.trim()).filter(Boolean);
+      hc.innerHTML = lines.map((l,i) => `<span class="${i === lines.length - 1 && lines.length > 2 ? "hc__stat" : "hc__ln"}">${esc(l).replace(/\*([^*]+)\*/g, "<b>$1</b>")}</span>`).join(""); hc.hidden = !lines.length; const hl = $("#heroLead"); if(hl && lines.length) hl.hidden = true; } }
     txt("heroLead", String(S.lead || "").replace(/Mix Ready/g, "Mix\u00A0Ready")); txt("trust", S.trust); txt("phone", S.phone);
     ["hCovers","pCovers","hProcess","hProductions","hSources","pSources","hStudio","hTestimonials","ctaTitle","ctaText"].forEach(k => txt(k, S[k]));
     $("#year").textContent = new Date().getFullYear();

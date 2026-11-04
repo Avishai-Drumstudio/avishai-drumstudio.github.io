@@ -69,7 +69,7 @@ body::after{content:"";position:fixed;inset:0;z-index:90;pointer-events:none;opa
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
 /* ---------- intro curtain ---------- */
-.intro{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;animation:introFail .5s 9s forwards}
+.intro{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;animation:introFail .5s 6s forwards}
 @keyframes introFail{to{opacity:0;visibility:hidden;pointer-events:none}}
 @keyframes pulse{50%{transform:scale(.92)}}
 
@@ -1406,6 +1406,16 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
 @keyframes opRec{0%,100%{opacity:1}50%{opacity:.3}}
 @media (prefers-reduced-motion:reduce){.opt3__ic svg{animation:none!important}}
 
+/* loading rings: the tap registered, the file is on its way */
+@keyframes aySpin{to{transform:rotate(360deg)}}
+.track.is-loading .track__btn{position:relative}
+.track.is-loading .track__btn::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2.5px solid rgba(46,211,195,.25);border-top-color:#2ED3C3;animation:aySpin .8s linear infinite}
+.c3__media.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;animation:aySpin .8s linear infinite;z-index:6;pointer-events:none}
+/* the mic: brighter and bigger so it doesn't disappear */
+.opt3 li:nth-child(3) .opt3__ic svg{width:17px;height:17px;stroke:#FF3B3B;stroke-width:2.3;filter:drop-shadow(0 0 6px rgba(255,40,40,1)) drop-shadow(0 0 2px rgba(255,90,90,.9));animation:opRec2 1.3s ease-in-out infinite}
+@keyframes opRec2{0%,100%{opacity:1}50%{opacity:.55}}
+.c3__card.far .c3__loop{display:none}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -2131,6 +2141,8 @@ window.mergeContent = function (saved) {
 
   /* ---------------- render ---------------- */
   const audios = [];
+  const stoppers = {}; // one sound at a time: whoever starts playing stops the others
+  const stopAllMedia = except => Object.keys(stoppers).forEach(k => { if(k !== except) try{ stoppers[k](); }catch(_){} });
   function pauseAudio(except){ audios.forEach(a => a !== except && a !== (except && except.__pair) && a.pause()); }
 
   function splitWords(el){
@@ -2181,9 +2193,10 @@ window.mergeContent = function (saved) {
     // tap: centered item plays, side item comes to the center
     let dragged = false;
     function stopInline(){ items.forEach(el => { if(el.classList.contains("is-playing")){ el.classList.remove("is-playing"); el.querySelector(".reel__frame")?.remove(); } }); }
+    stoppers.reel = stopInline;
     function playInline(it){
       if(it.classList.contains("is-playing")) return;
-      stopInline(); pauseAudio(); it.classList.add("is-playing");
+      stopInline(); pauseAudio(); stopAllMedia("reel"); it.classList.add("is-playing");
       it.insertAdjacentHTML("beforeend", `<iframe class="reel__frame" src="${embedUrl(it.dataset.id)}" title="YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`);
     }
     track.addEventListener("click", e => { const it = e.target.closest(".reel__item"); if(!it || dragged) return;
@@ -2342,7 +2355,7 @@ window.mergeContent = function (saved) {
           <line class="sn__stick" x1="430" y1="-66" x2="240" y2="58"/></svg></div>`,
       `<div class="sc sc--call"><div class="scr"><span class="scr__rec"><i></i>${L("לייב","LIVE")}</span>
           <div class="scr__tile"><span class="ov__face"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><small>${L("המפיק","Producer")}</small><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></div>
-          <div class="scr__tile scr__tile--me"><img class="fg" src="assets/me-call.webp" alt="" decoding="async"><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>
+          <div class="scr__tile scr__tile--me"><img class="fg" src="assets/me-call.webp" alt="" decoding="async" loading="lazy"><span class="scr__name"><span class="ov__lv"><i></i><i></i><i></i><i></i><i></i></span></span></div>
           </div></div>`,
       `<div class="sc sc--stems"><div class="daw"><span class="daw__tb"><i></i><i></i><i></i><b></b><i></i><i></i></span>
           <span class="daw__ruler"></span>
@@ -2379,7 +2392,8 @@ window.mergeContent = function (saved) {
       if(!v.parentNode) $("#heroMedia").appendChild(v);
       let soundOn = false, heroIn = true, touched = false; // silent until the speaker button is pressed
       // always autoplay muted; sound only when the speaker button is pressed
-      const tryPlay = () => { v.muted = !(touched && soundOn && heroIn); const p = v.play(); if(p && p.catch) p.catch(() => { if(!v.muted){ v.muted = true; v.play().catch(() => {}); } }); };
+      let heroVis = true;
+      const tryPlay = () => { if(!heroVis) return; v.muted = !(touched && soundOn && heroIn); const p = v.play(); if(p && p.catch) p.catch(() => { if(!v.muted){ v.muted = true; v.play().catch(() => {}); } }); };
       // sound on/off: starts muted (phones only allow that), one tap turns the studio sound on
       const sb = $("#heroSnd");
       if(sb && /hero(-v2)?\.mp4/.test(bg)){
@@ -2395,6 +2409,8 @@ window.mergeContent = function (saved) {
         const md = $("#modal"); if(md) new MutationObserver(() => { v.muted = !(touched && soundOn && heroIn && md.hidden); }).observe(md, {attributes:true, attributeFilter:["hidden"]});
         paint();
       }
+      // off screen it rests (saves battery and lets the rest of the page load faster), back on screen it plays again
+      if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { heroVis = e.isIntersecting; if(heroVis) tryPlay(); else v.pause(); }, {threshold:0}).observe($("#hero"));
       tryPlay(); v.addEventListener("canplay", tryPlay, {once:true});
       // phones in battery-saving mode block autoplay until the first touch or scroll
       const kick = () => { tryPlay(); if(!v.paused) ["touchstart","pointerdown","scroll"].forEach(ev => removeEventListener(ev, kick)); };
@@ -2522,7 +2538,7 @@ window.mergeContent = function (saved) {
         return { c, id, src, prev: id ? "" : previewOf(c, src), thumb: id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : (real(c.poster) ? c.poster : "") }; });
       ring.innerHTML = covers.map((cv,i) => `<div class="c3__card" data-i="${i}" role="button" tabindex="0" aria-label="${L("קאבר","Cover")} ${esc(cv.c.style || "")}">
           <div class="c3__float" style="animation-delay:${(-i * .7).toFixed(1)}s">
-            <div class="c3__media">${cv.prev ? `${cv.thumb ? `<img class="c3__poster" src="${esc(cv.thumb)}" alt="" decoding="async">` : ""}<img class="c3__loop" src="${esc(/_p\.mp4$/.test(cv.prev) ? cv.prev.replace(/\.mp4$/, ".webp") : cv.prev)}" alt="" decoding="async">`
+            <div class="c3__media">${cv.prev ? `${cv.thumb ? `<img class="c3__poster" src="${esc(cv.thumb)}" alt="" decoding="async" loading="lazy">` : ""}<img class="c3__loop" data-src="${esc(/_p\.mp4$/.test(cv.prev) ? cv.prev.replace(/\.mp4$/, ".webp") : cv.prev)}" alt="" decoding="async">`
               : cv.thumb ? `<img src="${esc(cv.thumb)}" alt="" loading="lazy" decoding="async">` : ""}</div>
             <span class="c3__glare" aria-hidden="true"></span>
             <span class="c3__tag">${esc(cv.c.style || cv.c.title || "")}</span>
@@ -2536,6 +2552,7 @@ window.mergeContent = function (saved) {
       const closeBtn = document.createElement("button"); closeBtn.type = "button"; closeBtn.className = "c3__x"; closeBtn.setAttribute("aria-label", L("סגירה","Close"));
       closeBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
       const prog = document.createElement("span"); prog.className = "c3__prog"; prog.innerHTML = "<i><b></b></i>";
+      let near = false; // the covers are close to the screen: time to fetch the moving previews
       let angle = 0, target = 0, active = -1, raf = 0, inView = false, playing = -1, frame = null, timer = 0, hold = 0;
       const R = () => { const w = cards[0].offsetWidth; return Math.max(w * .95, (w / 2) / Math.tan(Math.PI / Math.max(n, 3)) + w * .22); };
       const paint = () => { const r = R();
@@ -2543,7 +2560,8 @@ window.mergeContent = function (saved) {
           const lift = i === playing ? 230 : 0; // the playing card floats toward you
           el.style.transform = `translate3d(${(Math.sin(a) * r).toFixed(1)}px,0,${(cz * r - r + lift).toFixed(1)}px) rotateY(${rel.toFixed(1)}deg)`;
           el.style.opacity = String(Math.max(.12, .25 + .75 * (cz + 1) / 2 * (cz > 0 ? 1 : .6)).toFixed(3));
-          el.style.zIndex = String(Math.round(100 + cz * 100));
+          el.style.zIndex = String(Math.round(100 + cz * 100)); el.classList.toggle("far", cz < .15); // cards at the back stop animating (smoother on older phones)
+          if(near && cz >= .15){ const lp = el.querySelector(".c3__loop[data-src]"); if(lp){ lp.src = lp.dataset.src; lp.removeAttribute("data-src"); } } // moving previews load only when they come near the front
           el.style.setProperty("--dim", cz > .96 ? 0 : (.45 - .45 * Math.max(0, cz)).toFixed(2));
           const v = el.querySelector(".c3__media video:not(.c3__full)"); if(v){ const near = cz > .2; if(near !== v._near){ v._near = near; if(near && inView && !reduce){ v.muted = true; v.play().catch(() => {}); } else v.pause(); } } }); };
       const setActive = i => { if(i === active) return; active = i;
@@ -2563,12 +2581,12 @@ window.mergeContent = function (saved) {
       bar.style.setProperty("--t", AUTO + "ms");
       // listen with sound inside the front card
       let liftT = 0; const lift = () => { stage.classList.add("lift"); clearTimeout(liftT); liftT = setTimeout(() => stage.classList.remove("lift"), 700); };
-      function stopPlay(){ if(playing < 0) return; const el = cards[playing]; el.classList.remove("is-play"); el.querySelector(".c3__media")?.classList.remove("need-sound"); full.pause(); full.remove(); closeBtn.remove(); prog.remove();
+      function stopPlay(){ if(playing < 0) return; const el = cards[playing]; el.classList.remove("is-play"); el.querySelector(".c3__media")?.classList.remove("need-sound"); full.pause(); full.remove(); closeBtn.remove(); prog.remove(); el.querySelector(".c3__media")?.classList.remove("is-loading");
         if(frame){ frame.remove(); frame = null; } playing = -1; stage.classList.remove("is-playing"); lift(); paint(); pauseFor(1500); }
-      let playAt = 0;
-      function play(i){ const cv = covers[i]; if(!cv) return; playAt = Date.now(); stopPlay(); stopAuto(); clearTimeout(hold); pauseAudio();
+      let playAt = 0; stoppers.covers = () => stopPlay();
+      function play(i){ const cv = covers[i]; if(!cv) return; playAt = Date.now(); stopPlay(); stopAuto(); clearTimeout(hold); pauseAudio(); stopAllMedia("covers");
         playing = i; const el = cards[i], media = el.querySelector(".c3__media"); el.classList.add("is-play"); stage.classList.add("is-playing"); lift(); paint();
-        if(!cv.id){ if(full.getAttribute("src") !== cv.src){ full.src = cv.src; if(cv.thumb) full.poster = cv.thumb; }
+        if(!cv.id){ media.classList.add("is-loading"); const cn = navigator.connection || {}; const slow = cn.saveData || /(^|-)2g|3g/.test(cn.effectiveType || ""); const want = slow ? cv.src.replace(/-hq\.mp4$/, ".mp4") : cv.src; if(full.getAttribute("src") !== want){ full.src = want; if(cv.thumb) full.poster = cv.thumb; }
           media.appendChild(full); media.appendChild(prog); prog.firstChild.style.width = "0%"; full.muted = false; try{ full.currentTime = 0; }catch(_){}
           // one tap = it plays. If the phone says "not yet" (still loading), try again as soon as it can; if it refuses sound, play muted with a tap-for-sound hint
           let tries = 0; const go = () => { if(playing !== i) return; const p = full.play(); if(p && p.catch) p.catch(err => { if(playing !== i) return;
@@ -2588,6 +2606,7 @@ window.mergeContent = function (saved) {
       prog.addEventListener("pointerup", endSeek); prog.addEventListener("pointercancel", endSeek);
       prog.addEventListener("click", e => e.stopPropagation());
       full.addEventListener("ended", stopPlay);
+      ["playing","error"].forEach(ev => full.addEventListener(ev, () => full.parentNode && full.parentNode.classList.remove("is-loading")));
       closeBtn.addEventListener("click", e => { e.stopPropagation(); stopPlay(); });
       const outside = e => { if(playing < 0) return; const m = cards[playing] && cards[playing].querySelector(".c3__media");
         if(m && m.contains(e.target)) return; if(e.target.closest(".c3__card") && e.target.closest(".c3__card") !== cards[playing]) return; if(Date.now() - playAt < 400) return; stopPlay(); };
@@ -2610,6 +2629,7 @@ window.mergeContent = function (saved) {
       if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { inView = e.isIntersecting;
         if(inView){ wake(); startAuto(); } else { stopAuto(); stopPlay(); loops.forEach(v => v.pause()); } }, {threshold:.25}).observe(stage);
       else { inView = true; startAuto(); }
+      if("IntersectionObserver" in window){ const no = new IntersectionObserver(([e]) => { if(e.isIntersecting){ near = true; paint(); no.disconnect(); } }, {rootMargin:"500px 0px"}); no.observe(stage); } else { near = true; paint(); }
       ["touchstart","pointerdown","scroll"].forEach(ev => addEventListener(ev, wake, {passive:true}));
       // restart the timing line every automatic step
       let lastT = 0;
@@ -2674,7 +2694,7 @@ window.mergeContent = function (saved) {
     $$(".track").forEach(el => {
       const t = S.sources[el.dataset.i]; if(!real(t.audio)) return;
       const hasMix = real(t.mix);
-      const mk = (src, cors) => { const x = new Audio(); x.preload = "metadata"; if(cors) x.crossOrigin = "anonymous"; x.src = src; return x; };
+      const mk = (src, cors) => { const x = new Audio(); x.preload = "none"; if(cors) x.crossOrigin = "anonymous"; x.src = src; return x; };
       // a = drums only (drives the timeline), b = full production
       let a = mk(t.audio, hasMix), b = hasMix ? mk(t.mix, true) : null;
       let mix = 0, ctx = null, ga = null, gb = null, mode = hasMix ? "gain" : "single";
@@ -2711,9 +2731,15 @@ window.mergeContent = function (saved) {
       const paint = () => { const p = a.duration ? a.currentTime / a.duration : 0; const k = Math.round(p * bs.length); if(cur2) cur2.textContent = fmt(a.currentTime); if(dur2 && a.duration) dur2.textContent = fmt(a.duration);
         bs.forEach((x,i) => x.classList.toggle("on", i < k)); cur.textContent = fmt(a.currentTime); wave.setAttribute("aria-valuenow", Math.round(p*100));
         head.style.left = (p*100) + "%"; };
+      let watch = 0, retried = false;
       const play = () => { setupGraph(); if(ctx && ctx.state === "suspended") ctx.resume();
-        if(b){ b.currentTime = a.currentTime; b.play().catch(() => {}); } a.play().catch(() => {}); };
-      const pause = () => { a.pause(); b && b.pause(); };
+        el.classList.add("is-loading"); clearTimeout(watch);
+        // if nothing has started after a few seconds (slow network / stuck file), reload once and try again
+        watch = setTimeout(() => { if(a.paused || a.readyState < 3){ if(!retried){ retried = true; const t0 = a.currentTime; try{ a.load(); a.currentTime = t0; }catch(_){} a.play().catch(() => {}); } else el.classList.remove("is-loading"); } }, 6000);
+        if(b){ b.currentTime = a.currentTime; b.play().catch(() => {}); }
+        const p = a.play(); if(p && p.catch) p.catch(err => { if(err && err.name === "NotAllowedError"){ el.classList.remove("is-loading"); return; }
+          a.addEventListener("canplay", () => a.play().catch(() => el.classList.remove("is-loading")), {once:true}); try{ a.load(); }catch(_){} }); };
+      const pause = () => { clearTimeout(watch); el.classList.remove("is-loading"); a.pause(); b && b.pause(); };
       const seek = p => { p = Math.max(0, Math.min(1, p));
         if(!a.duration){ pending = p; head.style.left = (p*100) + "%"; return; }
         a.currentTime = p * a.duration; if(b) b.currentTime = a.currentTime; paint(); };
@@ -2721,7 +2747,9 @@ window.mergeContent = function (saved) {
       function wire(){
         a.addEventListener("loadedmetadata", () => { dur.textContent = fmt(a.duration); const d2 = $(".dur2", el); if(d2) d2.textContent = fmt(a.duration); if(pending !== null){ const q = pending; pending = null; seek(q); } });
         a.addEventListener("timeupdate", () => { paint(); if(b && !b.paused && Math.abs(b.currentTime - a.currentTime) > .15) b.currentTime = a.currentTime; });
-        a.addEventListener("play", () => { pauseAudio(a); el.classList.add("is-playing"); if(!rafP) rafP = requestAnimationFrame(tick); btn.setAttribute("aria-label",L("השהה ","Pause ")+t.name); });
+        a.addEventListener("playing", () => { clearTimeout(watch); el.classList.remove("is-loading"); });
+        a.addEventListener("error", () => { clearTimeout(watch); el.classList.remove("is-loading"); });
+        a.addEventListener("play", () => { pauseAudio(a); stopAllMedia("src"); el.classList.add("is-playing"); if(!rafP) rafP = requestAnimationFrame(tick); btn.setAttribute("aria-label",L("השהה ","Pause ")+t.name); });
         a.addEventListener("pause", () => { b && b.pause(); el.classList.remove("is-playing"); btn.setAttribute("aria-label",L("נגן ","Play ")+t.name); });
         a.addEventListener("ended", () => { b && b.pause(); a.currentTime = 0; paint(); });
         if(b){ a.addEventListener("error", fallback, {once:true}); b.addEventListener("error", fallback, {once:true}); }
@@ -2731,6 +2759,10 @@ window.mergeContent = function (saved) {
 
       btn.addEventListener("click", () => a.paused ? play() : pause());
       if("IntersectionObserver" in window) new IntersectionObserver(([e]) => { if(!e.isIntersecting && !a.paused) pause(); }, {threshold:0}).observe(el);
+      // start fetching the file a little before it scrolls into view, so play is instant
+      const warm = () => { [a, b].forEach(x => { if(x && x.preload !== "auto"){ x.preload = "auto"; try{ x.load(); }catch(_){} } }); };
+      if("IntersectionObserver" in window){ const wo = new IntersectionObserver(([e]) => { if(e.isIntersecting){ warm(); wo.disconnect(); } }, {rootMargin:"900px 0px"}); wo.observe(el); } else warm();
+      ["pointerdown","touchstart"].forEach(ev => el.addEventListener(ev, warm, {passive:true, once:true}));
       // tap or drag along the waveform to move through the song
       let scrub = false;
       const at = e => { const r = wave.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
@@ -3039,7 +3071,7 @@ window.mergeContent = function (saved) {
     }, wait);
   }
   // never leave the opening screen stuck
-  setTimeout(() => { const i = document.getElementById("intro"); if(i) i.remove(); }, 11000);
+  setTimeout(() => { const i = document.getElementById("intro"); if(i) i.remove(); }, 6500);
   // wait for the deferred animation libraries
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();

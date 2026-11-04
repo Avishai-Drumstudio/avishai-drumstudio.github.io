@@ -1714,7 +1714,7 @@ window.SITE_DEFAULTS = {
   steps: [
     { title: "הסקיצה", text: "סקיצה או פלייבק, טמפו ורפרנס לסאונד." },
     { title: "הסאונד", text: "מערכת, סנר וכיוון סאונד – בהתאמה להפקה." },
-    { title: "ההקלטה", text: "גייד ראשון ← הערות ← טייק סופי. או סשן לייב בווידאו." },
+    { title: "ההקלטה", text: "גייד ראשון ← הערות ← טייק סופי.\nאו סשן לייב בווידאו." },
     { title: "הערוצים", text: "קבלת ערוצים תוך 24 שעות · Mix Ready · כל פורמט · עד 3 סבבי תיקונים" }
   ],
   hProductions: "שירים שניגנתי בהם",
@@ -1738,7 +1738,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 34,
+  layoutV: 35,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1953,6 +1953,7 @@ window.mergeContent = function (saved) {
     d.steps = D.steps.map(x => ({...x}));
   }
   if (saved && (saved.layoutV || 0) < 34) { d.credits = window.SITE_DEFAULTS.credits; d.layoutV = 34; }
+  if (saved && (saved.layoutV || 0) < 35) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = x.text.replace("טייק סופי. או סשן", "טייק סופי.\nאו סשן"); }); d.layoutV = 35; }
   return d;
 };
 
@@ -2005,7 +2006,7 @@ window.mergeContent = function (saved) {
     steps: [
       { title: "The Demo", text: "A demo or playback, the tempo and a sound reference." },
       { title: "The Sound", text: "Kit, snare and sonic direction — matched to the production." },
-      { title: "The Recording", text: "First take → your notes → final take. Or a live video session." },
+      { title: "The Recording", text: "First take → your notes → final take.\nOr a live video session." },
       { title: "The Stems", text: "Stems within 24 hours · Mix Ready · any format · up to 3 revision rounds" }
     ],
     styles: { "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
@@ -2327,7 +2328,7 @@ window.mergeContent = function (saved) {
         <span class="step__icon"><svg viewBox="0 0 24 24"><use href="#${stepIcons[i % stepIcons.length]}"/></svg></span>
         <span class="step__n">${L("שלב","Step")} ${i+1}</span>
         <h3>${esc(s.title)}</h3>
-        <p>${esc(s.text)}</p>
+        <p>${esc(s.text).replace(/\n/g, "<br>")}</p>
       </li>`).join(""));
 
     // hero background: poster + video (YouTube or mp4)

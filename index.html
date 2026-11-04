@@ -1387,6 +1387,14 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
 .step__list li::before{content:"";position:absolute;inset-inline-start:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--lime)}
 .step__list li{font-size:16px}
 
+/* step 3: three ways to record */
+.opt3__cap{display:block;margin-top:6px;font-size:12px;letter-spacing:.06em;color:var(--lime);font-weight:600}
+.opt3{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 0;padding:0}
+.opt3 li{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 6px 10px;border-radius:14px;background:rgba(46,211,195,.07);border:1px solid rgba(46,211,195,.22);text-align:center}
+.opt3__ic svg{width:22px;height:22px;fill:none;stroke:var(--lime);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.opt3 b{font-size:15px;color:var(--text);font-weight:600;line-height:1.25}
+.opt3 small{font-size:11.5px;color:var(--muted);line-height:1.35}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -1718,7 +1726,7 @@ window.SITE_DEFAULTS = {
   steps: [
     { title: "הסקיצה", text: "סקיצה או פלייבק, טמפו ורפרנס לסאונד." },
     { title: "הסאונד", text: "מערכת, סנר וכיוון סאונד – בהתאמה להפקה." },
-    { title: "ההקלטה", text: "• גייד ראשוני – הערות – טייק סופי\n• סשן לייב בווידאו\n• סשן באולפן – מגיעים ומקליטים יחד" },
+    { title: "ההקלטה", text: "• מרחוק – גייד, הערות, טייק סופי\n• לייב בווידאו – שומעים בזמן אמת\n• באולפן – מקליטים יחד" },
     { title: "הערוצים", text: "קבלת ערוצים תוך 24 שעות · Mix Ready · כל פורמט · עד 3 סבבי תיקונים" }
   ],
   hProductions: "שירים שניגנתי בהם",
@@ -1742,7 +1750,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 37,
+  layoutV: 38,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1960,6 +1968,7 @@ window.mergeContent = function (saved) {
   if (saved && (saved.layoutV || 0) < 35) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = x.text.replace("טייק סופי. או סשן", "טייק סופי.\nאו סשן"); }); d.layoutV = 35; }
   if (saved && (saved.layoutV || 0) < 36) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה" && !/באולפן/.test(x.text)) x.text += "\nאו סשן באולפן – מגיעים ומקליטים יחד."; }); d.layoutV = 36; }
   if (saved && (saved.layoutV || 0) < 37) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = "• גייד ראשוני – הערות – טייק סופי\n• סשן לייב בווידאו\n• סשן באולפן – מגיעים ומקליטים יחד"; }); d.layoutV = 37; }
+  if (saved && (saved.layoutV || 0) < 38) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = "• מרחוק – גייד, הערות, טייק סופי\n• לייב בווידאו – שומעים בזמן אמת\n• באולפן – מקליטים יחד"; }); d.layoutV = 38; }
   return d;
 };
 
@@ -2012,7 +2021,7 @@ window.mergeContent = function (saved) {
     steps: [
       { title: "The Demo", text: "A demo or playback, the tempo and a sound reference." },
       { title: "The Sound", text: "Kit, snare and sonic direction — matched to the production." },
-      { title: "The Recording", text: "• First take – notes – final take\n• Live video session\n• In-studio session – come and record together" },
+      { title: "The Recording", text: "• Remote – guide, notes, final take\n• Live video – hear it in real time\n• In studio – record together" },
       { title: "The Stems", text: "Stems within 24 hours · Mix Ready · any format · up to 3 revision rounds" }
     ],
     styles: { "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
@@ -2328,13 +2337,14 @@ window.mergeContent = function (saved) {
           <span class="daw__tp"><i></i><i class="play"></i><i class="rec"></i><b>00:00:24</b></span><span class="daw__head"></span></div>
         <em class="sc__sent">${L("נשלח ✓","Sent ✓")} <small>${L("תוך 24 שעות","within 24 hrs")}</small></em></div>`
     ];
+    const OPT_IC = ['<svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z M4 7l8 6 8-6"/></svg>', '<svg viewBox="0 0 24 24"><path d="M3 7h12v10H3z M15 10l6-3v10l-6-3"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z M6 11a6 6 0 0 0 12 0 M12 17v4 M8 21h8"/></svg>'];
     $("#steps").insertAdjacentHTML("beforeend", (S.steps || []).filter(s => s.title).map((s,i) => `
       <li class="step${i < 4 ? " has-media" : ""}">
         ${i < 4 ? `<span class="step__media" aria-hidden="true">${stepOv[i] || ""}</span>` : ""}
         <span class="step__icon"><svg viewBox="0 0 24 24"><use href="#${stepIcons[i % stepIcons.length]}"/></svg></span>
         <span class="step__n">${L("שלב","Step")} ${i+1}</span>
         <h3>${esc(s.title)}</h3>
-        ${/^\s*•/.test(s.text || "") ? `<ul class="step__list">${String(s.text).split("\n").map(x => x.replace(/^\s*•\s*/, "").trim()).filter(Boolean).map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p>${esc(s.text).replace(/\n/g, "<br>")}</p>`}
+        ${/^\s*•/.test(s.text || "") ? `<span class="opt3__cap">${L("3 אפשרויות","3 ways")}</span><ul class="opt3">${String(s.text).split("\n").map(x => x.replace(/^\s*•\s*/, "").trim()).filter(Boolean).map((x,k) => { const [h, ...r] = x.split(/\s+[–-]\s+/); return `<li><span class="opt3__ic">${OPT_IC[k] || ""}</span><b>${esc(h)}</b>${r.length ? `<small>${esc(r.join(" – "))}</small>` : ""}</li>`; }).join("")}</ul>` : `<p>${esc(s.text).replace(/\n/g, "<br>")}</p>`}
       </li>`).join(""));
 
     // hero background: poster + video (YouTube or mp4)

@@ -2790,12 +2790,21 @@ window.mergeContent = function (saved) {
       if("IntersectionObserver" in window){ const wo = new IntersectionObserver(([e]) => { if(e.isIntersecting){ warm(); wo.disconnect(); } }, {rootMargin:"900px 0px"}); wo.observe(el); } else warm();
       ["pointerdown","touchstart"].forEach(ev => el.addEventListener(ev, warm, {passive:true, once:true}));
       // tap or drag along the waveform to move through the song
+      // tap or drag along the waveform. Touch screens use touch events (iPhone could cancel the pointer stream mid-drag);
+      // mouse uses pointer events. The very end is kept out of reach so a tap there doesn't instantly finish the song.
       let scrub = false;
-      const at = e => { const r = wave.getBoundingClientRect(); return (e.clientX - r.left) / r.width; };
-      wave.addEventListener("pointerdown", e => { scrub = true; el.classList.add("scrubbed"); try { wave.setPointerCapture(e.pointerId); } catch(_){} el.classList.add("is-scrub"); seek(at(e)); });
-      wave.addEventListener("pointermove", e => { if(scrub) seek(at(e)); });
-      wave.addEventListener("pointerup", () => { if(!scrub) return; scrub = false; el.classList.remove("is-scrub"); if(a.paused) play(); });
-      wave.addEventListener("pointercancel", () => { scrub = false; el.classList.remove("is-scrub"); });
+      const at = x => { const r = wave.getBoundingClientRect(); if(!r.width) return null; const p = (x - r.left) / r.width; dlog("seek", "x=" + Math.round(x), "left=" + Math.round(r.left), "w=" + Math.round(r.width), "p=" + p.toFixed(2)); return Math.max(0, Math.min(.97, p)); };
+      const go = x => { const p = at(x); if(p !== null && isFinite(p)) seek(p); };
+      const begin = x => { scrub = true; el.classList.add("scrubbed", "is-scrub"); go(x); };
+      const finish = () => { if(!scrub) return; scrub = false; el.classList.remove("is-scrub"); if(a.paused) play(); };
+      wave.addEventListener("touchstart", e => { if(e.cancelable) e.preventDefault(); const t = e.touches[0]; if(t) begin(t.clientX); }, {passive:false});
+      wave.addEventListener("touchmove", e => { if(!scrub) return; if(e.cancelable) e.preventDefault(); const t = e.touches[0]; if(t) go(t.clientX); }, {passive:false});
+      wave.addEventListener("touchend", e => { if(e.cancelable) e.preventDefault(); dlog("touchend wave"); finish(); }, {passive:false});
+      wave.addEventListener("touchcancel", () => { dlog("touchcancel wave"); finish(); });
+      wave.addEventListener("pointerdown", e => { if(e.pointerType === "touch") return; try { wave.setPointerCapture(e.pointerId); } catch(_){} begin(e.clientX); });
+      wave.addEventListener("pointermove", e => { if(e.pointerType !== "touch" && scrub) go(e.clientX); });
+      wave.addEventListener("pointerup", e => { if(e.pointerType !== "touch") finish(); });
+      wave.addEventListener("pointercancel", e => { if(e.pointerType !== "touch"){ scrub = false; el.classList.remove("is-scrub"); } });
       $$(".skip button", el).forEach(sb => sb.addEventListener("click", () => {
         if(!a.duration) return; seek((a.currentTime + (+sb.dataset.skip)) / a.duration); if(a.paused) play(); }));
       wave.addEventListener("keydown", e => { if(!a.duration) return;

@@ -1423,6 +1423,14 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
 .track__btn{touch-action:manipulation;position:relative;z-index:5}
 .wave{position:relative;z-index:4}
 
+/* covers carousel: lighter to draw, so turning stays smooth on phones */
+.c3__card:not(.is-front) .c3__float{animation:none}
+.c3__card:not(.is-front):not(.is-play) .c3__media{box-shadow:0 0 0 1px rgba(237,228,211,.12),0 18px 30px -20px rgba(0,0,0,.85);transition:none}
+.c3__card:not(.is-front) .c3__shadow{display:none}
+@media (pointer:coarse){.c3__shadow{animation:none;filter:none}.c3__halo{filter:none}.c3__card{will-change:transform}}
+.c3__x{z-index:20;touch-action:manipulation}
+.c3__x::before{content:"";position:absolute;inset:-10px}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
@@ -2148,6 +2156,11 @@ window.mergeContent = function (saved) {
 
   /* ---------------- render ---------------- */
   const audios = [];
+  // ?debug=1 → a small on-screen log (to see on a phone what the players are doing)
+  const DBG = /[?&]debug/.test(location.search); let dbgBox = null;
+  const dlog = (...m) => { if(!DBG) return; try{ if(!dbgBox){ dbgBox = document.createElement("pre"); dbgBox.style.cssText = "position:fixed;left:6px;right:6px;bottom:6px;max-height:38vh;overflow:auto;z-index:99999;background:rgba(0,0,0,.85);color:#7BF3E6;font:11px/1.35 monospace;padding:8px;border-radius:8px;direction:ltr;text-align:left;white-space:pre-wrap;pointer-events:none"; document.body.appendChild(dbgBox); }
+    dbgBox.textContent += new Date().toISOString().slice(17,23) + " " + m.join(" ") + "\n"; dbgBox.scrollTop = 1e9; }catch(_){} };
+  if(DBG){ addEventListener("error", e => dlog("ERR", e.message, (e.filename||"").split("/").pop(), e.lineno)); addEventListener("unhandledrejection", e => dlog("REJ", e.reason && (e.reason.name + ": " + e.reason.message))); dlog("UA", navigator.userAgent.slice(0,90)); }
   const stoppers = {}; // one sound at a time: whoever starts playing stops the others
   const stopAllMedia = except => Object.keys(stoppers).forEach(k => { if(k !== except) try{ stoppers[k](); }catch(_){} });
   function pauseAudio(except){ audios.forEach(a => a !== except && a !== (except && except.__pair) && a.pause()); }
@@ -2567,9 +2580,9 @@ window.mergeContent = function (saved) {
           const lift = i === playing ? 230 : 0; // the playing card floats toward you
           el.style.transform = `translate3d(${(Math.sin(a) * r).toFixed(1)}px,0,${(cz * r - r + lift).toFixed(1)}px) rotateY(${rel.toFixed(1)}deg)`;
           el.style.opacity = String(Math.max(.12, .25 + .75 * (cz + 1) / 2 * (cz > 0 ? 1 : .6)).toFixed(3));
-          el.style.zIndex = String(Math.round(100 + cz * 100)); el.classList.toggle("far", cz < .15); // cards at the back stop animating (smoother on older phones)
+          const zi = String(Math.round(100 + cz * 100)); if(el._zi !== zi){ el._zi = zi; el.style.zIndex = zi; } const far = cz < .15; if(el._far !== far){ el._far = far; el.classList.toggle("far", far); } // cards at the back stop animating (smoother on older phones)
           if(near && cz >= .15){ const lp = el.querySelector(".c3__loop[data-src]"); if(lp){ lp.src = lp.dataset.src; lp.removeAttribute("data-src"); } } // moving previews load only when they come near the front
-          el.style.setProperty("--dim", cz > .96 ? 0 : (.45 - .45 * Math.max(0, cz)).toFixed(2));
+          const dm = cz > .96 ? "0" : (.45 - .45 * Math.max(0, cz)).toFixed(2); if(el._dm !== dm){ el._dm = dm; el.style.setProperty("--dim", dm); }
           const v = el.querySelector(".c3__media video:not(.c3__full)"); if(v){ const near = cz > .2; if(near !== v._near){ v._near = near; if(near && inView && !reduce){ v.muted = true; v.play().catch(() => {}); } else v.pause(); } } }); };
       const setActive = i => { if(i === active) return; active = i;
         cards.forEach((el,j) => el.classList.toggle("is-front", j === i));
@@ -2614,21 +2627,23 @@ window.mergeContent = function (saved) {
       prog.addEventListener("click", e => e.stopPropagation());
       full.addEventListener("ended", stopPlay);
       ["playing","error"].forEach(ev => full.addEventListener(ev, () => full.parentNode && full.parentNode.classList.remove("is-loading")));
-      closeBtn.addEventListener("click", e => { e.stopPropagation(); stopPlay(); });
+      let noClickUntil = 0;
+      const closeNow = e => { e.stopPropagation(); if(e.cancelable) e.preventDefault(); noClickUntil = Date.now() + 700; stopPlay(); };
+      closeBtn.addEventListener("pointerdown", closeNow); closeBtn.addEventListener("touchstart", closeNow, {passive:false}); closeBtn.addEventListener("click", closeNow);
       const outside = e => { if(playing < 0) return; const m = cards[playing] && cards[playing].querySelector(".c3__media");
-        if(m && m.contains(e.target)) return; if(e.target.closest(".c3__card") && e.target.closest(".c3__card") !== cards[playing]) return; if(Date.now() - playAt < 400) return; stopPlay(); };
+        if(m && m.contains(e.target)) return; if(e.target.closest(".c3__card") && e.target.closest(".c3__card") !== cards[playing]) return; if(Date.now() - playAt < 400) return; if(e.target.closest && e.target.closest(".c3__x")) return; noClickUntil = Date.now() + 700; stopPlay(); };
       ["pointerdown","touchstart"].forEach(ev => document.addEventListener(ev, outside, {capture:true, passive:true}));
       // tap: front card plays; a side card turns to the front and plays — one tap
       let moved = false;
-      ring.addEventListener("click", e => { if(moved) return; const el = e.target.closest(".c3__card"); if(!el) return; const i = +el.dataset.i;
+      ring.addEventListener("click", e => { if(moved || Date.now() < noClickUntil) return; const el = e.target.closest(".c3__card"); if(!el) return; const i = +el.dataset.i;
         if(playing === i){ if(full.muted){ full.muted = false; full.play().catch(() => {}); el.querySelector(".c3__media").classList.remove("need-sound"); } return; } if(i !== active) goIdx(i); play(i); });
       ring.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); const el = e.target.closest(".c3__card"); if(el) el.click(); } });
       // swipe sideways to turn (up/down still scrolls the page)
-      let sx = 0, sy = 0, a0 = 0, dragging = false;
+      let sx = 0, sy = 0, a0 = 0, dragging = false, dragRaf = 0;
       stage.addEventListener("pointerdown", e => { if(playing >= 0) return; sx = e.clientX; sy = e.clientY; a0 = angle; dragging = true; moved = false; });
       stage.addEventListener("pointermove", e => { if(!dragging) return; const dx = e.clientX - sx;
         if(!moved){ if(Math.abs(dx) < 8) return; if(Math.abs(e.clientY - sy) > Math.abs(dx)){ dragging = false; return; } moved = true; stopAuto(); clearTimeout(hold); }
-        if(raf){ cancelAnimationFrame(raf); raf = 0; } angle = target = a0 - dx * .45; paint(); setActive(nearest()); });
+        if(raf){ cancelAnimationFrame(raf); raf = 0; } angle = target = a0 - dx * .45; if(!dragRaf) dragRaf = requestAnimationFrame(() => { dragRaf = 0; paint(); setActive(nearest()); }); });
       const end = () => { if(!dragging) return; dragging = false; if(moved){ turnTo(Math.round(angle / STEP) * STEP); pauseFor(3500); setTimeout(() => moved = false, 60); } };
       stage.addEventListener("pointerup", end); stage.addEventListener("pointercancel", end);
       // only move / play loops while on screen; first touch wakes loops in battery-saver mode
@@ -2705,6 +2720,7 @@ window.mergeContent = function (saved) {
       // a = drums only (drives the timeline), b = full production
       let a = mk(t.audio, hasMix), b = hasMix ? mk(t.mix, true) : null;
       let mix = 0, ctx = null, ga = null, gb = null, mode = hasMix ? "gain" : "single";
+      if(DBG){ ["loadstart","loadedmetadata","canplay","canplaythrough","play","playing","pause","waiting","stalled","suspend","abort","emptied","ended","error"].forEach(ev => a.addEventListener(ev, () => dlog("audio", ev, "t=" + (a.currentTime||0).toFixed(1), "rs=" + a.readyState, "ns=" + a.networkState, a.error ? "err=" + a.error.code : ""))); ["pointerdown","touchstart","click"].forEach(ev => el.addEventListener(ev, e => dlog("tap", ev, (e.target.className && e.target.className.baseVal !== undefined ? e.target.className.baseVal : e.target.className) || e.target.tagName), true)); }
       const btn = $(".track__btn", el), wave = $(".wave", el), cur = $(".cur", el), dur = $(".dur", el), bs = $$("i", wave);
       const slider = $(".mixer input", el), labels = $$(".mixer__labels b", el), head = $(".wave__head", el);
       let pending = null; // a jump asked for before the file reported its length
@@ -2744,7 +2760,8 @@ window.mergeContent = function (saved) {
         // if nothing has started after a few seconds (slow network / stuck file), reload once and try again
         watch = setTimeout(() => { if(a.paused && a.readyState < 3){ if(!retried){ retried = true; const t0 = a.currentTime; try{ a.load(); a.currentTime = t0; }catch(_){} a.play().catch(() => {}); } else el.classList.remove("is-loading"); } }, 6000);
         if(b){ b.currentTime = a.currentTime; b.play().catch(() => {}); }
-        const p = a.play(); if(p && p.catch) p.catch(err => { if(err && err.name === "NotAllowedError"){ el.classList.remove("is-loading"); return; }
+        dlog("play() called", "src=" + (a.currentSrc || a.src).split("/").pop(), "paused=" + a.paused);
+        const p = a.play(); if(p && p.catch) p.catch(err => { dlog("play() rejected", err && err.name, err && err.message); if(err && err.name === "NotAllowedError"){ el.classList.remove("is-loading"); return; }
           a.addEventListener("canplay", () => a.play().catch(() => el.classList.remove("is-loading")), {once:true}); try{ a.load(); }catch(_){} }); };
       const pause = () => { clearTimeout(watch); el.classList.remove("is-loading"); a.pause(); b && b.pause(); };
       const seek = p => { p = Math.max(0, Math.min(1, p));

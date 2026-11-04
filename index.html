@@ -1381,6 +1381,7 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
 .hero__cred{max-width:none}
 @media (max-width:759px){.hero__cred{font-size:12.5px}}
 .hero__cred{font-size:15.5px!important;gap:6px;line-height:1.45}.hero__cred .hc__stat{font-size:14.5px!important;margin-top:8px}@media (min-width:760px){.hero__cred{font-size:17px!important}}
+.hero__cred{font-size:14px!important}.hero__cred .hc__stat{font-size:13.5px!important}@media (min-width:760px){.hero__cred{font-size:16px!important}}
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
@@ -1696,7 +1697,7 @@ window.SITE_DEFAULTS = {
   studioTitle: "My Drum Studio",
   productionsFirst: 2,
 
-  credits: "עובד עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
+  credits: "הקלטות והופעות עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
   aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. בן 29, נשוי ואבא לילד מתוק.",
   aboutImage: "assets/avishai.jpg",
@@ -1737,7 +1738,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 33,
+  layoutV: 34,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -1951,7 +1952,7 @@ window.mergeContent = function (saved) {
     ["hProcess","ctaTitle","ctaText","aboutText","credits"].forEach(k => d[k] = D[k]);
     d.steps = D.steps.map(x => ({...x}));
   }
-  if (saved && (saved.layoutV || 0) < 33) { d.credits = window.SITE_DEFAULTS.credits; d.layoutV = 33; }
+  if (saved && (saved.layoutV || 0) < 34) { d.credits = window.SITE_DEFAULTS.credits; d.layoutV = 34; }
   return d;
 };
 
@@ -1990,7 +1991,7 @@ window.mergeContent = function (saved) {
     aboutTitle: "Avishai Yashar",
     aboutText: "Recording and performing with Israel's leading singers and producers — singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur* and *Aviv Alush*, among others, and producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and more.\nThe right feel for every genre — rock, pop, funk, Mediterranean and Hasidic.\n\nThese days, mostly remote sessions from my private studio.\n\nAn alumnus of the IDF Military Rabbinate Band, and from there to stages in Israel and abroad. 29, married, and a proud dad.",
     hProcess: "The Process",
-    credits: "Working with singers *Static*, *Nasrin*, *Yair Elitzur*, *Itzik Kala* and more\nand producers *Naor Carmi*, *Elnatan Shalom*, *Netanel Ben Giat*, *Shai Vagos* and more\n🥁 Hundreds of productions · 🎧 Tens of millions of plays",
+    credits: "Recording and performing with singers *Static*, *Nasrin*, *Yair Elitzur*, *Itzik Kala* and more\nand producers *Naor Carmi*, *Elnatan Shalom*, *Netanel Ben Giat*, *Shai Vagos* and more\n🥁 Hundreds of productions · 🎧 Tens of millions of plays",
     hProductions: "Songs I've Played On",
     hCovers: "Covers",
     pCovers: "",

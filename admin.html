@@ -217,7 +217,7 @@ window.SITE_DEFAULTS = {
   steps: [
     { title: "הסקיצה", text: "סקיצה או פלייבק, טמפו ורפרנס לסאונד." },
     { title: "הסאונד", text: "מערכת, סנר וכיוון סאונד – בהתאמה להפקה." },
-    { title: "ההקלטה", text: "גייד ראשון ← הערות ← טייק סופי.\nאו סשן לייב בווידאו." },
+    { title: "ההקלטה", text: "גייד ראשון ← הערות ← טייק סופי.\nאו סשן לייב בווידאו.\nאו סשן באולפן – מגיעים ומקליטים יחד." },
     { title: "הערוצים", text: "קבלת ערוצים תוך 24 שעות · Mix Ready · כל פורמט · עד 3 סבבי תיקונים" }
   ],
   hProductions: "שירים שניגנתי בהם",
@@ -241,7 +241,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 35,
+  layoutV: 36,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -457,6 +457,7 @@ window.mergeContent = function (saved) {
   }
   if (saved && (saved.layoutV || 0) < 34) { d.credits = window.SITE_DEFAULTS.credits; d.layoutV = 34; }
   if (saved && (saved.layoutV || 0) < 35) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה") x.text = x.text.replace("טייק סופי. או סשן", "טייק סופי.\nאו סשן"); }); d.layoutV = 35; }
+  if (saved && (saved.layoutV || 0) < 36) { (d.steps || []).forEach(x => { if (x && x.title === "ההקלטה" && !/באולפן/.test(x.text)) x.text += "\nאו סשן באולפן – מגיעים ומקליטים יחד."; }); d.layoutV = 36; }
   return d;
 };
 

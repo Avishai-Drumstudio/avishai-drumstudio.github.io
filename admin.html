@@ -241,7 +241,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 43,
+  layoutV: 44,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -289,6 +289,7 @@ window.SITE_DEFAULTS = {
   testimonials: [
     { name: "ניצן אלון", role: "מפיקה", reply: "תודה ניצן היקרה, כיף לעבוד יחד 🙌🏼", photo: "assets/people/nitzan-alon.jpg", text: "אבישי מתופף מקצועי, מדויק ומהיר, עם *סאונד מעולה וסורסים נקיים*. העבודה איתו מרחוק נוחה ויעילה – הוא שולח טייק ראשוני, מקבל הערות ומדייק את התפקיד בדיוק למה שההפקה צריכה. כמפיקה, לקבל תופים ברמה הכי גבוהה בלי להיות בסשן חוסך המון זמן, בלי שום פשרה על האיכות. ומעבר לזה – איש רגיש ומתוק שתמיד כיף לעבוד איתו ❤️", show: true },
     { name: "בניה מדליון", role: "מפיק", reply: "אחשלי, תענוג איתך כמו תמיד ❤️", photo: "assets/people/benaya-medalion.jpg", text: "מתופף מקצועי ומסודר, כיף מאוד לעבוד איתו באולפן. תמיד מביא את הוויז'ן שלו לדברים, ויודע *לדייק מאוד את התוצאה* לרצונות שלי כמפיק. *הסורסים מעולים*, נקיים ומסודרים, ותמיד נשמעים מדהים במיקס. ממליץ בחום!", show: true },
+    { name: "יגאל שטטנר", role: "מפיק", reply: "אני מת עליך, ומודה לה׳ על הזכות לעבוד עם אנשים כמוך 🙏", photo: "assets/people/yigal-shtetner.jpg", text: "תענוג לעבוד עם אבישי! אבישי הקליט לי תופים *לעשרות פרויקטים*. הוא תמיד מחפש איך לתת את *הטייק המדויק שישרת את השיר* בצורה הכי טובה, מבלי להתפשר על סאונד וטכניקה מושלמים. תמיד זמין ושירותי, ונותן את כל הלב! ממליץ בחום!", show: true },
     { name: "ישי וייס", role: "מפיק", photo: "assets/people/ishai-weiss.jpg", text: "כשאני מפיק שיר ומחפש נגנים, אני קודם כל מחפש אנשים שמנגנים עם הלב – ואבישי בדיוק כזה. *מתופף מטורף*, נגינה והקלטות ברמה בינלאומית, ויש משהו ברגש שהוא מביא לשיר שאי אפשר להסביר במילים. ממליץ עליו מכל הלב ❤️", show: true },
     { name: "יוני", role: "מפיק", photo: "assets/people/yoni.jpg", text: "הקלטתי אצל ישר כמה וכמה סשנים – מקרוב ומרחוק, בודדים וכפולים. אצלו זה אווירה, השקעה, תשומת לב והקשבה, ו*הסורסים הכי טובים שאפשר*. אף פעם לא מתאכזבים – אתם בידיים טובות 🥁", show: true },
     { name: "איציק סוויסה", role: "מפיק", photo: "assets/people/itzik-swisa.jpg", text: "זכיתי לעבוד עם אבישי בכמה פרויקטים מקוריים שהפקתי, והעבודה איתו היא פשוט תענוג – כיפית, מקצועית ומדויקת. אבישי יודע להביא את עצמו ואת *הצבע המדויק לשיר*, מבחירת הסנר הנכון ועד המכה שמכניסה את הלב לתוך השיר.", show: true }
@@ -475,6 +476,11 @@ window.mergeContent = function (saved) {
     if (i >= 0) { const m = pr.splice(i, 1)[0]; const r = pr.findIndex(p => has(p, "1ui0jm29em4")); pr.splice(r >= 0 ? r + 1 : Math.min(4, pr.length), 0, m); }
     const g = pr.findIndex(p => has(p, "mvIhYC6DV9A")); if (g > 0) pr.unshift(pr.splice(g, 1)[0]); // Michal Gringlick first
     d.productions = pr; d.layoutV = 43;
+  }
+  if (saved && (saved.layoutV || 0) < 44) { // testimonial: יגאל שטטנר, right after Benaya
+    const t = Array.isArray(d.testimonials) ? d.testimonials.slice() : [];
+    if (!t.some(x => x && x.name === "יגאל שטטנר")) { const n = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials.find(x => x.name === "יגאל שטטנר"))); let i = t.findIndex(x => x && x.name === "בניה מדליון"); if (i < 0) i = t.findIndex(x => x && x.name === "ניצן אלון"); t.splice(i >= 0 ? i + 1 : 0, 0, n); }
+    d.testimonials = t; d.layoutV = 44;
   }
   return d;
 };

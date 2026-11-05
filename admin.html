@@ -202,7 +202,7 @@ window.SITE_DEFAULTS = {
 
   credits: "הקלטות והופעות עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
-  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. בן 29, נשוי ואבא לילד מתוק.",
+  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. בן 29, נשוי ואבא לילד מתוק.",
   aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
@@ -241,7 +241,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 45,
+  layoutV: 46,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -488,6 +488,7 @@ window.mergeContent = function (saved) {
     if (!t.some(x => x && x.name === "אבישי רוזן")) { const n = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials.find(x => x.name === "אבישי רוזן"))); let i = t.findIndex(x => x && x.name === "יגאל שטטנר"); t.splice(i >= 0 ? i + 1 : Math.min(3, t.length), 0, n); }
     d.testimonials = t; d.layoutV = 45;
   }
+  if (saved && (saved.layoutV || 0) < 46) { if (typeof d.aboutText === "string" && !d.aboutText.includes("פיני איינהורן")) d.aboutText = d.aboutText.replace("*יאיר אליצור* ו*אביב אלוש*", "*יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש*"); d.layoutV = 46; } // Avishai asked
   return d;
 };
 

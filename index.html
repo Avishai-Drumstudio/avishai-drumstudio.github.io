@@ -1755,7 +1755,7 @@ window.SITE_DEFAULTS = {
 
   credits: "הקלטות והופעות עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
-  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. בן 29, נשוי ואבא לילד מתוק.",
+  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. בן 29, נשוי ואבא לילד מתוק.",
   aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
@@ -1794,7 +1794,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 45,
+  layoutV: 46,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
 
   productions: [
@@ -2041,6 +2041,7 @@ window.mergeContent = function (saved) {
     if (!t.some(x => x && x.name === "אבישי רוזן")) { const n = JSON.parse(JSON.stringify(window.SITE_DEFAULTS.testimonials.find(x => x.name === "אבישי רוזן"))); let i = t.findIndex(x => x && x.name === "יגאל שטטנר"); t.splice(i >= 0 ? i + 1 : Math.min(3, t.length), 0, n); }
     d.testimonials = t; d.layoutV = 45;
   }
+  if (saved && (saved.layoutV || 0) < 46) { if (typeof d.aboutText === "string" && !d.aboutText.includes("פיני איינהורן")) d.aboutText = d.aboutText.replace("*יאיר אליצור* ו*אביב אלוש*", "*יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש*"); d.layoutV = 46; } // Avishai asked
   return d;
 };
 
@@ -2077,7 +2078,7 @@ window.mergeContent = function (saved) {
     trust: "Studio and stage experience with Israel's top artists and producers",
     waMessage: "Hi Avishai 👋\nI found you through your website.\n\nMy name: \nI'd like to check your availability for a drum session on: \nProject type: single / medley / album\nGenre: \n\nI'll send you a demo and a reference here. Thanks!",
     aboutTitle: "Avishai Yashar",
-    aboutText: "Recording and performing with Israel's leading singers and producers — singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur* and *Aviv Alush*, among others, and producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and more.\nThe right feel for every genre — rock, pop, funk, Mediterranean and Hasidic.\n\nThese days, mostly remote sessions from my private studio.\n\nAn alumnus of the IDF Military Rabbinate Band, and from there to stages in Israel and abroad. 29, married, and a proud dad.",
+    aboutText: "Recording and performing with Israel's leading singers and producers — singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur*, *Pini Einhorn*, *Meydad Tasa* and *Aviv Alush*, among others, and producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and more.\nThe right feel for every genre — rock, pop, funk, Mediterranean and Hasidic.\n\nThese days, mostly remote sessions from my private studio.\n\nAn alumnus of the IDF Military Rabbinate Band, and from there to stages in Israel and abroad. 29, married, and a proud dad.",
     hProcess: "The Process",
     credits: "Recording and performing with singers *Static*, *Nasrin*, *Yair Elitzur*, *Itzik Kala* and more\nand producers *Naor Carmi*, *Elnatan Shalom*, *Netanel Ben Giat*, *Shai Vagos* and more\n🥁 Hundreds of productions · 🎧 Tens of millions of plays",
     hProductions: "Songs I've Played On",

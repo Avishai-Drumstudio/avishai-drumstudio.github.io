@@ -2705,7 +2705,7 @@ window.mergeContent = function (saved) {
       let playAt = 0; stoppers.covers = () => stopPlay();
       function play(i){ const cv = covers[i]; if(!cv) return; playAt = Date.now(); stopPlay(); stopAuto(); clearTimeout(hold); pauseAudio(); stopAllMedia("covers");
         playing = i; const el = cards[i], media = el.querySelector(".c3__media"); el.classList.add("is-play"); stage.classList.add("is-playing"); lift(); paint();
-        if(!cv.id){ full.style.objectFit = cv.c.fit === "contain" ? "contain" : ""; full.style.background = cv.c.fit === "contain" ? "#000" : ""; media.classList.add("is-loading"); const cn = navigator.connection || {}; const slow = cn.saveData || /(^|-)2g|3g/.test(cn.effectiveType || ""); const want = slow ? cv.src.replace(/-hq\.mp4$/, ".mp4") : cv.src; if(full.getAttribute("src") !== want){ full.src = want; if(cv.thumb) full.poster = cv.thumb; }
+        if(!cv.id){ full.style.objectFit = cv.c.fit === "contain" ? "contain" : ""; media.classList.add("is-loading"); const cn = navigator.connection || {}; const slow = cn.saveData || /(^|-)2g|3g/.test(cn.effectiveType || ""); const want = slow ? cv.src.replace(/-hq\.mp4$/, ".mp4") : cv.src; if(full.getAttribute("src") !== want){ full.src = want; if(cv.thumb) full.poster = cv.thumb; }
           media.appendChild(full); media.appendChild(prog); prog.firstChild.style.width = "0%"; full.muted = false; try{ full.currentTime = 0; }catch(_){}
           // one tap = it plays. If the phone says "not yet" (still loading), try again as soon as it can; if it refuses sound, play muted with a tap-for-sound hint
           let tries = 0; const go = () => { if(playing !== i) return; const p = full.play(); if(p && p.catch) p.catch(err => { if(playing !== i) return;

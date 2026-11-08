@@ -1776,7 +1776,7 @@ window.SITE_DEFAULTS = {
 
   credits: "הקלטות והופעות עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
-  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמותאם לכל ז'אנר – רוק, פופ, פאנק, ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. נשוי ואבא לילד מתוק.",
+  aboutText: "נעים מאוד, אני אבישי – מתופף סשן והופעות, נשוי ואבא לילד מתוק.\n\nהדרך שלי התחילה בלהקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם.\n\nהקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמותאם לכל ז'אנר – רוק, פופ, פאנק, ים-תיכוני וחסידי.\n\nהיום אני מקליט מהאולפן הפרטי שלי – מרחוק, או שתגיעו אליי לאולפן ונקליט יחד.",
   aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
@@ -1798,6 +1798,7 @@ window.SITE_DEFAULTS = {
   hCovers: "קאברים",
   pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
   covers: [
+    { url: "assets/covers/kulam-hq.mp4", poster: "assets/covers/kulam.jpg", style: "פופ ישראלי", title: "כולם גנבים", fit: "contain", show: true },
     { url: "assets/covers/funk.mp4", poster: "assets/covers/funk.jpg", style: "פיוז׳ן", title: "", show: true },
     { url: "assets/covers/c6.mp4", poster: "assets/covers/c6.jpg", style: "גוספל", title: "", show: true },
     { url: "assets/covers/c5.mp4", poster: "assets/covers/c5.jpg", style: "פופ-רוק", title: "", show: true },
@@ -1815,7 +1816,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "faq", "cta"],
-  layoutV: 48,
+  layoutV: 49,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, faq: true, cta: true },
 
   productions: [
@@ -2074,6 +2075,11 @@ window.mergeContent = function (saved) {
     const D = window.SITE_DEFAULTS; ["credits","aboutText"].forEach(k => d[k] = D[k]);
     (d.gear || []).forEach(g => { if (g && g.role === "Preamps") g.show = true; }); d.layoutV = 48;
   }
+  if (saved && (saved.layoutV || 0) < 49) { // Avishai asked: "כולם גנבים" is the first cover; a more personal about
+    const D = window.SITE_DEFAULTS, k = D.covers[0];
+    const cv = (Array.isArray(d.covers) ? d.covers : []).filter(x => !(x && /kulam/.test(x.url || "")));
+    cv.unshift({...k}); d.covers = cv; d.aboutText = D.aboutText; d.layoutV = 49;
+  }
   return d;
 };
 
@@ -2110,7 +2116,7 @@ window.mergeContent = function (saved) {
     trust: "Studio and stage experience with Israel's top artists and producers",
     waMessage: "Hi Avishai 👋\nI found you through your website.\n\nMy name: \nI'd like to check your availability for a drum session on: \nProject type: single / medley / album\nGenre: \n\nI'll send you a demo and a reference here. Thanks!",
     aboutTitle: "Avishai Yashar",
-    aboutText: "Recording and performing with Israel's leading singers and producers — singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur*, *Pini Einhorn*, *Meydad Tasa* and *Aviv Alush*, among others, and producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and more.\nThe right feel for every genre — rock, pop, funk, Mediterranean and Hasidic.\n\nThese days, mostly remote sessions from my private studio.\n\nAn alumnus of the IDF Military Rabbinate Band — and from there, to stages across Israel and abroad. Married, and a proud dad.",
+    aboutText: "Nice to meet you — I'm Avishai, a session and live drummer, married and a proud dad.\n\nMy journey started in the IDF Military Rabbinate Band — and from there, to stages across Israel and abroad.\n\nRecording and performing with Israel's leading singers and producers — singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur*, *Pini Einhorn*, *Meydad Tasa* and *Aviv Alush*, among others, and producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and more.\nThe right feel for every genre — rock, pop, funk, Mediterranean and Hasidic.\n\nToday I record from my own private studio — remotely, or come to the studio and we'll record together.",
     hProcess: "The Process",
     studioTitle: "My Drum Studio",
     credits: "Recording and performing with singers *Static*, *Nasrin*, *Yair Elitzur*, *Itzik Kala* and more\nand producers *Naor Carmi*, *Elnatan Shalom*, *Netanel Ben Giat*, *Shai Vagos* and more\n🥁 Hundreds of productions · 🎧 Tens of millions of plays",
@@ -2130,7 +2136,7 @@ window.mergeContent = function (saved) {
       { title: "The Recording", text: "• Remote – guide & notes\n• Live video – hear it in real time\n• In studio – come to my studio" },
       { title: "The Stems", text: "Stems within 24 hours · Mix Ready · any format · up to 3 revision rounds" }
     ],
-    styles: { "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
+    styles: { "פופ ישראלי":"Israeli Pop", "פיוז׳ן":"Fusion", "פיוזן":"Fusion", "פאנק":"Funk", "גוספל":"Gospel", "פופ-רוק":"Pop-Rock", "פופ רוק":"Pop-Rock", "פופ":"Pop", "רוק":"Rock", "גרוב":"Groove", "בלדה 6/8":"6/8 Ballad", "בלדה":"Ballad", "ים-תיכוני":"Mediterranean", "ים תיכוני":"Mediterranean", "חסידי":"Hasidic", "מזרחי":"Mizrahi", "ג'אז":"Jazz", "אלטרנטיבי":"Alternative" },
     cats: { "מערכות תופים":"Drum Kits", "מצילות וסנרים":"Cymbals & Snares", "מיקרופונים":"Microphones", "כרטיס קול ופראמפים":"Interface & Preamps", "כללי":"Other" },
     names: { "הלוואי":"Halevai", "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "איציק סוויסה":"Itzik Swisa", "בניה מדליון":"Benaya Medalion", "יגאל שטטנר":"Yigal Shtetner", "אבישי רוזן":"Avishai Rozen", "ניצן אלון":"Nitzan Alon", "מפיקה":"Producer", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
     replies: { "ניצן אלון": "Thank you, dear Nitzan — always a joy working together 🙌🏼", "בניה מדליון": "Brother, a pleasure with you as always ❤️", "אבישי רוזן": "Thanks, my dear 😍", "יגאל שטטנר": "Love you, man — and thankful to God for the privilege of working with people like you 🙏" },
@@ -2698,7 +2704,7 @@ window.mergeContent = function (saved) {
       let playAt = 0; stoppers.covers = () => stopPlay();
       function play(i){ const cv = covers[i]; if(!cv) return; playAt = Date.now(); stopPlay(); stopAuto(); clearTimeout(hold); pauseAudio(); stopAllMedia("covers");
         playing = i; const el = cards[i], media = el.querySelector(".c3__media"); el.classList.add("is-play"); stage.classList.add("is-playing"); lift(); paint();
-        if(!cv.id){ media.classList.add("is-loading"); const cn = navigator.connection || {}; const slow = cn.saveData || /(^|-)2g|3g/.test(cn.effectiveType || ""); const want = slow ? cv.src.replace(/-hq\.mp4$/, ".mp4") : cv.src; if(full.getAttribute("src") !== want){ full.src = want; if(cv.thumb) full.poster = cv.thumb; }
+        if(!cv.id){ full.style.objectFit = cv.c.fit === "contain" ? "contain" : ""; media.classList.add("is-loading"); const cn = navigator.connection || {}; const slow = cn.saveData || /(^|-)2g|3g/.test(cn.effectiveType || ""); const want = slow ? cv.src.replace(/-hq\.mp4$/, ".mp4") : cv.src; if(full.getAttribute("src") !== want){ full.src = want; if(cv.thumb) full.poster = cv.thumb; }
           media.appendChild(full); media.appendChild(prog); prog.firstChild.style.width = "0%"; full.muted = false; try{ full.currentTime = 0; }catch(_){}
           // one tap = it plays. If the phone says "not yet" (still loading), try again as soon as it can; if it refuses sound, play muted with a tap-for-sound hint
           let tries = 0; const go = () => { if(playing !== i) return; const p = full.play(); if(p && p.catch) p.catch(err => { if(playing !== i) return;

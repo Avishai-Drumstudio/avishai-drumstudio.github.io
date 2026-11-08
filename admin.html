@@ -202,7 +202,7 @@ window.SITE_DEFAULTS = {
 
   credits: "הקלטות והופעות עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
-  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמותאם לכל ז'אנר – רוק, פופ, פאנק, ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. נשוי ואבא לילד מתוק.",
+  aboutText: "נעים מאוד, אני אבישי – מתופף סשן והופעות, נשוי ואבא לילד מתוק.\n\nהדרך שלי התחילה בלהקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם.\n\nהקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמותאם לכל ז'אנר – רוק, פופ, פאנק, ים-תיכוני וחסידי.\n\nהיום אני מקליט מהאולפן הפרטי שלי – מרחוק, או שתגיעו אליי לאולפן ונקליט יחד.",
   aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
@@ -224,6 +224,7 @@ window.SITE_DEFAULTS = {
   hCovers: "קאברים",
   pCovers: "כמה קאברים שמראים איך אני ניגש לכל ז'אנר",
   covers: [
+    { url: "assets/covers/kulam-hq.mp4", poster: "assets/covers/kulam.jpg", style: "פופ ישראלי", title: "כולם גנבים", fit: "contain", show: true },
     { url: "assets/covers/funk.mp4", poster: "assets/covers/funk.jpg", style: "פיוז׳ן", title: "", show: true },
     { url: "assets/covers/c6.mp4", poster: "assets/covers/c6.jpg", style: "גוספל", title: "", show: true },
     { url: "assets/covers/c5.mp4", poster: "assets/covers/c5.jpg", style: "פופ-רוק", title: "", show: true },
@@ -241,7 +242,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "faq", "cta"],
-  layoutV: 48,
+  layoutV: 49,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, faq: true, cta: true },
 
   productions: [
@@ -499,6 +500,11 @@ window.mergeContent = function (saved) {
   if (saved && (saved.layoutV || 0) < 48) { // Avishai asked: original credits wording, full detailed about, preamps shown
     const D = window.SITE_DEFAULTS; ["credits","aboutText"].forEach(k => d[k] = D[k]);
     (d.gear || []).forEach(g => { if (g && g.role === "Preamps") g.show = true; }); d.layoutV = 48;
+  }
+  if (saved && (saved.layoutV || 0) < 49) { // Avishai asked: "כולם גנבים" is the first cover; a more personal about
+    const D = window.SITE_DEFAULTS, k = D.covers[0];
+    const cv = (Array.isArray(d.covers) ? d.covers : []).filter(x => !(x && /kulam/.test(x.url || "")));
+    cv.unshift({...k}); d.covers = cv; d.aboutText = D.aboutText; d.layoutV = 49;
   }
   return d;
 };

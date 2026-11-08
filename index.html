@@ -15,6 +15,11 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://avishai-drumstudio.github.io/">
+<link rel="canonical" href="https://avishai-drumstudio.github.io/">
+<link rel="alternate" hreflang="he" href="https://avishai-drumstudio.github.io/">
+<link rel="alternate" hreflang="en" href="https://avishai-drumstudio.github.io/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://avishai-drumstudio.github.io/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"Avishai Yashar – Live & Studio Drums","alternateName":"אבישי ישר – אולפן תופים","description":"Session drummer and remote drum recording. Mix-ready stems within 24 hours.","url":"https://avishai-drumstudio.github.io/","image":"https://avishai-drumstudio.github.io/assets/og-ay2.jpg","telephone":"+972532854507","areaServed":"Worldwide","founder":{"@type":"Person","name":"Avishai Yashar","jobTitle":"Session Drummer"},"sameAs":["https://www.instagram.com/avishai_yashar","https://youtube.com/@avishaiyashar-4676"]}</script>
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -188,7 +193,7 @@ body::after{content:"";position:fixed;inset:0;z-index:90;pointer-events:none;opa
 .about__card img{position:absolute;inset:-6% 0;width:100%;height:112%;object-fit:cover;object-position:50% 20%;will-change:transform}
 .about__card::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,15,14,.75),transparent 40%)}
 .about__tape{position:absolute;top:14px;left:50%;z-index:2;transform:translateX(-50%) rotate(2deg);padding:7px 16px 6px;background:rgba(232,220,190,.92);color:#2a2620;
-  font:700 13px/1 "Marker Felt","Comic Sans MS","Chalkboard SE",ui-rounded,system-ui,sans-serif;letter-spacing:.06em;direction:ltr;white-space:nowrap;
+  font:800 13px/1 Heebo,system-ui,sans-serif;letter-spacing:.14em;direction:ltr;white-space:nowrap;
   box-shadow:0 4px 10px rgba(0,0,0,.35);clip-path:polygon(2% 0,98% 4%,100% 50%,97% 100%,3% 96%,0 50%)}
 .fader{--v:.3;position:relative;width:46px;height:min(68vw,300px);align-self:center;flex:none;touch-action:none;cursor:grab}
 .fader__slot{position:absolute;left:50%;top:8px;bottom:8px;width:6px;margin-left:-3px;border-radius:6px;background:#070b0a;box-shadow:inset 0 1px 3px rgba(0,0,0,.9),0 0 0 1px rgba(227,211,182,.08)}
@@ -363,6 +368,14 @@ a.row__link:hover .row__go{background:var(--lime);color:var(--on-lime)}
 .socials a{width:48px;height:48px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;transition:color .2s,border-color .2s,transform .2s}
 .socials a:hover{color:var(--lime);border-color:var(--lime);transform:translateY(-2px)}
 .socials svg{width:20px;height:20px;fill:currentColor}
+.faq{max-width:720px;margin-inline:auto;display:grid;gap:10px}
+.faq__q{background:rgba(22,30,28,.7);border:1px solid rgba(237,228,211,.12);border-radius:16px;padding:0 18px}
+.faq__q summary{cursor:pointer;list-style:none;padding:16px 0;font-weight:700;font-size:17px;display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:44px}
+.faq__q summary::-webkit-details-marker{display:none}
+.faq__q summary::after{content:"+";font-size:22px;color:#2ED3C3;transition:transform .25s}
+.faq__q[open] summary::after{transform:rotate(45deg)}
+.faq__q p{margin:0 0 16px;color:var(--muted);line-height:1.65;font-size:15.5px}
+.foot__legal{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .foot__small{font-size:13px;color:var(--muted);display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
 .foot__small a:hover{color:var(--text)}
 .wordmark{margin-top:40px;font-weight:900;line-height:.8;white-space:nowrap;direction:ltr;font-size:min(14vw,12rem);letter-spacing:-.03em;color:transparent;-webkit-text-stroke:1.5px rgba(227,211,182,.22);user-select:none;will-change:transform}
@@ -509,7 +522,7 @@ html,body{max-width:100%;overflow-x:hidden}
 #heroTitle .ln{display:block;white-space:nowrap}
 
 .reel__fb{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(120% 80% at 70% 20%,rgba(46,211,195,.28),transparent 60%),radial-gradient(90% 70% at 20% 90%,rgba(237,228,211,.12),transparent 60%),linear-gradient(160deg,#16201e,#0b1110)}
-.reel__fb i{font:italic 800 clamp(4rem,22vw,7rem)/1 Inter,system-ui,sans-serif;letter-spacing:-.05em;padding:0 .12em;background:linear-gradient(135deg,#EDE4D3,#2ED3C3);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.22;margin-top:-18%}
+.reel__fb i{font:italic 800 clamp(4rem,22vw,7rem)/1 Heebo,system-ui,sans-serif;letter-spacing:-.05em;padding:0 .12em;background:linear-gradient(135deg,#EDE4D3,#2ED3C3);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.22;margin-top:-18%}
 .modal{grid-template-rows:auto auto;align-content:center;gap:14px}
 .modal__yt{justify-self:center;color:rgba(237,228,211,.75);font-size:.92rem;text-decoration:underline;text-underline-offset:3px;padding:8px 12px}
 
@@ -578,7 +591,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .vu{width:110px;height:58px;border-radius:10px;background:linear-gradient(#efe6cf,#d9cdb0);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25),0 8px 20px -8px rgba(0,0,0,.6);padding:2px}
 .vu__arc{fill:none;stroke:#2a2620;stroke-width:1}.vu__red{fill:none;stroke:#c8302a;stroke-width:2.4}
 .vu__ticks path{stroke:#2a2620;stroke-width:1.2}
-.vu text{font:700 8px/1 Inter,system-ui,sans-serif;fill:#2a2620;letter-spacing:.1em}
+.vu text{font:700 8px/1 Heebo,system-ui,sans-serif;fill:#2a2620;letter-spacing:.1em}
 .vu__needle{stroke:#1b1814;stroke-width:1.3;stroke-linecap:round;transform-origin:60px 60px;transform:rotate(-48deg);transition:transform .09s linear}
 .vu circle{fill:#1b1814}
 .counter{font:600 20px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;color:#ff8a3d;text-shadow:0 0 10px rgba(255,138,61,.55);background:#0a0d0c;padding:10px 12px;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);direction:ltr}
@@ -782,7 +795,7 @@ html,body{max-width:100%;overflow-x:hidden}
 /* ===== the page as a journey: chapter numbers behind clear titles ===== */
 .has-chap{position:relative;isolation:isolate}
 .chap{position:absolute;left:50%;top:50%;z-index:-1;transform:translate(-50%,-46%) scale(.85);opacity:0;pointer-events:none;
-  font:900 clamp(6rem,30vw,11rem)/1 Inter,system-ui,sans-serif;letter-spacing:-.05em;direction:ltr;
+  font:900 clamp(6rem,30vw,11rem)/1 Heebo,system-ui,sans-serif;letter-spacing:-.05em;direction:ltr;
   color:transparent;-webkit-text-stroke:1.5px rgba(46,211,195,.38);
   background:linear-gradient(180deg,rgba(46,211,195,.14),transparent 75%);-webkit-background-clip:text;background-clip:text;
   transition:opacity .9s ease,transform 1.1s cubic-bezier(.2,.8,.2,1)}
@@ -1230,12 +1243,12 @@ html,body{max-width:100%;overflow-x:hidden}
 
 /* HE / EN switch */
 .langsw{display:flex;align-items:center;gap:2px;padding:3px;border-radius:999px;background:rgba(15,23,22,.55);border:1px solid rgba(237,228,211,.16);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);margin-inline:auto 10px;direction:ltr}
-.langsw a{font:700 11.5px/1 Rubik,system-ui,sans-serif;letter-spacing:.06em;color:var(--muted);text-decoration:none;padding:6px 8px;border-radius:999px;transition:background .25s,color .25s}
+.langsw a{font:700 11.5px/1 Heebo,system-ui,sans-serif;letter-spacing:.06em;color:var(--muted);text-decoration:none;padding:6px 8px;border-radius:999px;transition:background .25s,color .25s}
 .langsw a[aria-current="true"]{background:rgba(46,211,195,.18);color:#7FE7DC}
 @media (max-width:420px){.langsw{margin-inline:auto 6px}.langsw a{padding:6px 6px;font-size:11px}}
 
 /* ---------- English (LTR) adjustments ---------- */
-.is-en body{font-family:Rubik,system-ui,-apple-system,"Segoe UI",sans-serif}
+.is-en body{font-family:Heebo,system-ui,-apple-system,"Segoe UI",sans-serif}
 .is-en .brand__txt b,.is-en .brand__txt small{white-space:nowrap}
 .is-en .brand__txt small{text-align:left}
 .is-en .hero__content{text-align:left}
@@ -1258,11 +1271,11 @@ html,body{max-width:100%;overflow-x:hidden}
 .is-en .wq__out::before{left:auto;right:-7px;border-left:7px solid transparent;border-right:0}
 .is-en .wq__t{float:right;margin:8px 0 0 10px}
 .is-en .wq__back,.is-en .wa__back{transform:scaleX(-1)}
-@media (max-width:420px){ .is-en .top .btn.js-wa{padding:0 12px;font-size:14px} .is-en .brand__txt b{font-size:14px} .is-en .brand__txt small{font-size:10px} }
+@media (max-width:420px){ .is-en .top .btn.js-wa{padding:0 12px;font-size:14px} .is-en .brand__txt b{font-size:14px} .is-en .brand__txt small{font-size:11.5px} }
 @media (max-width:420px){
   .langsw{padding:2px;margin-inline:auto 6px}.langsw a{padding:5px 6px;font-size:10.5px;letter-spacing:.04em}
   .top .btn.js-wa{padding:0 12px;font-size:13.5px}
-  .brand__txt b{font-size:14.5px;white-space:nowrap}.brand__txt small{font-size:10px;white-space:nowrap}
+  .brand__txt b{font-size:14.5px;white-space:nowrap}.brand__txt small{font-size:11.5px;white-space:nowrap}
   .top__start{gap:6px}
 }
 .is-en .reel__info{text-align:left}
@@ -1281,7 +1294,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .hero-anim .hero__mp4{opacity:0}
 /* language switch: bigger, smooth */
 .langsw{padding:3px!important}
-.langsw a{font-size:13px!important;padding:8px 11px!important;min-width:38px;text-align:center}
+.langsw a{font-size:13px!important;padding:8px 11px!important;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
 html.lang-out body{opacity:0;transition:opacity .15s ease}
 html{background:#0f1716}
 
@@ -1293,7 +1306,7 @@ html{background:#0f1716}
 .wq__body{min-height:0;padding:10px 10px 12px;gap:5px}
 .wq__in,.wq__out{font-size:13.5px!important;line-height:1.45!important;padding:6px 9px}
 .wq__out{font-size:12.5px!important}
-.wq__t{font-size:10px;margin-top:6px}
+.wq__t{font-size:11px;margin-top:6px}
 #testimonials{padding-bottom:clamp(18px,4vw,40px)!important}
 #testimonials .head{margin-bottom:18px}
 #testimonials .quotes{padding-top:6px;padding-bottom:6px}
@@ -1305,18 +1318,18 @@ html{background:#0f1716}
 .quote.wq{width:min(62vw,250px)!important;border-radius:18px!important}
 .wq__hd{padding:6px 9px}
 .wq__av{width:26px;height:26px;font-size:12px}
-.wq__nm b{font-size:12.5px}.wq__nm small{font-size:10px}
+.wq__nm b{font-size:12.5px}.wq__nm small{font-size:11.5px}
 .wq__body{padding:8px 8px 10px;gap:4px}
 .quote.wq .wq__in{font-size:12.5px!important;line-height:1.42!important;padding:5px 8px}
 .quote.wq .wq__out{font-size:11.5px!important;padding:4px 8px}
-.wq__t{font-size:9.5px}
+.wq__t{font-size:11px}
 #testimonials{padding-top:clamp(24px,5vw,48px)!important}
 #testimonials .head{margin-bottom:12px}
 #testimonials .head h2{font-size:clamp(1.5rem,5.6vw,2.3rem)}
 .quotes__track{gap:12px!important}
 /* YouTube fallbacks */
-.ytout{position:absolute;z-index:6;top:8px;inset-inline-start:8px;font:600 11.5px/1 Rubik,system-ui,sans-serif;color:#fff;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.2);padding:6px 9px;border-radius:999px;text-decoration:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.ytfail{position:absolute;inset:0;z-index:5;display:grid;place-items:center;align-content:center;gap:10px;background:radial-gradient(circle at 50% 45%,rgba(46,211,195,.18),rgba(8,12,11,.92));color:#fff;text-decoration:none;font:700 15px/1.2 Rubik,system-ui,sans-serif;border-radius:inherit}
+.ytout{position:absolute;z-index:6;top:8px;inset-inline-start:8px;font:600 11.5px/1 Heebo,system-ui,sans-serif;color:#fff;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.2);padding:6px 9px;border-radius:999px;text-decoration:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.ytfail{position:absolute;inset:0;z-index:5;display:grid;place-items:center;align-content:center;gap:10px;background:radial-gradient(circle at 50% 45%,rgba(46,211,195,.18),rgba(8,12,11,.92));color:#fff;text-decoration:none;font:700 15px/1.2 Heebo,system-ui,sans-serif;border-radius:inherit}
 .ytfail__play{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:#FF0033;font-size:24px;padding-left:4px;box-shadow:0 10px 30px rgba(255,0,51,.35)}
 /* covers: the playing card opens bigger */
 .c3__media.need-sound::before{content:"🔇 הקישו לסאונד";position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:7;opacity:1!important;background:rgba(0,0,0,.7);color:#fff;font:600 12px/1 Rubik,sans-serif;padding:7px 11px;border-radius:999px;inset:auto auto 14px 50%;width:auto;height:auto}
@@ -1329,11 +1342,11 @@ html{background:#0f1716}
 .wave__head{width:2px;top:-6px;bottom:-6px;background:#fff;transition:left .12s linear}
 .wave__head::after{width:20px;height:20px;margin-left:-10px;bottom:-10px;background:#fff;box-shadow:0 0 0 5px rgba(46,211,195,.35),0 4px 14px rgba(0,0,0,.5)}
 .track.is-playing .wave__head{transition:none}
-.wave__tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;font:600 11px/1 Rubik,system-ui,sans-serif;font-style:normal;color:#0c1412;background:#2ED3C3;padding:5px 8px;border-radius:999px;box-shadow:0 4px 14px rgba(46,211,195,.35);animation:tipBob 1.6s ease-in-out infinite;pointer-events:none}
+.wave__tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;font:600 11px/1 Heebo,system-ui,sans-serif;font-style:normal;color:#0c1412;background:#2ED3C3;padding:5px 8px;border-radius:999px;box-shadow:0 4px 14px rgba(46,211,195,.35);animation:tipBob 1.6s ease-in-out infinite;pointer-events:none}
 .wave__tip::after{content:"";position:absolute;top:100%;left:50%;margin-left:-5px;border:5px solid transparent;border-top-color:#2ED3C3}
 @keyframes tipBob{50%{transform:translate(-50%,-3px)}}
 .track.scrubbed .wave__tip,.track.is-playing .wave__tip{opacity:0;transition:opacity .3s}
-.wave__times{display:flex;justify-content:space-between;font:500 12px/1 Rubik,system-ui,sans-serif;color:var(--muted);margin-top:-6px}
+.wave__times{display:flex;justify-content:space-between;font:500 12px/1 Heebo,system-ui,sans-serif;color:var(--muted);margin-top:-6px}
 .track__time{display:none}
 .stems-link{justify-self:center;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:999px;border:1px solid var(--line)}
 .stems-link svg{width:14px;height:14px}
@@ -1490,7 +1503,7 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
       <p class="hero__sub" id="heroLead" data-hero></p>
       <div class="hero__cta" id="heroCta" data-hero>
         <a class="btn btn--lime js-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-wa"/></svg>לתיאום הקלטה</a>
-        <button class="btn btn--ghost" type="button" id="watchIntro"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play"/></svg><span>צפו בסרטון</span></button>
+        <button class="btn btn--ghost" type="button" id="watchIntro" aria-label="צפו בסרטון"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-play"/></svg><span>צפו בסרטון</span></button>
       </div>
     </div>
     <button class="snd" id="heroSnd" type="button" aria-pressed="false" aria-label="סאונד" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path class="snd__spk" d="M4 9h3l5-4v14l-5-4H4z"/><path class="snd__on" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/><path class="snd__off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
@@ -1639,6 +1652,14 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
     </div>
   </section>
 
+  <!-- ============ FAQ ============ -->
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="head"><h2 id="faqTitle">שאלות נפוצות</h2></div>
+      <div class="faq" id="faqList"></div>
+    </div>
+  </section>
+
   <!-- ============ CTA ============ -->
   <section class="section" id="ctaSection">
     <div class="wrap">
@@ -1658,7 +1679,7 @@ h1,h2,.hero h1,.head h2,.about__text h2,.cta h2,.custom__txt h2,.about__name{fon
     <nav class="socials" id="socials" aria-label="רשתות חברתיות"></nav>
     <div class="foot__small">
       <span>© <span id="year">2026</span> כל הזכויות שמורות</span>
-      <a href="admin.html" id="adminLink">כניסת ניהול</a>
+      <span class="foot__legal"><a href="privacy.html" id="privLink">מדיניות פרטיות</a><a href="accessibility.html" id="a11yLink">הצהרת נגישות</a></span>
     </div>
   </div>
   <div class="wordmark" id="wordmark" aria-hidden="true">AVISHAI YASHAR · AVISHAI YASHAR</div>
@@ -1739,7 +1760,7 @@ window.SITE_LINKS = { home: "./", admin: "admin.html" };
 window.SITE_DEFAULTS = {
   eyebrow: "מתופף סשן | הקלטות מרחוק",
   title: "תופים מוכנים למיקס, ישר להפקה שלך",
-  lead: "מקליט מהאולפן שלי ושולח ערוצים נקיים ברמת Mix Ready. מרוק, פופ ופאנק ועד ים-תיכוני וחסידי. מהיר, מדויק, וחוסך לך זמן.",
+  lead: "מקליט מהאולפן שלי ושולח ערוצים נקיים ברמת Mix Ready. רוק, פופ, פאנק, ים-תיכוני וחסידי. מהיר, מדויק, וחוסך לך זמן.",
   trust: "ניסיון בהקלטות ובהופעות עם האמנים והמפיקים המובילים בישראל",
 
   whatsapp: "https://wa.me/972532854507",
@@ -1750,12 +1771,12 @@ window.SITE_DEFAULTS = {
   introVideo: "https://youtu.be/SMZbWh5Qp8A",
   heroIntroEnd: 0, heroIntroCut: 2.5, // play N seconds of the ending, stopping heroIntroCut seconds before the end (the outro logo); // opening background = the last N seconds of the intro video, with a sound button (0 = use the studio clip)
   studioVideo: "https://youtube.com/shorts/acj-V-isUmU",
-  studioTitle: "My Drum Studio",
+  studioTitle: "האולפן שלי",
   productionsFirst: 2,
 
-  credits: "הקלטות והופעות עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
+  credits: "ניגנתי עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
-  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמענה מדויק לכל ז'אנר: מרוק, פופ ופאנק ועד ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. בן 29, נשוי ואבא לילד מתוק.",
+  aboutText: "ניגנתי עם עוד הרבה זמרים ומפיקים מובילים – בהם *שמואל*, *אהרון רזאל*, *פיני איינהורן*, *מידד טסה*, *אביב אלוש*, *יגאל שטטנר*, *אריאל גמליאל* ו*תמיר מאור*.\nמותאם לכל ז'אנר – רוק, פופ, פאנק, ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. נשוי ואבא לילד מתוק.",
   aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
@@ -1793,9 +1814,9 @@ window.SITE_DEFAULTS = {
   ctaTitle: "השיר הבא שלך מחכה לתופים.",
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
-  order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "cta"],
-  layoutV: 46,
-  show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, cta: true },
+  order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "faq", "cta"],
+  layoutV: 47,
+  show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, faq: true, cta: true },
 
   productions: [
     { url: "https://youtu.be/mvIhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
@@ -1830,7 +1851,7 @@ window.SITE_DEFAULTS = {
     { category: "מיקרופונים", role: "Hi-Hat", name: "AKG C430", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/586af5b12_image.png", url: "https://www.thomann.ie/akg_c430.htm", show: true },
     { category: "מיקרופונים", role: "Rooms", name: "Lewitt LCT 441 Flex", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/d6c1cd271_thomann-image.jpg", url: "https://www.thomann.ie/lewitt_lct_441_flex.htm", show: true },
     { category: "כרטיס קול ופראמפים", role: "Interface", name: "Roland Studio Capture", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg", url: "https://vintageking.com/roland-studio-capture-usb-audio-interface", show: true },
-    { category: "כרטיס קול ופראמפים", role: "Preamps", name: "פראמפים", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg", url: "", show: true }
+    { category: "כרטיס קול ופראמפים", role: "Preamps", name: "פראמפים", show: false, img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg", url: "" }
   ],
   gearCats: [
     { name: "מערכות תופים", show: true },
@@ -2042,6 +2063,14 @@ window.mergeContent = function (saved) {
     d.testimonials = t; d.layoutV = 45;
   }
   if (saved && (saved.layoutV || 0) < 46) { if (typeof d.aboutText === "string" && !d.aboutText.includes("פיני איינהורן")) d.aboutText = d.aboutText.replace("*יאיר אליצור* ו*אביב אלוש*", "*יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש*"); d.layoutV = 46; } // Avishai asked
+  if (saved && (saved.layoutV || 0) < 47) { // site review (Avishai approved): exact wording, no age, shorter about, studio title, preamps hidden, FAQ before the contact
+    const D = window.SITE_DEFAULTS;
+    ["credits","aboutText","lead"].forEach(k => d[k] = D[k]);
+    if (d.studioTitle === "My Drum Studio") d.studioTitle = D.studioTitle;
+    (d.gear || []).forEach(g => { if (g && g.role === "Preamps" && (!g.name || g.name === "פראמפים")) g.show = false; });
+    const o = (d.order || []).filter(k => k !== "faq"), c = o.indexOf("cta"); o.splice(c >= 0 ? c : o.length, 0, "faq"); d.order = o;
+    d.show = Object.assign({}, d.show, { faq: true }); d.layoutV = 47;
+  }
   return d;
 };
 
@@ -2078,9 +2107,10 @@ window.mergeContent = function (saved) {
     trust: "Studio and stage experience with Israel's top artists and producers",
     waMessage: "Hi Avishai 👋\nI found you through your website.\n\nMy name: \nI'd like to check your availability for a drum session on: \nProject type: single / medley / album\nGenre: \n\nI'll send you a demo and a reference here. Thanks!",
     aboutTitle: "Avishai Yashar",
-    aboutText: "Recording and performing with Israel's leading singers and producers — singers such as *Nasrin*, *Static*, *Shmuel*, *Itzik Kala*, *Aharon Razel*, *Yair Elitzur*, *Pini Einhorn*, *Meydad Tasa* and *Aviv Alush*, among others, and producers including *Elnatan Shalom*, *Naor Carmi*, *Netanel Ben Giat*, *Shai Vagos*, *Yigal Shtetner*, *Ariel Gamliel*, *Tamir Maor* and more.\nThe right feel for every genre — rock, pop, funk, Mediterranean and Hasidic.\n\nThese days, mostly remote sessions from my private studio.\n\nAn alumnus of the IDF Military Rabbinate Band, and from there to stages in Israel and abroad. 29, married, and a proud dad.",
+    aboutText: "I've also played with many more of Israel's leading singers and producers — including *Shmuel*, *Aharon Razel*, *Pini Einhorn*, *Meydad Tasa*, *Aviv Alush*, *Yigal Shtetner*, *Ariel Gamliel* and *Tamir Maor*.\nThe right feel for every genre — rock, pop, funk, Mediterranean and Hasidic.\n\nThese days, mostly remote sessions from my private studio.\n\nAn alumnus of the IDF Military Rabbinate Band — and from there, to stages across Israel and abroad. Married, and a proud dad.",
     hProcess: "The Process",
-    credits: "Recording and performing with singers *Static*, *Nasrin*, *Yair Elitzur*, *Itzik Kala* and more\nand producers *Naor Carmi*, *Elnatan Shalom*, *Netanel Ben Giat*, *Shai Vagos* and more\n🥁 Hundreds of productions · 🎧 Tens of millions of plays",
+    studioTitle: "My Drum Studio",
+    credits: "Played with singers *Static*, *Nasrin*, *Yair Elitzur*, *Itzik Kala* and more\nand producers *Naor Carmi*, *Elnatan Shalom*, *Netanel Ben Giat*, *Shai Vagos* and more\n🥁 Hundreds of productions · 🎧 Tens of millions of plays",
     hProductions: "Songs I've Played On",
     hCovers: "Covers",
     pCovers: "",
@@ -2105,7 +2135,7 @@ window.mergeContent = function (saved) {
     titles: { "1QuNAhONztA": "Nishmecha Band — Shabbat Medley", "ogfbC9pYXsQ": "Purim Medley | IDF Military Rabbinate Band", "qV9VPSyfSVI": "Aviya Sherman — Hakol Letova", "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
   };
   const toEN = S => { if(!EN) return S; const T = EN_TEXT, tr = (m, v) => (m[String(v || "").trim()] || v);
-    ["eyebrow","title","lead","trust","credits","waMessage","aboutTitle","aboutText","hProcess","hProductions","hCovers","pCovers","hSources","pSources","hStudio","studioHl","hTestimonials","ctaTitle","ctaText"].forEach(k => { S[k] = T[k]; });
+    ["eyebrow","title","lead","trust","credits","waMessage","aboutTitle","aboutText","studioTitle","hProcess","hProductions","hCovers","pCovers","hSources","pSources","hStudio","studioHl","hTestimonials","ctaTitle","ctaText"].forEach(k => { S[k] = T[k]; });
     S.steps = T.steps.map(s => ({...s}));
     S.covers = (S.covers || []).map(c => ({...c, style: tr(T.styles, c.style), title: /[א-ת]/.test(c.title || "") ? "" : c.title}));
     S.gear = (S.gear || []).map(g => ({...g, category: tr(T.cats, g.category || "כללי"), name: tr(T.names, g.name)}));
@@ -2127,7 +2157,7 @@ window.mergeContent = function (saved) {
     document.querySelectorAll(".top .js-wa").forEach(a => waTxt(a, "Check Availability"));
     document.querySelectorAll("#heroCta .js-wa, .menu .js-wa, .cta .js-wa, #ctaSection .js-wa").forEach(a => waTxt(a, "Book a Session"));
     document.querySelectorAll("#about .js-wa").forEach(a => waTxt(a, "Let's talk about your project"));
-    set("#watchIntro span", "Watch the Video");
+    set("#watchIntro span", "Watch the Video"); set("#watchIntro", "Watch the Video", "aria-label");
     set(".scrollcue span", "Explore"); set(".scrollcue", "Explore", "aria-label");
     set("#reel", "Selected Work", "aria-label"); set("#reel .head h2", "Selected Work");
     set("#reelPrev", "Previous", "aria-label"); set("#reelNext", "Next", "aria-label");
@@ -2137,6 +2167,7 @@ window.mergeContent = function (saved) {
     set("#socials", "Social media", "aria-label");
     const y = document.getElementById("year"); if(y && y.parentNode) y.parentNode.lastChild.textContent = " All rights reserved";
     const ad = document.getElementById("adminLink"); if(ad) ad.hidden = true;
+    set("#privLink", "Privacy Policy"); set("#a11yLink", "Accessibility"); document.querySelectorAll("#privLink,#a11yLink").forEach(a => a.href = a.getAttribute("href") + "?lang=en");
     set("#fab", "Message me on WhatsApp", "aria-label");
     set("#menu", "Site menu", "aria-label"); set("#menuClose", "Close menu", "aria-label");
     set("#modal", "Video", "aria-label"); set("#modalClose", "Close", "aria-label");
@@ -2317,12 +2348,12 @@ window.mergeContent = function (saved) {
     txt("heroLead", String(S.lead || "").replace(/Mix Ready/g, "Mix\u00A0Ready")); txt("trust", S.trust); txt("phone", S.phone);
     ["hCovers","pCovers","hProcess","hProductions","hSources","pSources","hStudio","hTestimonials","ctaTitle","ctaText"].forEach(k => txt(k, S[k]));
     $("#year").textContent = new Date().getFullYear();
-    if(window.SITE_LINKS) $("#adminLink").href = SITE_LINKS.admin;
+    if(window.SITE_LINKS && $("#adminLink")) $("#adminLink").href = SITE_LINKS.admin;
     $$("[data-split]").forEach(splitWords);
     $("#heroEyebrow").hidden = !S.eyebrow;
 
     // section order + visibility (hero is always first)
-    const ids = { reel:"reel", about:"about", marquee:"marquee", facts:"facts", process:"process", productions:"productions", covers:"covers", sources:"sources", studio:"studio", testimonials:"testimonials", cta:"ctaSection" };
+    const ids = { reel:"reel", about:"about", marquee:"marquee", facts:"facts", process:"process", productions:"productions", covers:"covers", sources:"sources", studio:"studio", testimonials:"testimonials", faq:"faq", cta:"ctaSection" };
     const main = $("#main");
     // sections added from the admin
     (S.custom || []).forEach(c => {
@@ -2372,7 +2403,7 @@ window.mergeContent = function (saved) {
     })();
 
     // menu: every visible section, in page order
-    const navNames = EN ? { reel:"Selected Work", about:"About Me", marquee:"Genres", facts:"Why Me", process:"How It Works", covers:"Covers", productions:"Productions", sources:"Drum Stems", studio:"The Studio & Gear", testimonials:"What Producers Say", cta:"Contact" } : { reel:"הפקות נבחרות", about:"קצת עליי", marquee:"ז'אנרים", facts:"במה אני שונה", process:"איך זה עובד", covers:"קאברים", productions:"הפקות", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", cta:"יצירת קשר" };
+    const navNames = EN ? { reel:"Selected Work", about:"About Me", marquee:"Genres", facts:"Why Me", process:"How It Works", covers:"Covers", productions:"Productions", sources:"Drum Stems", studio:"The Studio & Gear", testimonials:"What Producers Say", faq:"FAQ", cta:"Contact" } : { reel:"הפקות נבחרות", about:"קצת עליי", marquee:"ז'אנרים", facts:"במה אני שונה", process:"איך זה עובד", covers:"קאברים", productions:"הפקות", sources:"סורסים", studio:"האולפן והציוד", testimonials:"המלצות", faq:"שאלות נפוצות", cta:"יצירת קשר" };
     $("#menuList").innerHTML = S.order.map(k => {
       const el = document.getElementById(ids[k]); if(!el || el.hidden) return "";
       let name = navNames[k];
@@ -2382,6 +2413,21 @@ window.mergeContent = function (saved) {
       if(k === "covers" && !S.covers.length) return "";
       return name ? `<li><a href="#${el.id}" data-go>${esc(name)}</a></li>` : "";
     }).join("");
+
+    // FAQ: the questions a producer asks before writing
+    (() => { const qs = EN ? [
+        ["How much does it cost?", "It depends on the song — length, complexity and the type of session. Send a demo and you'll get an exact quote."],
+        ["What will I receive?", "Separate, organized drum tracks, mix-ready, in whatever format suits your project."],
+        ["How long does it take?", "Stems within 24 hours, with up to 3 revision rounds."],
+        ["Can I be part of the session?", "Yes — join live on video with full studio sound, or come record with me at the studio."]
+      ] : [
+        ["כמה זה עולה?", "המחיר נקבע לפי השיר – אורך, מורכבות וסוג הסשן. שלחו סקיצה ותקבלו הצעת מחיר מדויקת."],
+        ["מה אקבל?", "ערוצי תופים נפרדים ומסודרים, מוכנים למיקס, בפורמט שמתאים להפקה שלך."],
+        ["כמה זמן זה לוקח?", "ערוצים תוך 24 שעות, ועד 3 סבבי תיקונים."],
+        ["אפשר להיות בהקלטה?", "כן – לייב בווידאו עם סאונד מלא מהאולפן, או להגיע ולהקליט איתי באולפן."]
+      ];
+      const t = $("#faqTitle"); if(t) t.textContent = L("שאלות נפוצות", "FAQ");
+      const box = $("#faqList"); if(box) box.innerHTML = qs.map(q => `<details class="faq__q"><summary>${esc(q[0])}</summary><p>${esc(q[1])}</p></details>`).join(""); })();
 
     // about
     txt("aboutTitle", S.aboutTitle); splitWords($("#aboutTitle"));

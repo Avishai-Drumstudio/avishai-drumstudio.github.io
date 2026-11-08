@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://avishai-drumstudio.github.io/</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://avishai-drumstudio.github.io/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://avishai-drumstudio.github.io/?lang=en"/>
+    <lastmod>2026-11-08</lastmod>
+  </url>
+  <url>
+    <loc>https://avishai-drumstudio.github.io/?lang=en</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://avishai-drumstudio.github.io/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://avishai-drumstudio.github.io/?lang=en"/>
+    <lastmod>2026-11-08</lastmod>
+  </url>
+  <url><loc>https://avishai-drumstudio.github.io/privacy.html</loc><lastmod>2026-11-08</lastmod></url>
+  <url><loc>https://avishai-drumstudio.github.io/accessibility.html</loc><lastmod>2026-11-08</lastmod></url>
+</urlset>

@@ -200,9 +200,9 @@ window.SITE_DEFAULTS = {
   studioTitle: "האולפן שלי",
   productionsFirst: 2,
 
-  credits: "ניגנתי עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
+  credits: "הקלטות והופעות עם הזמרים *סטטיק*, *נסרין*, *יאיר אליצור*, *איציק קלה* ועוד\nועם המפיקים *נאור כרמי*, *אלנתן שלום*, *נתנאל בן גיאת*, *שי וגוס* ועוד\n🥁 מאות הפקות · 🎧 עשרות מיליוני האזנות",
   aboutTitle: "אבישי ישר",
-  aboutText: "ניגנתי עם עוד הרבה זמרים ומפיקים מובילים – בהם *שמואל*, *אהרון רזאל*, *פיני איינהורן*, *מידד טסה*, *אביב אלוש*, *יגאל שטטנר*, *אריאל גמליאל* ו*תמיר מאור*.\nמותאם לכל ז'אנר – רוק, פופ, פאנק, ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. נשוי ואבא לילד מתוק.",
+  aboutText: "הקלטות והופעות עם הזמרים והמפיקים המובילים בישראל – זמרים כמו *נסרין*, *סטטיק*, *שמואל*, *איציק קלה*, *אהרון רזאל*, *יאיר אליצור*, *פיני איינהורן*, *מידד טסה* ו*אביב אלוש* ועוד, ומפיקים כמו *אלנתן שלום*, *נאור כרמי*, *נתנאל בן גיאת*, *שי וגוס*, *יגאל שטטנר*, *אריאל גמליאל*, *תמיר מאור* ועוד.\nמותאם לכל ז'אנר – רוק, פופ, פאנק, ים-תיכוני וחסידי.\n\nהיום עובד בעיקר מרחוק, מהאולפן הפרטי.\n\nבוגר להקת הרבנות הצבאית, ומשם לבמות בארץ ובעולם. נשוי ואבא לילד מתוק.",
   aboutImage: "assets/avishai.jpg",
 
   marquee1: "רוק, פופ, פאנק, ים-תיכוני, חסידי, אלטרנטיבי",
@@ -241,7 +241,7 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "faq", "cta"],
-  layoutV: 47,
+  layoutV: 48,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, faq: true, cta: true },
 
   productions: [
@@ -277,7 +277,7 @@ window.SITE_DEFAULTS = {
     { category: "מיקרופונים", role: "Hi-Hat", name: "AKG C430", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/586af5b12_image.png", url: "https://www.thomann.ie/akg_c430.htm", show: true },
     { category: "מיקרופונים", role: "Rooms", name: "Lewitt LCT 441 Flex", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/d6c1cd271_thomann-image.jpg", url: "https://www.thomann.ie/lewitt_lct_441_flex.htm", show: true },
     { category: "כרטיס קול ופראמפים", role: "Interface", name: "Roland Studio Capture", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/4085e20a2_IMG_8094.jpeg", url: "https://vintageking.com/roland-studio-capture-usb-audio-interface", show: true },
-    { category: "כרטיס קול ופראמפים", role: "Preamps", name: "פראמפים", show: false, img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg", url: "" }
+    { category: "כרטיס קול ופראמפים", role: "Preamps", name: "פראמפים", img: "https://base44.app/api/apps/6a777cb7cc015cd93baf4efa/files/mp/public/6a777cb7cc015cd93baf4efa/bd0701709_IMG_8093.jpeg", url: "", show: true }
   ],
   gearCats: [
     { name: "מערכות תופים", show: true },
@@ -493,9 +493,12 @@ window.mergeContent = function (saved) {
     const D = window.SITE_DEFAULTS;
     ["credits","aboutText","lead"].forEach(k => d[k] = D[k]);
     if (d.studioTitle === "My Drum Studio") d.studioTitle = D.studioTitle;
-    (d.gear || []).forEach(g => { if (g && g.role === "Preamps" && (!g.name || g.name === "פראמפים")) g.show = false; });
     const o = (d.order || []).filter(k => k !== "faq"), c = o.indexOf("cta"); o.splice(c >= 0 ? c : o.length, 0, "faq"); d.order = o;
     d.show = Object.assign({}, d.show, { faq: true }); d.layoutV = 47;
+  }
+  if (saved && (saved.layoutV || 0) < 48) { // Avishai asked: original credits wording, full detailed about, preamps shown
+    const D = window.SITE_DEFAULTS; ["credits","aboutText"].forEach(k => d[k] = D[k]);
+    (d.gear || []).forEach(g => { if (g && g.role === "Preamps") g.show = true; }); d.layoutV = 48;
   }
   return d;
 };

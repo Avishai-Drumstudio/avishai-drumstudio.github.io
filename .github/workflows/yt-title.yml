@@ -1,0 +1,15 @@
+name: yt title
+on:
+  push:
+    paths: ['.github/workflows/yt-title.yml']
+permissions:
+  contents: write
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p .data && curl -s "https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=ruvVNrPsLCI&format=json" > .data/yt-title.json
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git add .data; git commit -m "yt title" || exit 0; git push

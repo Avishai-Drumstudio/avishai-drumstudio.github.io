@@ -2240,6 +2240,8 @@ window.mergeContent = function (saved) {
     new MutationObserver(ms => ms.forEach(m => { m.removedNodes.forEach(n => { if(n.nodeType === 1){ (n.tagName === "IFRAME" ? [n] : [...(n.querySelectorAll ? n.querySelectorAll("iframe") : [])]).forEach(f => f._out && f._out.remove()); } }); m.addedNodes.forEach(n => { if(n.nodeType !== 1) return; if(n.tagName === "IFRAME") hook(n); else n.querySelectorAll && n.querySelectorAll("iframe").forEach(hook); }); }))
       .observe(document.documentElement, {childList:true, subtree:true}); })();
   const thumbFix = "if(this.naturalWidth<=120){this.remove()}";
+  // local copy first (fast, always there); if missing, YouTube's own thumbnail; if that fails too, the branded tile underneath shows
+  const thumbErr = "if(!this.dataset.yt){this.dataset.yt=1;this.src=this.src.replace(/^.*assets\\/thumbs\\/([\\w-]+)\\.jpg.*$/,'https://i.ytimg.com/vi/$1/hqdefault.jpg')}else{this.remove()}";
 
   /* ---------------- load content (saved in the admin panel) ---------------- */
   async function loadContent(){
@@ -2276,7 +2278,7 @@ window.mergeContent = function (saved) {
     track.innerHTML = list.map((v,i) => { const id = ytId(v.url); return `
       <div class="reel__item" role="button" tabindex="0" data-i="${i}" data-id="${esc(id)}" aria-label="${esc(v.title)}">
         <span class="reel__fb" aria-hidden="true"><i>AY</i></span>
-        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="eager" onerror="this.remove()" onload="${thumbFix}">
+        <img src="assets/thumbs/${esc(id)}.jpg" alt="" loading="eager" onerror="${thumbErr}" onload="${thumbFix}">
         <span class="reel__play" aria-hidden="true">${icon('i-play')}</span>
         <span class="reel__info"><b>${esc(v.title)}</b><small>${L("לחצו לצפייה","Tap to watch")}</small></span>
       </div>`; }).join("");
@@ -2347,7 +2349,7 @@ window.mergeContent = function (saved) {
     return `<article class="card" data-reveal>
       <div class="video zoom" data-id="${esc(id)}">
         <span class="video__fb" aria-hidden="true">${esc(v.title)}</span>
-        <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" loading="lazy" decoding="async" onerror="this.remove()" onload="${thumbFix}">
+        <img src="assets/thumbs/${esc(id)}.jpg" alt="" loading="lazy" decoding="async" onerror="${thumbErr}" onload="${thumbFix}">
         <button type="button" aria-label="${L("נגן","Play")}: ${esc(v.title)}"><span class="play">${icon('i-play')}</span></button>
       </div>
       <div class="card__body">

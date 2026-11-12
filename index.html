@@ -1817,11 +1817,11 @@ window.SITE_DEFAULTS = {
   ctaText: "שליחת סקיצה לקבלת הצעה",
 
   order: ["reel", "testimonials", "process", "covers", "sources", "about", "studio", "facts", "productions", "marquee", "faq", "cta"],
-  layoutV: 53,
+  layoutV: 54,
   show: { reel: true, covers: true, about: true, marquee: false, facts: false, process: true, productions: false, sources: true, studio: true, testimonials: true, faq: true, cta: true },
 
   productions: [
-    { url: "https://youtu.be/ruvVNrPsLCI", title: "אלייצור ואביב אלוש – סתם תמים", show: true },
+    { url: "https://youtu.be/xfSR7pCtSDk", title: "אלייצור ואביב אלוש – סתם תמים", show: true },
     { url: "https://youtu.be/mvIhYC6DV9A", title: "מיכל גרינגליק – יש פה מקום", show: true },
     { url: "https://www.youtube.com/watch?v=5eJqw0t3e9c", title: "מחרוזת שירי רבאק | הרבנות הצבאית ואיחוד הלהקות", show: true },
     { url: "https://youtu.be/qV9VPSyfSVI", title: "אביה שרמן – הכל לטובה", show: true },
@@ -2091,7 +2091,7 @@ window.mergeContent = function (saved) {
     d.testimonials = t; d.layoutV = 51;
   }
   if (saved && (saved.layoutV || 0) < 52) { // new first production (Avishai asked)
-    const pr = Array.isArray(d.productions) ? d.productions.filter(p => !String(p && p.url || "").includes("ruvVNrPsLCI")) : [];
+    const pr = Array.isArray(d.productions) ? d.productions.filter(p => !String(p && p.url || "").includes("xfSR7pCtSDk")) : [];
     pr.unshift({...window.SITE_DEFAULTS.productions[0]}); d.productions = pr; d.layoutV = 52;
   }
   if (saved && (saved.layoutV || 0) < 53) { // testimonial: אלנתן שלום, second (right after Nitzan)
@@ -2100,6 +2100,7 @@ window.mergeContent = function (saved) {
     const i = t.findIndex(x => x && x.name === "ניצן אלון"); t.splice(i >= 0 ? i + 1 : 0, 0, n);
     d.testimonials = t; d.layoutV = 53;
   }
+  if (saved && (saved.layoutV || 0) < 54) { (d.productions || []).forEach(p => { if (p && /ruvVNrPsLCI/.test(p.url || "")) p.url = "https://youtu.be/xfSR7pCtSDk"; }); d.layoutV = 54; } // Stam Tamim: the public clip (the first link was private)
   return d;
 };
 
@@ -2161,7 +2162,7 @@ window.mergeContent = function (saved) {
     names: { "הלוואי":"Halevai", "פראמפים":"Preamps", "אלנתן שלום":"Elnatan Shalom", "זירה ריקה":"Zira Reika", "ישי וייס":"Ishai Weiss", "יוני":"Yoni", "איציק סוויסה":"Itzik Swisa", "בניה מדליון":"Benaya Medalion", "יגאל שטטנר":"Yigal Shtetner", "אבישי רוזן":"Avishai Rozen", "טוהר אוחיון":"Tohar Ohayon", "ניצן אלון":"Nitzan Alon", "מפיקה":"Producer", "נתן שלום":"Natan Shalom", "אבישי רוזן":"Avishai Rozen", "מפיק":"Producer" },
     replies: { "ניצן אלון": "Thank you, dear Nitzan — always a joy working together 🙌🏼", "בניה מדליון": "Brother, a pleasure with you as always ❤️", "אבישי רוזן": "Thanks, my dear 😍", "טוהר אוחיון": "Brother, you're simply a genius — a pleasure 🫶🏽", "אלנתן שלום": "The most moving thing in the world. Love you, and thankful to God for the privilege of creating with you ❤️", "יגאל שטטנר": "Love you, man — and thankful to God for the privilege of working with people like you 🙏" },
     quotes: { "אלנתן שלום": "There are a million drummers in the world — talented, with technique, who know which hit to play and when. With Avishai it's *an art*: a beating heart and a soul that connects to the song. As a producer I never tell him what I need — I write to him \"tell me what you feel should be here\", and he always brings *his own unique color to every song*, from the essence down to the snare, the tuning and the delivery. A creative home and a heart for your songs.", "טוהר אוחיון": "Dear brother, what a beast you are! *Insane sound* — it came out amazing. Super talented ❤️", "אבישי רוזן": "12 years in the production world, I've met many drummers and edited countless drum recordings — and Avishai *outdoes himself every single time*: in sound, communication and ease of work. *Every stem hits the spot*, with top-level gear you can hear in every recording. Highly recommended!", "יגאל שטטנר": "A pleasure working with Avishai! He has recorded drums for me on *dozens of projects*. He always looks for *the exact take that serves the song* best, without compromising on sound or technique. Always available, easy to work with, and gives it his whole heart. Highly recommended!", "בניה מדליון": "A professional, organized drummer — a real pleasure to work with in the studio. He always brings his own vision to the song and knows how to *nail the result* to exactly what I want as a producer. *The stems are excellent* — clean, organized, and they always sound great in the mix. Highly recommended!", "ניצן אלון": "Avishai is a professional, precise and fast drummer, with *a great sound and clean stems*. Working with him remotely is easy and efficient — he sends a first take, takes your notes and fine-tunes the part to exactly what the production needs. As a producer, getting top-level drums without being at the session saves me so much time, with zero compromise on quality. And beyond that, he's a sensitive, sweet person who's always a pleasure to work with ❤️", "איציק סוויסה": "I've had the privilege of working with Avishai on several original projects I produced, and it's always a pleasure — fun, professional and precise. Avishai brings himself and *exactly the right color to every song*, from choosing the right snare to the one hit that puts the heart into the track.", "יוני": "I've recorded quite a few sessions with Avishai — in person and remotely, single and double sessions. With him you get a great vibe, real dedication, attention to detail and someone who truly listens — plus *the best stems you can get*. Never once disappointed. You're in good hands 🥁", "ישי וייס": "When I produce a song and look for musicians, I look for people who play from the heart — and that's exactly who Avishai is. *An incredible drummer* with world-class playing and recordings, and he brings an emotion to a song that words can't quite describe. I recommend him wholeheartedly ❤️" },
-    titles: { "1QuNAhONztA": "Nishmecha Band — Shabbat Medley", "ogfbC9pYXsQ": "Purim Medley | IDF Military Rabbinate Band", "qV9VPSyfSVI": "Aviya Sherman — Hakol Letova", "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "ruvVNrPsLCI": "Elitzur & Aviv Alush — Stam Tamim", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
+    titles: { "1QuNAhONztA": "Nishmecha Band — Shabbat Medley", "ogfbC9pYXsQ": "Purim Medley | IDF Military Rabbinate Band", "qV9VPSyfSVI": "Aviya Sherman — Hakol Letova", "XopiF8ylTAo": "The Jamshid Sisters — Bo Nihye Shemesh", "5eJqw0t3e9c": "Rabak Medley | IDF Military Rabbinate Band", "1ui0jm29em4": "Avishai Rozen — Chamesh Dakot", "xfSR7pCtSDk": "Elitzur & Aviv Alush — Stam Tamim", "mvIhYC6DV9A": "Michal Gringlick — Yesh Po Makom", "i3dohlGVZD4": "Mia Mashraki — Nishar Rak Ga'agua" }
   };
   const toEN = S => { if(!EN) return S; const T = EN_TEXT, tr = (m, v) => (m[String(v || "").trim()] || v);
     ["eyebrow","title","lead","trust","credits","waMessage","aboutTitle","aboutText","studioTitle","hProcess","hProductions","hCovers","pCovers","hSources","pSources","hStudio","studioHl","hTestimonials","ctaTitle","ctaText"].forEach(k => { S[k] = T[k]; });

@@ -1,0 +1,29 @@
+name: yt thumbs
+on:
+  push:
+    paths: ['.github/workflows/yt-thumbs.yml']
+permissions:
+  contents: write
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p assets/thumbs
+          for id in ruvVNrPsLCI mvIhYC6DV9A 5eJqw0t3e9c qV9VPSyfSVI 1ui0jm29em4 i3dohlGVZD4 9kgGM_m-i9I qGAhDaOMN2s XopiF8ylTAo; do
+            for q in maxresdefault sddefault hqdefault; do
+              curl -sfL -o /tmp/t.jpg "https://i.ytimg.com/vi/$id/$q.jpg" || continue
+              w=$(python3 -c "import struct;d=open('/tmp/t.jpg','rb').read();i=2
+          while i<len(d):
+              m=d[i+1];l=struct.unpack('>H',d[i+2:i+4])[0]
+              if m in (0xC0,0xC2): print(struct.unpack('>H',d[i+7:i+9])[0]);break
+              i+=2+l")
+              echo "$id $q $w"
+              if [ "${w:-0}" -gt 120 ]; then cp /tmp/t.jpg "assets/thumbs/$id.jpg"; break; fi
+            done
+          done
+          ls -la assets/thumbs
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git rm -q .github/workflows/yt-thumbs.yml
+          git add assets/thumbs; git commit -m "Production thumbnails (local copies)" || exit 0; git push

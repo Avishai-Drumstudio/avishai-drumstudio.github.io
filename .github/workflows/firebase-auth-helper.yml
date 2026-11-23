@@ -1,0 +1,30 @@
+name: firebase auth helper
+# מעתיק את קבצי הכניסה של Firebase לדומיין שלנו (/__/auth/), כדי שהכניסה עם גוגל תעבוד גם בספארי/אייפון
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/firebase-auth-helper.txt']
+permissions:
+  contents: write
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: download the helper files from studio-manager-7eb85.firebaseapp.com
+        run: |
+          set -e
+          B=https://studio-manager-7eb85.firebaseapp.com
+          mkdir -p __/auth __/firebase
+          # GitHub Pages מגיש /__/auth/handler מתוך handler.html
+          curl -fsSL "$B/__/auth/handler"        -o __/auth/handler.html
+          curl -fsSL "$B/__/auth/handler.js"     -o __/auth/handler.js
+          curl -fsSL "$B/__/auth/experiments.js" -o __/auth/experiments.js
+          curl -fsSL "$B/__/auth/iframe"         -o __/auth/iframe.html
+          curl -fsSL "$B/__/auth/iframe.js"      -o __/auth/iframe.js
+          curl -fsSL "$B/__/firebase/init.json"  -o __/firebase/init.json
+          ls -la __/auth __/firebase
+      - name: commit
+        run: |
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git add __; git commit -m "Firebase auth helper files (self-hosted)" || exit 0; git push

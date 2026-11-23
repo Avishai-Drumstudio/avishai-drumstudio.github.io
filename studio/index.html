@@ -146,6 +146,8 @@ button, a, [role="button"] { touch-action: manipulation; }
 .pin-shake{animation:pinShake .38s cubic-bezier(.36,.07,.19,.97)}
 @keyframes pinShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
 .pin-err{min-height:20px;font-size:13px;color:#fca5a5;margin-bottom:10px}
+.pin-input{display:block;width:150px;margin:0 auto 16px;padding:10px 12px;border-radius:14px;border:1px solid #ffffff30;background:#ffffff14;color:#fff;font:500 20px Rubik,sans-serif;letter-spacing:8px;text-align:center;direction:ltr}
+.pin-input::placeholder{color:#ffffff60;letter-spacing:2px;font-size:14px}
 .pin-pad{display:grid;grid-template-columns:repeat(3,78px);justify-content:center;gap:16px 24px}
 .pin-pad button{width:78px;height:78px;border-radius:50%;border:0;background:rgba(255,255,255,.09);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:background .25s,transform .08s,box-shadow .25s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
@@ -170,7 +172,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261123165500';
+window.STUDIO_VERSION = '20261123170500';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -3236,7 +3238,10 @@ function AppLock({ admin, pin, onOk, onSetPin }) {
   };
   const press = k => { if (hold.current) return; setErr(''); if (k === 'del') { setCode(c => c.slice(0, -1)); return; }
     setCode(c => { if (c.length >= 4) return c; const n = c + k; if (n.length === 4) { hold.current = true; setTimeout(() => { hold.current = false; done(n); }, 60); } return n; }); };
-  useEffect(() => { const f = e => { if (stage === 'forgot') return; if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('del'); };
+  // שדה קלט רגיל: אותו קוד, אותה בדיקה (done) כמו המקלדת
+  const typed = e => { if (hold.current) return; const v = e.target.value.replace(/\D/g, '').slice(0, 4); setErr(''); setCode(v);
+    if (v.length === 4) { hold.current = true; setTimeout(() => { hold.current = false; done(v); }, 60); } };
+  useEffect(() => { const f = e => { if (stage === 'forgot' || (e.target && e.target.tagName === 'INPUT')) return; if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('del'); };
     window.addEventListener('keydown', f); return () => window.removeEventListener('keydown', f); }, [stage, first, pin]);
   const forgot = async e => { e.preventDefault(); try { const h = await hashPw(pw, admin.salt); if (h === admin.hash) { setPw(''); setErr(''); setStage('new'); } else setErr('סיסמה שגויה'); } catch (x) { setErr('משהו השתבש'); } };
   const title = stage === 'enter' ? 'הקלד קוד' : stage === 'new' ? 'בחר קוד בן 4 ספרות' : stage === 'confirm' ? 'הקלד שוב לאישור' : 'שכחת קוד?';
@@ -3257,6 +3262,7 @@ function AppLock({ admin, pin, onOk, onSetPin }) {
           ${[0, 1, 2, 3].map(i => html`<span key=${i} className=${i < code.length ? 'on' : ''} style=${i < code.length ? { background: LED[i], boxShadow: '0 0 14px ' + LED[i] + ', 0 0 4px ' + LED[i] } : null}></span>`)}
         </div>
         <div className="pin-err" role="alert">${err}</div>
+        <input type="password" inputMode="numeric" pattern="[0-9]*" maxLength="4" autoComplete="off" className="pin-input" aria-label="קוד בן 4 ספרות" placeholder="או הקלד כאן" value=${code} onChange=${typed} />
         <div className="pin-pad" dir="ltr">
           ${KEYS.map(([n, l]) => html`<button key=${n} type="button" onPointerDown=${e => { e.preventDefault(); press(n); }}><b>${n}</b><small>${l}</small></button>`)}
           <button type="button" className="pin-txt" onClick=${() => { setErr(''); setCode(''); setStage('forgot'); }}>${stage === 'enter' ? 'שכחתי' : ''}</button>

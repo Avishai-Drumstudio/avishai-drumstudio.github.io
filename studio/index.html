@@ -172,7 +172,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261123170500';
+window.STUDIO_VERSION = '20261123172000';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -3272,8 +3272,9 @@ function AppLock({ admin, pin, onOk, onSetPin }) {
     </div></div>`, document.body);
 }
 
-function AdminLogin({ adminData, mode, onSuccess, onSetPassword, onClose }) {
-  // mode: 'setup' | 'login' | 'change'
+function AdminLogin({ adminData, mode: mode0, onSuccess, onSetPassword, onClose }) {
+  // mode: 'setup' | 'login' | 'change' (שכחתי סיסמה: בעלי האפליקציה, מחוברים עם גוגל, עוברים ל-setup)
+  const [mode, setMode] = useState(mode0);
   const [cur, setCur] = useState(''), [pw, setPw] = useState(''), [pw2, setPw2] = useState('');
   const [remember, setRemember] = useState(!IS_DESKTOP), [err, setErr] = useState(''), [busy, setBusy] = useState(false), [show, setShow] = useState(false);
   const title = mode === 'setup' ? 'יצירת סיסמת ניהול' : mode === 'change' ? 'שינוי סיסמת ניהול' : 'כניסה לניהול';
@@ -3313,6 +3314,7 @@ function AdminLogin({ adminData, mode, onSuccess, onSetPassword, onClose }) {
           <${Btn} kind="grad" type="submit" disabled=${busy}>${mode === 'login' ? 'כניסה' : 'שמירת סיסמה'}<//>
           <${Btn} type="button" onClick=${onClose}>ביטול<//>
         </div>
+        ${mode === 'login' && window.__studioIsOwner && html`<button type="button" className="text-sm text-muted underline" onClick=${() => { setErr(''); setPw(''); setMode('setup'); }}>שכחתי סיסמה</button>`}
       </form>
     <//>`;
 }

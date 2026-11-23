@@ -170,7 +170,7 @@ a[href^="https://wa.me"]:hover { background: #18914a !important; }
 <div id="root"></div>
 <script>
 /* עדכון אוטומטי: האתר נשמר בטלפון עד 10 דק׳. בודקים אם יש גרסה חדשה וטוענים אותה מיד */
-window.STUDIO_VERSION = '20261109130921';
+window.STUDIO_VERSION = '20261123165500';
 (function () {
   function check() {
     fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (v) {
@@ -254,11 +254,10 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   }
   function signIn() {
     var p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' });
-    firebase.auth().signInWithPopup(p).catch(function (e) {
-      var c = e && e.code;
-      if (c === 'auth/popup-blocked' || c === 'auth/operation-not-supported-in-this-environment') return firebase.auth().signInWithRedirect(p);
-      if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return;
-      showLogin('ההתחברות לא הצליחה (' + (c || 'שגיאה') + '). נסה שוב.');
+    // כניסה בהפניה (redirect) — עובדת גם בדפדפנים שחוסמים את החלון הקופץ
+    gate('<div class="spin"></div>');
+    firebase.auth().signInWithRedirect(p).catch(function (e) {
+      showLogin('ההתחברות לא הצליחה (' + ((e && e.code) || 'שגיאה') + '). נסה שוב.');
     });
   }
   window.__studioFriends = {
@@ -493,7 +492,10 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
   document.addEventListener('DOMContentLoaded', function () {
     OWNERS = (window.STUDIO_OWNERS || window.STUDIO_ALLOWED || []).map(function (e) { return e.toLowerCase(); });
     if (!(window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey) || !window.firebase) { gate('<p>האפליקציה עוד לא חוברה ל-Firebase.<br>צריך למלא את הקובץ firebase-config.js.</p>'); return; }
-    firebase.initializeApp(window.FIREBASE_CONFIG);
+    // קבצי הכניסה של Firebase יושבים באתר שלנו (/__/auth/) — כך הכניסה לא נחסמת בספארי/אייפון
+    var fbCfg = window.FIREBASE_CONFIG;
+    if (location.host === 'avishai-drumstudio.github.io') fbCfg = Object.assign({}, fbCfg, { authDomain: location.host });
+    firebase.initializeApp(fbCfg);
     fs = firebase.firestore();
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function () {});
     var cachedUid = null, cachedUser = null;
@@ -505,7 +507,9 @@ body::after{content:"";position:fixed;inset:0;z-index:45;pointer-events:none;opa
       uid = cachedUid; window.__studioUser = cachedUser; window.__studioEmail = cachedUser.email; window.__studioIsOwner = OWNERS.indexOf(cachedUser.email) >= 0;
       start();
     } else gate('<div class="spin"></div>');
-    firebase.auth().getRedirectResult().catch(function () {});
+    firebase.auth().getRedirectResult().catch(function (e) {
+      var c = e && e.code; if (c && c !== 'auth/no-auth-event') showLogin('ההתחברות לא הצליחה (' + c + '). נסה שוב.');
+    });
     firebase.auth().onAuthStateChanged(function (u) {
       if (!u) { showLogin(); return; }
       if (started && cachedUid && u.uid !== cachedUid) {

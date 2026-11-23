@@ -15,14 +15,13 @@ jobs:
         run: |
           set -e
           B=https://studio-manager-7eb85.firebaseapp.com
-          mkdir -p __/auth __/firebase
+          mkdir -p __/auth
           # GitHub Pages מגיש /__/auth/handler מתוך handler.html
           curl -fsSL "$B/__/auth/handler"        -o __/auth/handler.html
           curl -fsSL "$B/__/auth/handler.js"     -o __/auth/handler.js
           curl -fsSL "$B/__/auth/experiments.js" -o __/auth/experiments.js
           curl -fsSL "$B/__/auth/iframe"         -o __/auth/iframe.html
           curl -fsSL "$B/__/auth/iframe.js"      -o __/auth/iframe.js
-          curl -fsSL "$B/__/firebase/init.json"  -o __/firebase/init.json
           ls -la __/auth __/firebase
       - name: commit
         run: |
